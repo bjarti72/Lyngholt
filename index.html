@@ -372,13 +372,14 @@
           <input id="dateRange" type="text" placeholder="Veldu dagabil" />
         </div>
 
-        
-        <button
+        <button id="bookBtn" onclick="window.bookNow()">Bóka valda daga</button>
+  
+ <!--       <button
   id="bookBtn"
   onclick="document.getElementById('bookingStatus').textContent='BÓKUNARTAKKI VIRKAR'; document.getElementById('bookingStatus').classList.add('show');"
 >
-  Bóka valda daga
-</button>
+  Bóka valda daga 
+</button> -->
         <!--<button id="bookBtn" onclick="bookNow()">Bóka valda daga</button>
        <button id="bookBtn">Bóka valda daga</button>
         <button id="bookBtn" disabled>Bóka valda daga</button>
@@ -852,6 +853,7 @@ supabase.auth.onAuthStateChange(async () => {
 };
 
 window.bookNow = async function () {
+  alert("window.bookNow keyrir");
   console.log("bookNow keyrir");
   clearStatus(bookingStatus);
 
