@@ -371,8 +371,16 @@
           <label for="dateRange">Veldu dagabil</label>
           <input id="dateRange" type="text" placeholder="Veldu dagabil" />
         </div>
-<button id="bookBtn" onclick="bookNow()">Bóka valda daga</button>
-       <!-- <button id="bookBtn">Bóka valda daga</button>
+
+        
+        <button
+  id="bookBtn"
+  onclick="document.getElementById('bookingStatus').textContent='BÓKUNARTAKKI VIRKAR'; document.getElementById('bookingStatus').classList.add('show');"
+>
+  Bóka valda daga
+</button>
+        <!--<button id="bookBtn" onclick="bookNow()">Bóka valda daga</button>
+       <button id="bookBtn">Bóka valda daga</button>
         <button id="bookBtn" disabled>Bóka valda daga</button>
        <button id="bookBtn" onclick="alert('BOOK HTML VIRKAR')">Bóka valda daga</button>  -->
       </div>
