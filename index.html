@@ -304,7 +304,8 @@
           </div>
 
         
-           <button id="loginBtn">Skrá inn</button>
+         <!--  <button id="loginBtn">Skrá inn</button> -->
+          <button id="loginBtn" onclick="window.testLoginClick()">Skrá inn</button>
           
           <button id="signupBtn" class="secondary">Búa til notanda</button>
         </div>
@@ -703,6 +704,17 @@ supabase.auth.onAuthStateChange(async () => {
 /* ========================================= */
 /* SECTION: STARTUP                          */
 /* ========================================= */
+window.testLoginClick = async function () {
+  showStatus(authStatus, 'window.testLoginClick keyrir');
+
+  try {
+    await loginWithPassword();
+  } catch (err) {
+    showStatus(authStatus, 'Villa: ' + err.message, true);
+    console.error(err);
+  }
+};
+    
 updateAuthUI();
   </script>
 </body>
