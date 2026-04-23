@@ -658,14 +658,30 @@ async function loginWithPassword() {
 
     console.log("login data:", data);
     console.log("login error:", error);
+  
+  if (error) {
+  showStatus(authStatus, error.message, true);
+  return;
+}
 
-    if (error) {
+showStatus(authStatus, 'Innskráning tókst.');
+
+loggedOutBox.classList.add('hidden');
+loggedInBox.classList.remove('hidden');
+userEmail.textContent = data.user.email;
+bookBtn.disabled = false;
+
+await refreshBookings();
+
+   /*if (error) {
       showStatus(authStatus, error.message, true);
       return;
     }
 
     showStatus(authStatus, 'Innskráning tókst.');
-    await updateAuthUI();
+    await updateAuthUI(); */
+
+    
 
   } catch (err) {
     console.error("CRASH:", err);
