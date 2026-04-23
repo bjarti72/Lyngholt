@@ -1,2 +1,2 @@
 # Lyngholt
-Umsjónarsíða fyrir Lynghlot
+Umsjónarsíða fyrir Lyngholt
