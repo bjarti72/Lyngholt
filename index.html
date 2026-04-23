@@ -598,95 +598,90 @@
       await refreshBookings();
     }
 
-    /* ========================================= */
-    /* SECTION: AUTH                             */
-    /* ========================================= */
-    async function signup() {
-      clearStatus(authStatus);
+   /* ========================================= */
+/* SECTION: AUTH                             */
+/* ========================================= */
+async function signup() {
+  clearStatus(authStatus);
 
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
 
-      if (!email || !password) {
-        showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
-        return;
-      }
+  if (!email || !password) {
+    showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
+    return;
+  }
 
-      const { error } = await supabase.auth.signUp({
-        email,
-        password
-      });
+  const { error } = await supabase.auth.signUp({
+    email,
+    password
+  });
 
-      if (error) {
-        showStatus(authStatus, error.message, true);
-        return;
-      }
+  if (error) {
+    showStatus(authStatus, error.message, true);
+    return;
+  }
 
-      showStatus(authStatus, 'Notandi búinn til.');
-      await updateAuthUI();
-    }
+  showStatus(authStatus, 'Notandi búinn til.');
+  await updateAuthUI();
+}
 
-    async function loginWithPassword() {
-  
-     // console.log("login takkinn keyrir");
-    //  alert("loginWithPassword keyrir");
+async function loginWithPassword() {
+  clearStatus(authStatus);
 
-      clearStatus(authStatus);
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
 
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+  if (!email || !password) {
+    showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
+    return;
+  }
 
-      if (!email || !password) {
-        showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
-        return;
-      }
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+  if (error) {
+    showStatus(authStatus, error.message, true);
+    return;
+  }
 
-      if (error) {
-        showStatus(authStatus, error.message, true);
-        return;
-      }
+  showStatus(authStatus, 'Innskráning tókst.');
+  await updateAuthUI();
+}
 
-      showStatus(authStatus, 'Innskráning tókst.');
-      await updateAuthUI();
-    }
+async function logout() {
+  clearStatus(authStatus);
 
-    async function logout() {
-      clearStatus(authStatus);
+  const { error } = await supabase.auth.signOut();
 
-      const { error } = await supabase.auth.signOut();
+  if (error) {
+    showStatus(authStatus, error.message, true);
+    return;
+  }
 
-      if (error) {
-        showStatus(authStatus, error.message, true);
-        return;
-      }
+  showStatus(authStatus, 'Þú hefur verið skráð(ur) út.');
+  await updateAuthUI();
+}
 
-      showStatus(authStatus, 'Þú hefur verið skráð(ur) út.');
-      await updateAuthUI();
-    }
+async function updateAuthUI() {
+  const { data: { user } } = await supabase.auth.getUser();
 
-    async function updateAuthUI() {
-      const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    loggedOutBox.classList.add('hidden');
+    loggedInBox.classList.remove('hidden');
+    userEmail.textContent = user.email;
+    bookBtn.disabled = false;
+  } else {
+    loggedOutBox.classList.remove('hidden');
+    loggedInBox.classList.add('hidden');
+    userEmail.textContent = '';
+    bookBtn.disabled = true;
+  }
 
-      if (user) {
-        loggedOutBox.classList.add('hidden');
-        loggedInBox.classList.remove('hidden');
-        userEmail.textContent = user.email;
-        bookBtn.disabled = false;
-      } else {
-        loggedOutBox.classList.remove('hidden');
-        loggedInBox.classList.add('hidden');
-        userEmail.textContent = '';
-        bookBtn.disabled = true;
-      }
-
-      await refreshBookings();
-    }
-
+  await refreshBookings();
+}
     /* ========================================= */
     /* SECTION: EVENT LISTENERS                  */
     /* ========================================= */
