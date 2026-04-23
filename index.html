@@ -371,9 +371,9 @@
           <label for="dateRange">Veldu dagabil</label>
           <input id="dateRange" type="text" placeholder="Veldu dagabil" />
         </div>
-
-      <button id="bookBtn">Bóka valda daga</button>
-        <!--  <button id="bookBtn" disabled>Bóka valda daga</button>
+<button id="bookBtn" onclick="bookNow()">Bóka valda daga</button>
+       <!-- <button id="bookBtn">Bóka valda daga</button>
+        <button id="bookBtn" disabled>Bóka valda daga</button>
        <button id="bookBtn" onclick="alert('BOOK HTML VIRKAR')">Bóka valda daga</button>  -->
       </div>
 
@@ -796,7 +796,7 @@ async function updateAuthUI() {
 loginBtn.addEventListener('click', loginWithPassword);
 signupBtn.addEventListener('click', signup);
 logoutBtn.addEventListener('click', logout);
-bookBtn.addEventListener('click', createBooking);
+//bookBtn.addEventListener('click', createBooking);
 /*    bookBtn.addEventListener('click', () => {
   alert('BOOK JS VIRKAR');
 });*/
@@ -842,6 +842,70 @@ supabase.auth.onAuthStateChange(async () => {
   showStatus(authStatus, 'Innskráning tókst.');
   await updateAuthUI();
 };
+
+window.bookNow = async function () {
+  console.log("bookNow keyrir");
+  clearStatus(bookingStatus);
+
+  const start_date = selectedStart;
+  const end_date = selectedEnd;
+  const fullName = fullNameInput.value.trim();
+
+  if (!fullName) {
+    showStatus(bookingStatus, 'Settu inn nafn.', true);
+    return;
+  }
+
+  if (!start_date || !end_date) {
+    showStatus(bookingStatus, 'Veldu dagabil fyrst.', true);
+    return;
+  }
+
+  if (end_date < start_date) {
+    showStatus(bookingStatus, 'Lokadagur má ekki vera á undan upphafsdegi.', true);
+    return;
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    showStatus(bookingStatus, 'Þú þarft að vera skráð(ur) inn til að bóka.', true);
+    return;
+  }
+
+  const initials = fullName
+    .split(' ')
+    .filter(Boolean)
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
+
+  const { error } = await supabase
+    .from('bookings')
+    .insert([
+      {
+        user_id: user.id,
+        start_date,
+        end_date,
+        booked_by_name: fullName,
+        booked_by_email: user.email,
+        booked_by_initials: initials
+      }
+    ]);
+
+  if (error) {
+    showStatus(bookingStatus, error.message, true);
+    return;
+  }
+
+  showStatus(bookingStatus, 'Bókun vistuð.');
+  fullNameInput.value = '';
+  selectedStart = null;
+  selectedEnd = null;
+  datePicker.clear();
+  await refreshBookings();
+};
+    
 updateAuthUI();
   </script>
 </body>
