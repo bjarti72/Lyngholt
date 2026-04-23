@@ -325,7 +325,7 @@
             <input id="password" type="password" placeholder="Lykilorð" />
           </div>
 
-          <button id="loginBtn">Skrá inn</button>
+          <button id="loginBtn" onclick="window.loginNow()">Skrá inn</button>
           <button id="signupBtn" class="secondary">Búa til notanda</button>
         </div>
 
@@ -681,7 +681,7 @@
     /* ========================================= */
     /* SECTION: EVENT LISTENERS                  */
     /* ========================================= */
-    loginBtn.addEventListener('click', loginWithPassword);
+    // loginBtn.addEventListener('click', loginWithPassword);
     signupBtn.addEventListener('click', signup);
     logoutBtn.addEventListener('click', logout);
 
@@ -692,6 +692,10 @@
     /* ========================================= */
     /* SECTION: BOOKING VIA HTML BUTTON          */
     /* ========================================= */
+    window.loginNow = async function () {
+      await loginWithPassword();
+    };
+
     window.bookNow = async function () {
       clearStatus(bookingStatus);
 
@@ -756,3 +760,4 @@
   </script>
 </body>
 </html>
+
