@@ -302,7 +302,7 @@
             <input id="password" type="password" placeholder="Lykilorð" />
           </div>
 
-        <!-- <button id="loginBtn" onclick="alert('takkinn virkar')">Skrá inn</button> -->
+        
            <button id="loginBtn">Skrá inn</button>
           
           <button id="signupBtn" class="secondary">Búa til notanda</button>
@@ -685,7 +685,12 @@ async function updateAuthUI() {
 /* ========================================= */
 /* SECTION: EVENT LISTENERS                  */
 /* ========================================= */
-loginBtn.addEventListener('click', loginWithPassword);
+//loginBtn.addEventListener('click', loginWithPassword);
+loginBtn.addEventListener('click', async () => {
+  showStatus(authStatus, 'Smellt á Skrá inn...');
+  await loginWithPassword();
+});
+    
 signupBtn.addEventListener('click', signup);
 logoutBtn.addEventListener('click', logout);
 bookBtn.addEventListener('click', createBooking);
