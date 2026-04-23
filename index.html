@@ -174,6 +174,11 @@
       display: block;
     }
 
+    .status.warning {
+      background: #fff4cc;
+      color: #7a5d00;
+    }
+
     .calendar-list {
       display: grid;
       gap: 10px;
@@ -324,7 +329,7 @@
       <div id="calendar"></div>
     </section>
 
-    <section class="card">
+    <section id="bokanir" class="card">
       <h2>Bóka dvöl</h2>
       <p class="muted">Veldu dagabil og smelltu svo á bókunarhnappinn.</p>
 
@@ -357,85 +362,128 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script type="module">
-    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+  <script>
+    function showBootError(message) {
+      const authStatusEl = document.getElementById('authStatus');
+      if (!authStatusEl) return;
+      authStatusEl.textContent = message;
+      authStatusEl.classList.add('show', 'warning');
+      authStatusEl.classList.remove('error');
+    }
 
-    const SUPABASE_URL = 'https://fabkvblawbavbmozlutj.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_eC_30Wnq3C9B7lM46mfGkw_7rNcV-aG';
+    window.loginNow = function () {
+      showBootError('Síðan er enn að hlaðast eða rakst á villu. Endurhlaðaðu síðuna og reyndu aftur.');
+    };
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    window.bookNow = function () {
+      const bookingStatusEl = document.getElementById('bookingStatus');
+      if (!bookingStatusEl) return;
+      bookingStatusEl.textContent = 'Síðan er enn að hlaðast eða rakst á villu. Endurhlaðaðu síðuna og reyndu aftur.';
+      bookingStatusEl.classList.add('show', 'warning');
+      bookingStatusEl.classList.remove('error');
+    };
 
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const fullNameInput = document.getElementById('fullName');
-    const dateRangeInput = document.getElementById('dateRange');
+    window.addEventListener('error', (event) => {
+      const message = event?.error?.message || event.message || 'Óvænt villa kom upp við að hlaða síðunni.';
+      showBootError(message);
+    });
 
-    const loginBtn = document.getElementById('loginBtn');
-    const signupBtn = document.getElementById('signupBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const bookBtn = document.getElementById('bookBtn');
+    window.addEventListener('unhandledrejection', (event) => {
+      const message = event?.reason?.message || 'Óvænt villa kom upp í bakgrunni.';
+      showBootError(message);
+    });
 
-    const authStatus = document.getElementById('authStatus');
-    const bookingStatus = document.getElementById('bookingStatus');
+    if (!window.flatpickr) {
+      showBootError('Dagatalið náði ekki að hlaðast. Athugaðu nettengingu og reyndu aftur.');
+      console.error('flatpickr failed to load');
+    } else if (!window.supabase || !window.supabase.createClient) {
+      showBootError('Supabase náði ekki að hlaðast. Athugaðu nettengingu og reyndu aftur.');
+      console.error('supabase-js failed to load');
+    } else {
+      initializePage();
+    }
 
-    const loggedOutBox = document.getElementById('loggedOutBox');
-    const loggedInBox = document.getElementById('loggedInBox');
-    const userEmail = document.getElementById('userEmail');
+    function initializePage() {
+      const SUPABASE_URL = 'https://fabkvblawbavbmozlutj.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_eC_30Wnq3C9B7lM46mfGkw_7rNcV-aG';
 
-    const allBookingsEl = document.getElementById('allBookings');
-    const myBookingsEl = document.getElementById('myBookings');
+      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let selectedStart = null;
-    let selectedEnd = null;
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
+      const fullNameInput = document.getElementById('fullName');
+      const dateRangeInput = document.getElementById('dateRange');
 
-    const datePicker = flatpickr(dateRangeInput, {
-      mode: 'range',
-      dateFormat: 'Y-m-d',
-      minDate: 'today',
-      onChange(selectedDates) {
-        if (selectedDates.length === 2) {
-          selectedStart = selectedDates[0].toISOString().split('T')[0];
-          selectedEnd = selectedDates[1].toISOString().split('T')[0];
-        } else {
-          selectedStart = null;
-          selectedEnd = null;
+      const loginBtn = document.getElementById('loginBtn');
+      const signupBtn = document.getElementById('signupBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const bookBtn = document.getElementById('bookBtn');
+
+      const authStatus = document.getElementById('authStatus');
+      const bookingStatus = document.getElementById('bookingStatus');
+
+      const loggedOutBox = document.getElementById('loggedOutBox');
+      const loggedInBox = document.getElementById('loggedInBox');
+      const userEmail = document.getElementById('userEmail');
+
+      const allBookingsEl = document.getElementById('allBookings');
+      const myBookingsEl = document.getElementById('myBookings');
+
+      let selectedStart = null;
+      let selectedEnd = null;
+      let isLoggingIn = false;
+      let isBooking = false;
+
+      const datePicker = flatpickr(dateRangeInput, {
+        mode: 'range',
+        dateFormat: 'Y-m-d',
+        minDate: 'today',
+        onChange(selectedDates) {
+          if (selectedDates.length === 2) {
+            selectedStart = selectedDates[0].toISOString().split('T')[0];
+            selectedEnd = selectedDates[1].toISOString().split('T')[0];
+          } else {
+            selectedStart = null;
+            selectedEnd = null;
+          }
         }
+      });
+
+      const calendar = flatpickr('#calendar', {
+        inline: true,
+        dateFormat: 'Y-m-d',
+        clickOpens: false
+      });
+
+      function showStatus(el, text, isError = false) {
+        el.textContent = text;
+        el.classList.add('show');
+        el.classList.toggle('error', isError);
+        el.classList.remove('warning');
       }
-    });
 
-    const calendar = flatpickr('#calendar', {
-      inline: true,
-      dateFormat: 'Y-m-d',
-      clickOpens: false
-    });
+      function clearStatus(el) {
+        el.textContent = '';
+        el.classList.remove('show', 'error', 'warning');
+      }
 
-    function showStatus(el, text, isError = false) {
-      el.textContent = text;
-      el.classList.add('show');
-      el.classList.toggle('error', isError);
-    }
+      function formatDate(dateStr) {
+        return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
+      }
 
-    function clearStatus(el) {
-      el.textContent = '';
-      el.classList.remove('show', 'error');
-    }
+      function initialsFromName(name) {
+        if (!name) return '?';
+        return name
+          .split(' ')
+          .filter(Boolean)
+          .map((part) => part[0])
+          .join('')
+          .toUpperCase();
+      }
 
-    function formatDate(dateStr) {
-      return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
-    }
-
-    function initialsFromName(name) {
-      if (!name) return '?';
-      return name
-        .split(' ')
-        .filter(Boolean)
-        .map((part) => part[0])
-        .join('')
-        .toUpperCase();
-    }
-
-    function renderBookings(list, container, currentUserId, ownOnly = false) {
+      function renderBookings(list, container, currentUserId, ownOnly = false) {
       if (!list.length) {
         container.innerHTML = '<div class="empty">Engar bókanir enn.</div>';
         return;
@@ -478,10 +526,10 @@
           await deleteBooking(btn.dataset.deleteId);
         });
       });
-    }
+      }
 
-    async function fetchBookings() {
-      const { data, error } = await supabase
+      async function fetchBookings() {
+      const { data, error } = await supabaseClient
         .from('bookings')
         .select('id, user_id, start_date, end_date, created_at, booked_by_name, booked_by_email, booked_by_initials')
         .order('start_date', { ascending: true });
@@ -492,10 +540,10 @@
       }
 
       return data || [];
-    }
+      }
 
-    async function refreshBookings() {
-      const { data: { user } } = await supabase.auth.getUser();
+      async function refreshBookings() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
       const bookings = await fetchBookings();
 
       renderBookings(bookings, allBookingsEl, user?.id || null, false);
@@ -508,12 +556,12 @@
 
       datePicker.set('disable', disabledRanges);
       calendar.set('disable', disabledRanges);
-    }
+      }
 
-    async function deleteBooking(id) {
+      async function deleteBooking(id) {
       clearStatus(bookingStatus);
 
-      const { error } = await supabase
+      const { error } = await supabaseClient
         .from('bookings')
         .delete()
         .eq('id', id);
@@ -525,9 +573,9 @@
 
       showStatus(bookingStatus, 'Bókun eytt.');
       await refreshBookings();
-    }
+      }
 
-    async function signup() {
+      async function signup() {
       clearStatus(authStatus);
 
       const email = emailInput.value.trim();
@@ -538,7 +586,7 @@
         return;
       }
 
-      const { error } = await supabase.auth.signUp({
+      const { error } = await supabaseClient.auth.signUp({
         email,
         password
       });
@@ -549,41 +597,54 @@
       }
 
       showStatus(authStatus, 'Notandi búinn til. Athugaðu hvort staðfestingarpóstur hafi verið sendur.');
-    }
-
-    async function loginWithPassword() {
-      clearStatus(authStatus);
-
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-
-      if (!email || !password) {
-        showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
-        return;
       }
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      async function loginWithPassword() {
+      if (isLoggingIn) return;
+      isLoggingIn = true;
+      clearStatus(authStatus);
+      loginBtn.disabled = true;
+      showStatus(authStatus, 'Reyni að skrá inn...');
 
-      if (error) {
-        showStatus(authStatus, error.message, true);
-        return;
+      try {
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+          showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
+          return;
+        }
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          showStatus(authStatus, error.message, true);
+          return;
+        }
+
+        showStatus(authStatus, 'Innskráning tókst.');
+        loggedOutBox.classList.add('hidden');
+        loggedInBox.classList.remove('hidden');
+        userEmail.textContent = data.user.email;
+
+        refreshBookings().catch((refreshError) => {
+          showStatus(authStatus, 'Innskráning tókst en ekki tókst að hlaða bókanir: ' + refreshError.message, true);
+        });
+      } catch (error) {
+        showStatus(authStatus, error.message || 'Óvænt villa kom upp í innskráningu.', true);
+      } finally {
+        isLoggingIn = false;
+        loginBtn.disabled = false;
+      }
       }
 
-      showStatus(authStatus, 'Innskráning tókst.');
-      loggedOutBox.classList.add('hidden');
-      loggedInBox.classList.remove('hidden');
-      userEmail.textContent = data.user.email;
-
-      await refreshBookings();
-    }
-
-    async function logout() {
+      async function logout() {
       clearStatus(authStatus);
 
-      const { error } = await supabase.auth.signOut();
+      const { error } = await supabaseClient.auth.signOut();
 
       if (error) {
         showStatus(authStatus, error.message, true);
@@ -592,108 +653,10 @@
 
       showStatus(authStatus, 'Þú hefur verið skráð(ur) út.');
       await updateAuthUI();
-    }
+      }
 
-    async function updateAuthUI() {
-      const { data: { user } } = await supabase.auth.getUser();
+      async function updateAuthUI() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
 
       if (user) {
-        loggedOutBox.classList.add('hidden');
-        loggedInBox.classList.remove('hidden');
-        userEmail.textContent = user.email;
-      } else {
-        loggedOutBox.classList.remove('hidden');
-        loggedInBox.classList.add('hidden');
-        userEmail.textContent = '';
-      }
-
-      await refreshBookings();
-    }
-
-    async function createBooking() {
-      clearStatus(bookingStatus);
-
-      const start_date = selectedStart;
-      const end_date = selectedEnd;
-      const fullName = fullNameInput.value.trim();
-
-      if (!fullName) {
-        showStatus(bookingStatus, 'Settu inn nafn.', true);
-        return;
-      }
-
-      if (!start_date || !end_date) {
-        showStatus(bookingStatus, 'Veldu dagabil fyrst.', true);
-        return;
-      }
-
-      if (end_date < start_date) {
-        showStatus(bookingStatus, 'Lokadagur má ekki vera á undan upphafsdegi.', true);
-        return;
-      }
-
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        showStatus(bookingStatus, 'Þú þarft að vera skráð(ur) inn til að bóka.', true);
-        return;
-      }
-
-      const initials = initialsFromName(fullName);
-
-      const { data: overlappingBookings, error: overlapError } = await supabase
-        .from('bookings')
-        .select('id')
-        .lte('start_date', end_date)
-        .gte('end_date', start_date)
-        .limit(1);
-
-      if (overlapError) {
-        showStatus(bookingStatus, overlapError.message, true);
-        return;
-      }
-
-      if (overlappingBookings && overlappingBookings.length > 0) {
-        showStatus(bookingStatus, 'Þetta tímabil skarast við bókun sem er þegar til.', true);
-        return;
-      }
-
-      const { error } = await supabase
-        .from('bookings')
-        .insert([
-          {
-            user_id: user.id,
-            start_date,
-            end_date,
-            booked_by_name: fullName,
-            booked_by_email: user.email,
-            booked_by_initials: initials
-          }
-        ]);
-
-      if (error) {
-        showStatus(bookingStatus, error.message, true);
-        return;
-      }
-
-      showStatus(bookingStatus, 'Bókun vistuð.');
-      fullNameInput.value = '';
-      selectedStart = null;
-      selectedEnd = null;
-      datePicker.clear();
-      await refreshBookings();
-    }
-
-    loginBtn.addEventListener('click', loginWithPassword);
-    signupBtn.addEventListener('click', signup);
-    logoutBtn.addEventListener('click', logout);
-    bookBtn.addEventListener('click', createBooking);
-
-    supabase.auth.onAuthStateChange(async () => {
-      await updateAuthUI();
-    });
-
-    updateAuthUI();
-  </script>
-</body>
-</html>
+        loggedOutBox.classList.add('hidden
