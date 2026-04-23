@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="is">
 <head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sumarbústaður fjölskyldunnar</title>
@@ -260,17 +261,12 @@
       <p class="muted">Skráðu þig fyrst inn. Þegar þú ert innskráð(ur) geturðu bókað dagabil.</p>
 
       <div class="booking-row">
-        <div>
-          <label for="startDate">Upphafsdagur</label>
-          <input id="startDate" type="date" />
-        </div>
-        <div>
-          <label for="endDate">Lokadagur</label>
-          <input id="endDate" type="date" />
-        </div>
-        <button id="bookBtn" disabled>Bóka valda daga</button>
-      </div>
-
+  <div>
+    <label for="dateRange">Veldu dagabil</label>
+    <input id="dateRange" placeholder="Veldu dagabil" />
+  </div>
+  <button id="bookBtn" disabled>Bóka valda daga</button>
+</div>
       <div id="bookingStatus" class="status"></div>
     </section>
 
@@ -286,6 +282,7 @@
   </main>
 
   <script type="module">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
     const SUPABASE_URL = 'https://fabkvblawbavbmozlutj.supabase.co';
@@ -298,8 +295,9 @@
     const logoutBtn = document.getElementById('logoutBtn');
     const bookBtn = document.getElementById('bookBtn');
 
-    const startDateInput = document.getElementById('startDate');
-    const endDateInput = document.getElementById('endDate');
+   const dateRangeInput = document.getElementById('dateRange');
+  let selectedStart = null;
+  let selectedEnd = null;
 
     const authStatus = document.getElementById('authStatus');
     const bookingStatus = document.getElementById('bookingStatus');
