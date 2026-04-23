@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="is">
 <head>
-  <!-- ========================================= -->
-  <!-- SECTION: META / TITLE / LIBRARIES         -->
-  <!-- ========================================= -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sumarbústaður fjölskyldunnar</title>
@@ -11,9 +8,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
   <style>
-    /* ========================================= */
-    /* SECTION: ROOT / GLOBAL STYLES             */
-    /* ========================================= */
     :root {
       --bg: #f6f3ee;
       --card: #ffffff;
@@ -68,9 +62,6 @@
       z-index: 20;
     }
 
-    /* ========================================= */
-    /* SECTION: HERO / HEADER                    */
-    /* ========================================= */
     header {
       min-height: 58vh;
       background:
@@ -98,9 +89,6 @@
       line-height: 1.5;
     }
 
-    /* ========================================= */
-    /* SECTION: LAYOUT / CARDS                   */
-    /* ========================================= */
     main {
       max-width: var(--max-width);
       margin: -34px auto 40px;
@@ -122,9 +110,6 @@
       margin-bottom: 20px;
     }
 
-    /* ========================================= */
-    /* SECTION: FORMS / BUTTONS                  */
-    /* ========================================= */
     .auth-row,
     .booking-row {
       display: grid;
@@ -172,16 +157,6 @@
       cursor: not-allowed;
     }
 
-    .top-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    /* ========================================= */
-    /* SECTION: STATUS MESSAGES                  */
-    /* ========================================= */
     .status {
       margin-top: 12px;
       padding: 12px 14px;
@@ -199,9 +174,6 @@
       display: block;
     }
 
-    /* ========================================= */
-    /* SECTION: BOOKINGS LIST                    */
-    /* ========================================= */
     .calendar-list {
       display: grid;
       gap: 10px;
@@ -262,9 +234,6 @@
       background: #fff;
     }
 
-    /* ========================================= */
-    /* SECTION: INLINE CALENDAR                  */
-    /* ========================================= */
     #calendar {
       margin-top: 10px;
     }
@@ -283,18 +252,12 @@
       border-radius: 6px;
     }
 
-    /* ========================================= */
-    /* SECTION: RULES LIST                       */
-    /* ========================================= */
     .rules ul {
       margin: 0;
       padding-left: 18px;
       line-height: 1.7;
     }
 
-    /* ========================================= */
-    /* SECTION: MOBILE                           */
-    /* ========================================= */
     @media (max-width: 860px) {
       .grid {
         grid-template-columns: 1fr;
@@ -308,9 +271,6 @@
   </style>
 </head>
 <body>
-  <!-- ========================================= -->
-  <!-- SECTION: HERO                            -->
-  <!-- ========================================= -->
   <header>
     <div class="hero">
       <h1>Sumarbústaður fjölskyldunnar</h1>
@@ -319,13 +279,7 @@
   </header>
 
   <main>
-    <!-- ========================================= -->
-    <!-- SECTION: TOP GRID                        -->
-    <!-- ========================================= -->
     <div class="grid">
-      <!-- ========================================= -->
-      <!-- SECTION: AUTH CARD                       -->
-      <!-- ========================================= -->
       <section class="card">
         <h2>Innskráning</h2>
         <p class="muted">Skráðu þig inn með netfangi og lykilorði.</p>
@@ -341,21 +295,18 @@
             <input id="password" type="password" placeholder="Lykilorð" />
           </div>
 
-          <button id="loginBtn" onclick="window.loginNow()">Skrá inn</button>
-          <button id="signupBtn" class="secondary">Búa til notanda</button>
+          <button id="loginBtn" type="button">Skrá inn</button>
+          <button id="signupBtn" class="secondary" type="button">Búa til notanda</button>
         </div>
 
         <div id="loggedInBox" class="hidden">
           <p><strong>Innskráð(ur):</strong> <span id="userEmail"></span></p>
-          <button id="logoutBtn" class="secondary">Skrá út</button>
+          <button id="logoutBtn" class="secondary" type="button">Skrá út</button>
         </div>
 
         <div id="authStatus" class="status"></div>
       </section>
 
-      <!-- ========================================= -->
-      <!-- SECTION: RULES CARD                      -->
-      <!-- ========================================= -->
       <section class="card rules">
         <h2>Hvernig þetta virkar</h2>
         <ul>
@@ -367,18 +318,12 @@
       </section>
     </div>
 
-    <!-- ========================================= -->
-    <!-- SECTION: INLINE CALENDAR CARD            -->
-    <!-- ========================================= -->
     <section class="card">
       <h2>Dagatal</h2>
       <p class="muted">Uppteknir dagar eru litamerktir hér fyrir neðan.</p>
       <div id="calendar"></div>
     </section>
 
-    <!-- ========================================= -->
-    <!-- SECTION: BOOKING CARD                    -->
-    <!-- ========================================= -->
     <section class="card">
       <h2>Bóka dvöl</h2>
       <p class="muted">Veldu dagabil og smelltu svo á bókunarhnappinn.</p>
@@ -394,23 +339,17 @@
           <input id="dateRange" type="text" placeholder="Veldu dagabil" />
         </div>
 
-        <button id="bookBtn" onclick="window.bookNow()">Bóka valda daga</button>
+        <button id="bookBtn" type="button">Bóka valda daga</button>
       </div>
 
       <div id="bookingStatus" class="status"></div>
     </section>
 
-    <!-- ========================================= -->
-    <!-- SECTION: ALL BOOKINGS                    -->
-    <!-- ========================================= -->
     <section class="card">
       <h2>Allar bókanir</h2>
       <div id="allBookings" class="calendar-list"></div>
     </section>
 
-    <!-- ========================================= -->
-    <!-- SECTION: MY BOOKINGS                     -->
-    <!-- ========================================= -->
     <section class="card">
       <h2>Mínar bókanir</h2>
       <div id="myBookings" class="calendar-list"></div>
@@ -420,9 +359,6 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
   <script type="module">
-    /* ========================================= */
-    /* SECTION: IMPORTS / CONFIG                 */
-    /* ========================================= */
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
     const SUPABASE_URL = 'https://fabkvblawbavbmozlutj.supabase.co';
@@ -430,16 +366,15 @@
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    /* ========================================= */
-    /* SECTION: ELEMENT REFERENCES               */
-    /* ========================================= */
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const fullNameInput = document.getElementById('fullName');
+    const dateRangeInput = document.getElementById('dateRange');
 
     const loginBtn = document.getElementById('loginBtn');
     const signupBtn = document.getElementById('signupBtn');
     const logoutBtn = document.getElementById('logoutBtn');
+    const bookBtn = document.getElementById('bookBtn');
 
     const authStatus = document.getElementById('authStatus');
     const bookingStatus = document.getElementById('bookingStatus');
@@ -451,16 +386,10 @@
     const allBookingsEl = document.getElementById('allBookings');
     const myBookingsEl = document.getElementById('myBookings');
 
-    /* ========================================= */
-    /* SECTION: STATE                            */
-    /* ========================================= */
     let selectedStart = null;
     let selectedEnd = null;
 
-    /* ========================================= */
-    /* SECTION: DATE PICKERS                     */
-    /* ========================================= */
-    const datePicker = flatpickr('#dateRange', {
+    const datePicker = flatpickr(dateRangeInput, {
       mode: 'range',
       dateFormat: 'Y-m-d',
       minDate: 'today',
@@ -481,9 +410,6 @@
       clickOpens: false
     });
 
-    /* ========================================= */
-    /* SECTION: HELPER FUNCTIONS                 */
-    /* ========================================= */
     function showStatus(el, text, isError = false) {
       el.textContent = text;
       el.classList.add('show');
@@ -504,14 +430,11 @@
       return name
         .split(' ')
         .filter(Boolean)
-        .map(part => part[0])
+        .map((part) => part[0])
         .join('')
         .toUpperCase();
     }
 
-    /* ========================================= */
-    /* SECTION: RENDERING                        */
-    /* ========================================= */
     function renderBookings(list, container, currentUserId, ownOnly = false) {
       if (!list.length) {
         container.innerHTML = '<div class="empty">Engar bókanir enn.</div>';
@@ -519,7 +442,7 @@
       }
 
       const filtered = ownOnly
-        ? list.filter(item => item.user_id === currentUserId)
+        ? list.filter((item) => item.user_id === currentUserId)
         : list;
 
       if (!filtered.length) {
@@ -527,9 +450,9 @@
         return;
       }
 
-      container.innerHTML = filtered.map(item => {
+      container.innerHTML = filtered.map((item) => {
         const deleteButton = ownOnly
-          ? '<button class="danger" data-delete-id="' + item.id + '">Eyða bókun</button>'
+          ? '<button class="danger" type="button" data-delete-id="' + item.id + '">Eyða bókun</button>'
           : '';
 
         const displayName = item.booked_by_name || item.booked_by_email || 'Óþekktur notandi';
@@ -550,16 +473,13 @@
         `;
       }).join('');
 
-      container.querySelectorAll('[data-delete-id]').forEach(btn => {
+      container.querySelectorAll('[data-delete-id]').forEach((btn) => {
         btn.addEventListener('click', async () => {
           await deleteBooking(btn.dataset.deleteId);
         });
       });
     }
 
-    /* ========================================= */
-    /* SECTION: DATABASE / BOOKINGS              */
-    /* ========================================= */
     async function fetchBookings() {
       const { data, error } = await supabase
         .from('bookings')
@@ -581,7 +501,7 @@
       renderBookings(bookings, allBookingsEl, user?.id || null, false);
       renderBookings(bookings, myBookingsEl, user?.id || null, true);
 
-      const disabledRanges = bookings.map(b => ({
+      const disabledRanges = bookings.map((b) => ({
         from: b.start_date,
         to: b.end_date
       }));
@@ -607,9 +527,6 @@
       await refreshBookings();
     }
 
-    /* ========================================= */
-    /* SECTION: AUTH                             */
-    /* ========================================= */
     async function signup() {
       clearStatus(authStatus);
 
@@ -631,7 +548,7 @@
         return;
       }
 
-      showStatus(authStatus, 'Notandi búinn til.');
+      showStatus(authStatus, 'Notandi búinn til. Athugaðu hvort staðfestingarpóstur hafi verið sendur.');
     }
 
     async function loginWithPassword() {
@@ -656,7 +573,6 @@
       }
 
       showStatus(authStatus, 'Innskráning tókst.');
-
       loggedOutBox.classList.add('hidden');
       loggedInBox.classList.remove('hidden');
       userEmail.textContent = data.user.email;
@@ -694,33 +610,7 @@
       await refreshBookings();
     }
 
-    /* ========================================= */
-    /* SECTION: EVENT LISTENERS                  */
-    /* ========================================= */
-    loginBtn.addEventListener('click', async (event) => {
-      event.preventDefault();
-      await window.loginNow();
-    });
-    signupBtn.addEventListener('click', signup);
-    logoutBtn.addEventListener('click', logout);
-
-    supabase.auth.onAuthStateChange(async () => {
-      await updateAuthUI();
-    });
-
-    /* ========================================= */
-    /* SECTION: BOOKING VIA HTML BUTTON          */
-    /* ========================================= */
-    window.loginNow = async function () {
-      await loginWithPassword();
-    };
-
-    bookBtn.addEventListener('click', async (event) => {
-      event.preventDefault();
-      await window.bookNow();
-    });
-
-    window.bookNow = async function () {
+    async function createBooking() {
       clearStatus(bookingStatus);
 
       const start_date = selectedStart;
@@ -751,6 +641,23 @@
 
       const initials = initialsFromName(fullName);
 
+      const { data: overlappingBookings, error: overlapError } = await supabase
+        .from('bookings')
+        .select('id')
+        .lte('start_date', end_date)
+        .gte('end_date', start_date)
+        .limit(1);
+
+      if (overlapError) {
+        showStatus(bookingStatus, overlapError.message, true);
+        return;
+      }
+
+      if (overlappingBookings && overlappingBookings.length > 0) {
+        showStatus(bookingStatus, 'Þetta tímabil skarast við bókun sem er þegar til.', true);
+        return;
+      }
+
       const { error } = await supabase
         .from('bookings')
         .insert([
@@ -775,13 +682,18 @@
       selectedEnd = null;
       datePicker.clear();
       await refreshBookings();
-    };
+    }
 
-    /* ========================================= */
-    /* SECTION: STARTUP                          */
-    /* ========================================= */
+    loginBtn.addEventListener('click', loginWithPassword);
+    signupBtn.addEventListener('click', signup);
+    logoutBtn.addEventListener('click', logout);
+    bookBtn.addEventListener('click', createBooking);
+
+    supabase.auth.onAuthStateChange(async () => {
+      await updateAuthUI();
+    });
+
     updateAuthUI();
   </script>
 </body>
 </html>
-
