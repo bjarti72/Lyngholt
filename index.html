@@ -1,27 +1,38 @@
 <!DOCTYPE html>
 <html lang="is">
 <head>
+  <!-- ========================================= -->
+  <!-- SECTION: META / TITLE / LIBRARIES         -->
+  <!-- ========================================= -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sumarbústaður fjölskyldunnar</title>
 
+  <!-- Flatpickr styles -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
   <style>
+    /* ========================================= */
+    /* SECTION: ROOT / GLOBAL STYLES             */
+    /* ========================================= */
     :root {
       --bg: #f6f3ee;
       --card: #ffffff;
       --text: #1f2937;
       --muted: #6b7280;
       --accent: #2f5d50;
-      --accent-2: #d6e4dd;
+      --accent-soft: #d6e4dd;
       --danger: #9f3a38;
+      --danger-soft: #f3c6c6;
       --border: #e5e7eb;
-      --shadow: 0 10px 30px rgba(0,0,0,0.08);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       --radius: 18px;
+      --max-width: 1100px;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -30,10 +41,25 @@
       color: var(--text);
     }
 
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    /* ========================================= */
+    /* SECTION: HERO / HEADER                    */
+    /* ========================================= */
     header {
       min-height: 58vh;
       background:
-        linear-gradient(rgba(0,0,0,0.28), rgba(0,0,0,0.38)),
+        linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.38)),
         url('cabin-placeholder.png') center/cover no-repeat;
       display: flex;
       align-items: end;
@@ -41,26 +67,27 @@
     }
 
     .hero {
-      max-width: 1100px;
+      max-width: var(--max-width);
       margin: 0 auto;
       width: 100%;
       color: white;
     }
 
     .hero h1 {
-      margin: 0 0 10px;
+      margin-bottom: 10px;
       font-size: clamp(2rem, 5vw, 4rem);
     }
 
     .hero p {
       max-width: 650px;
-      margin: 0;
-      font-size: 1.05rem;
       line-height: 1.5;
     }
 
+    /* ========================================= */
+    /* SECTION: LAYOUT / CARDS                   */
+    /* ========================================= */
     main {
-      max-width: 1100px;
+      max-width: var(--max-width);
       margin: -34px auto 40px;
       padding: 0 16px;
     }
@@ -77,16 +104,12 @@
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: 22px;
+      margin-bottom: 20px;
     }
 
-    h2, h3 {
-      margin-top: 0;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
+    /* ========================================= */
+    /* SECTION: FORMS / BUTTONS                  */
+    /* ========================================= */
     .auth-row,
     .booking-row {
       display: grid;
@@ -98,7 +121,8 @@
       font-size: 0.95rem;
     }
 
-    input, button {
+    input,
+    button {
       width: 100%;
       padding: 12px 14px;
       border-radius: 12px;
@@ -133,11 +157,21 @@
       cursor: not-allowed;
     }
 
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    /* ========================================= */
+    /* SECTION: STATUS MESSAGES                  */
+    /* ========================================= */
     .status {
       margin-top: 12px;
       padding: 12px 14px;
       border-radius: 12px;
-      background: var(--accent-2);
+      background: var(--accent-soft);
       display: none;
     }
 
@@ -150,6 +184,9 @@
       display: block;
     }
 
+    /* ========================================= */
+    /* SECTION: BOOKINGS LIST                    */
+    /* ========================================= */
     .calendar-list {
       display: grid;
       gap: 10px;
@@ -172,7 +209,7 @@
       font-size: 0.85rem;
       padding: 6px 10px;
       border-radius: 999px;
-      background: var(--accent-2);
+      background: var(--accent-soft);
       color: var(--accent);
       font-weight: bold;
       margin-bottom: 8px;
@@ -186,41 +223,39 @@
       background: #fff;
     }
 
-    .top-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
+    /* ========================================= */
+    /* SECTION: INLINE CALENDAR                  */
+    /* ========================================= */
+    #calendar {
+      margin-top: 10px;
     }
 
+    #calendar .flatpickr-calendar {
+      box-shadow: none;
+      border: none;
+      width: 100%;
+    }
+
+    #calendar .flatpickr-day.flatpickr-disabled,
+    #calendar .flatpickr-day.disabled {
+      background: var(--danger-soft) !important;
+      color: #8b0000 !important;
+      border-color: var(--danger-soft) !important;
+      border-radius: 6px;
+    }
+
+    /* ========================================= */
+    /* SECTION: RULES LIST                       */
+    /* ========================================= */
     .rules ul {
       margin: 0;
       padding-left: 18px;
       line-height: 1.7;
     }
 
-    .hidden {
-      display: none !important;
-    }
-
-#calendar {
-  margin-top: 10px;
-}
-
-#calendar .flatpickr-calendar {
-  box-shadow: none;
-  border: none;
-  width: 100%;
-}
-
-#calendar .flatpickr-day.flatpickr-disabled,
-#calendar .flatpickr-day.disabled {
-  background: #f3c6c6 !important;
-  color: #8b0000 !important;
-  border-color: #f3c6c6 !important;
-  border-radius: 6px;
-}
-    
+    /* ========================================= */
+    /* SECTION: MOBILE                           */
+    /* ========================================= */
     @media (max-width: 860px) {
       .grid {
         grid-template-columns: 1fr;
@@ -234,6 +269,9 @@
   </style>
 </head>
 <body>
+  <!-- ========================================= -->
+  <!-- SECTION: HERO                            -->
+  <!-- ========================================= -->
   <header>
     <div class="hero">
       <h1>Sumarbústaður fjölskyldunnar</h1>
@@ -242,25 +280,31 @@
   </header>
 
   <main>
+    <!-- ========================================= -->
+    <!-- SECTION: TOP GRID                        -->
+    <!-- ========================================= -->
     <div class="grid">
+      <!-- ========================================= -->
+      <!-- SECTION: AUTH CARD                       -->
+      <!-- ========================================= -->
       <section class="card">
         <h2>Innskráning</h2>
-        <p class="muted">Skráðu þig inn með netfangi. Þú færð innskráningarhlekk í tölvupósti.</p>
+        <p class="muted">Skráðu þig inn með netfangi og lykilorði.</p>
 
-       <div id="loggedOutBox" class="auth-row">
-  <div>
-    <label for="email">Netfang</label>
-    <input id="email" type="email" placeholder="Netfang" />
-  </div>
+        <div id="loggedOutBox" class="auth-row">
+          <div>
+            <label for="email">Netfang</label>
+            <input id="email" type="email" placeholder="Netfang" />
+          </div>
 
-  <div>
-    <label for="password">Lykilorð</label>
-    <input id="password" type="password" placeholder="Lykilorð" />
-  </div>
+          <div>
+            <label for="password">Lykilorð</label>
+            <input id="password" type="password" placeholder="Lykilorð" />
+          </div>
 
-  <button id="loginBtn">Skrá inn</button>
-  <button id="signupBtn" class="secondary">Búa til notanda</button>
-</div>
+          <button id="loginBtn">Skrá inn</button>
+          <button id="signupBtn" class="secondary">Búa til notanda</button>
+        </div>
 
         <div id="loggedInBox" class="hidden">
           <p><strong>Innskráð(ur):</strong> <span id="userEmail"></span></p>
@@ -272,6 +316,9 @@
         <div id="authStatus" class="status"></div>
       </section>
 
+      <!-- ========================================= -->
+      <!-- SECTION: RULES CARD                      -->
+      <!-- ========================================= -->
       <section class="card rules">
         <h2>Hvernig þetta virkar</h2>
         <ul>
@@ -283,41 +330,58 @@
       </section>
     </div>
 
-  <section class="card" style="margin-top:20px;">
-     <h2>Dagatal</h2>
-    <p class="muted">Uppteknir dagar eru merktir í dagatalinu hér fyrir neðan.</p>
-    <div id="calendar"></div>
-  </section>
+    <!-- ========================================= -->
+    <!-- SECTION: INLINE CALENDAR CARD            -->
+    <!-- ========================================= -->
+    <section class="card">
+      <h2>Dagatal</h2>
+      <p class="muted">Uppteknir dagar eru litamerktir hér fyrir neðan.</p>
+      <div id="calendar"></div>
+    </section>
 
-    <section class="card" style="margin-top:20px;">
+    <!-- ========================================= -->
+    <!-- SECTION: BOOKING CARD                    -->
+    <!-- ========================================= -->
+    <section class="card">
       <h2>Bóka dvöl</h2>
-      <p class="muted">Skráðu þig fyrst inn. Þegar þú ert innskráð(ur) geturðu bókað dagabil.</p>
+      <p class="muted">Veldu dagabil og smelltu svo á bókunarhnappinn.</p>
 
       <div class="booking-row">
         <div>
           <label for="dateRange">Veldu dagabil</label>
           <input id="dateRange" type="text" placeholder="Veldu dagabil" />
         </div>
+
         <button id="bookBtn" disabled>Bóka valda daga</button>
       </div>
 
       <div id="bookingStatus" class="status"></div>
     </section>
 
-    <section class="card" style="margin-top:20px;">
+    <!-- ========================================= -->
+    <!-- SECTION: ALL BOOKINGS                    -->
+    <!-- ========================================= -->
+    <section class="card">
       <h2>Allar bókanir</h2>
       <div id="allBookings" class="calendar-list"></div>
     </section>
 
-    <section class="card" style="margin-top:20px;">
+    <!-- ========================================= -->
+    <!-- SECTION: MY BOOKINGS                     -->
+    <!-- ========================================= -->
+    <section class="card">
       <h2>Mínar bókanir</h2>
       <div id="myBookings" class="calendar-list"></div>
     </section>
   </main>
 
+  <!-- Flatpickr library -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
   <script type="module">
+    /* ========================================= */
+    /* SECTION: IMPORTS / CONFIG                 */
+    /* ========================================= */
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
     const SUPABASE_URL = 'https://fabkvblawbavbmozlutj.supabase.co';
@@ -325,8 +389,14 @@
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    /* ========================================= */
+    /* SECTION: ELEMENT REFERENCES               */
+    /* ========================================= */
     const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
     const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const bookBtn = document.getElementById('bookBtn');
 
@@ -340,24 +410,15 @@
     const allBookingsEl = document.getElementById('allBookings');
     const myBookingsEl = document.getElementById('myBookings');
 
+    /* ========================================= */
+    /* SECTION: STATE                            */
+    /* ========================================= */
     let selectedStart = null;
     let selectedEnd = null;
 
-    function showStatus(el, text, isError = false) {
-      el.textContent = text;
-      el.classList.add('show');
-      el.classList.toggle('error', isError);
-    }
-
-    function clearStatus(el) {
-      el.textContent = '';
-      el.classList.remove('show', 'error');
-    }
-
-    function formatDate(dateStr) {
-      return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
-    }
-
+    /* ========================================= */
+    /* SECTION: DATE PICKERS                     */
+    /* ========================================= */
     const datePicker = flatpickr('#dateRange', {
       mode: 'range',
       dateFormat: 'Y-m-d',
@@ -374,11 +435,32 @@
     });
 
     const calendar = flatpickr('#calendar', {
-  inline: true,
-  dateFormat: 'Y-m-d',
-  clickOpens: false
-});
+      inline: true,
+      dateFormat: 'Y-m-d',
+      clickOpens: false
+    });
 
+    /* ========================================= */
+    /* SECTION: HELPER FUNCTIONS                 */
+    /* ========================================= */
+    function showStatus(el, text, isError = false) {
+      el.textContent = text;
+      el.classList.add('show');
+      el.classList.toggle('error', isError);
+    }
+
+    function clearStatus(el) {
+      el.textContent = '';
+      el.classList.remove('show', 'error');
+    }
+
+    function formatDate(dateStr) {
+      return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
+    }
+
+    /* ========================================= */
+    /* SECTION: RENDERING                        */
+    /* ========================================= */
     function renderBookings(list, container, currentUserId, ownOnly = false) {
       if (!list.length) {
         container.innerHTML = '<div class="empty">Engar bókanir enn.</div>';
@@ -417,6 +499,9 @@
       });
     }
 
+    /* ========================================= */
+    /* SECTION: DATABASE / BOOKINGS              */
+    /* ========================================= */
     async function fetchBookings() {
       const { data, error } = await supabase
         .from('bookings')
@@ -431,93 +516,20 @@
       return data || [];
     }
 
- async function refreshBookings() {
-  const { data: { user } } = await supabase.auth.getUser();
-  const bookings = await fetchBookings();
-
-  renderBookings(bookings, allBookingsEl, user?.id || null, false);
-  renderBookings(bookings, myBookingsEl, user?.id || null, true);
-
-  const disabledRanges = bookings.map(b => ({
-    from: b.start_date,
-    to: b.end_date
-  }));
-
-  datePicker.set('disable', disabledRanges);
-  calendar.set('disable', disabledRanges);
-}
-
-    async function updateAuthUI() {
+    async function refreshBookings() {
       const { data: { user } } = await supabase.auth.getUser();
+      const bookings = await fetchBookings();
 
-      if (user) {
-        loggedOutBox.classList.add('hidden');
-        loggedInBox.classList.remove('hidden');
-        userEmail.textContent = user.email;
-        bookBtn.disabled = false;
-      } else {
-        loggedOutBox.classList.remove('hidden');
-        loggedInBox.classList.add('hidden');
-        userEmail.textContent = '';
-        bookBtn.disabled = true;
-      }
+      renderBookings(bookings, allBookingsEl, user?.id || null, false);
+      renderBookings(bookings, myBookingsEl, user?.id || null, true);
 
-      await refreshBookings();
-    }
+      const disabledRanges = bookings.map(b => ({
+        from: b.start_date,
+        to: b.end_date
+      }));
 
-   async function loginWithPassword() {
-  clearStatus(authStatus);
-
-  const email = emailInput.value.trim();
-  const password = document.getElementById('password').value;
-
-  if (!email || !password) {
-    showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
-    return;
-  }
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    showStatus(authStatus, error.message, true);
-    return;
-  }
-
-  showStatus(authStatus, 'Innskráning tókst.');
-}
-    async function signup() {
-  clearStatus(authStatus);
-
-  const email = emailInput.value.trim();
-  const password = document.getElementById('password').value;
-
-  const { error } = await supabase.auth.signUp({
-    email,
-    password
-  });
-
-  if (error) {
-    showStatus(authStatus, error.message, true);
-    return;
-  }
-
-  showStatus(authStatus, 'Notandi búinn til.');
-}
-    async function logout() {
-      clearStatus(authStatus);
-
-      const { error } = await supabase.auth.signOut();
-
-      if (error) {
-        showStatus(authStatus, error.message, true);
-        return;
-      }
-
-      showStatus(authStatus, 'Þú hefur verið skráð(ur) út.');
-      await updateAuthUI();
+      datePicker.set('disable', disabledRanges);
+      calendar.set('disable', disabledRanges);
     }
 
     async function createBooking() {
@@ -582,7 +594,96 @@
       await refreshBookings();
     }
 
-    loginBtn.addEventListener('click', loginWithMagicLink);
+    /* ========================================= */
+    /* SECTION: AUTH                             */
+    /* ========================================= */
+    async function signup() {
+      clearStatus(authStatus);
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
+        return;
+      }
+
+      const { error } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) {
+        showStatus(authStatus, error.message, true);
+        return;
+      }
+
+      showStatus(authStatus, 'Notandi búinn til.');
+      await updateAuthUI();
+    }
+
+    async function loginWithPassword() {
+      clearStatus(authStatus);
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        showStatus(authStatus, error.message, true);
+        return;
+      }
+
+      showStatus(authStatus, 'Innskráning tókst.');
+      await updateAuthUI();
+    }
+
+    async function logout() {
+      clearStatus(authStatus);
+
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        showStatus(authStatus, error.message, true);
+        return;
+      }
+
+      showStatus(authStatus, 'Þú hefur verið skráð(ur) út.');
+      await updateAuthUI();
+    }
+
+    async function updateAuthUI() {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        loggedOutBox.classList.add('hidden');
+        loggedInBox.classList.remove('hidden');
+        userEmail.textContent = user.email;
+        bookBtn.disabled = false;
+      } else {
+        loggedOutBox.classList.remove('hidden');
+        loggedInBox.classList.add('hidden');
+        userEmail.textContent = '';
+        bookBtn.disabled = true;
+      }
+
+      await refreshBookings();
+    }
+
+    /* ========================================= */
+    /* SECTION: EVENT LISTENERS                  */
+    /* ========================================= */
+    loginBtn.addEventListener('click', loginWithPassword);
+    signupBtn.addEventListener('click', signup);
     logoutBtn.addEventListener('click', logout);
     bookBtn.addEventListener('click', createBooking);
 
@@ -590,6 +691,9 @@
       await updateAuthUI();
     });
 
+    /* ========================================= */
+    /* SECTION: STARTUP                          */
+    /* ========================================= */
     updateAuthUI();
   </script>
 </body>
