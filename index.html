@@ -289,7 +289,8 @@
       <!-- ========================================= -->
       <section class="card">
         <h2>Innskráning</h2>
-        <p>TEST 125</p>
+        <p>TEST 126
+      </p>
         <p class="muted">Skráðu þig inn með netfangi og lykilorði.</p>
 
         <div id="loggedOutBox" class="auth-row">
@@ -306,7 +307,8 @@
         
          <!--  <button id="loginBtn">Skrá inn</button> -->
          <!--  <button id="loginBtn" onclick="window.testLoginClick()">Skrá inn</button> -->
-          <button id="loginBtn" onclick="alert('HTML TAKKI VIRKAR NUNA')">Skrá inn</button>
+         <!-- <button id="loginBtn" onclick="alert('HTML TAKKI VIRKAR NUNA')">Skrá inn</button> -->
+          <button id="loginBtn" onclick="loginNow()">Skrá inn</button>
           
           <button id="signupBtn" class="secondary">Búa til notanda</button>
         </div>
@@ -705,17 +707,40 @@ supabase.auth.onAuthStateChange(async () => {
 /* ========================================= */
 /* SECTION: STARTUP                          */
 /* ========================================= */
-window.testLoginClick = async function () {
-  showStatus(authStatus, 'window.testLoginClick keyrir');
+//window.testLoginClick = async function () {
+//  showStatus(authStatus, 'window.testLoginClick keyrir');
 
-  try {
-    await loginWithPassword();
-  } catch (err) {
-    showStatus(authStatus, 'Villa: ' + err.message, true);
-    console.error(err);
+//  try {
+//    await loginWithPassword();
+//  } catch (err) {
+//    showStatus(authStatus, 'Villa: ' + err.message, true);
+//    console.error(err);
+//  }
+//};
+    window.loginNow = async function () {
+  clearStatus(authStatus);
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!email || !password) {
+    showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
+    return;
   }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    showStatus(authStatus, error.message, true);
+    return;
+  }
+
+  showStatus(authStatus, 'Innskráning tókst.');
+  await updateAuthUI();
 };
-    
 updateAuthUI();
   </script>
 </body>
