@@ -361,6 +361,11 @@
       <h2>Bóka dvöl</h2>
       <p class="muted">Veldu dagabil og smelltu svo á bókunarhnappinn.</p>
 
+      <div>
+  <label for="fullName">Nafn</label>
+  <input id="fullName" type="text" placeholder="Fullt nafn" />
+</div>
+
       <div class="booking-row">
         <div>
           <label for="dateRange">Veldu dagabil</label>
@@ -426,6 +431,7 @@
 
     const allBookingsEl = document.getElementById('allBookings');
     const myBookingsEl = document.getElementById('myBookings');
+    const fullNameInput = document.getElementById('fullName');
 
     /* ========================================= */
     /* SECTION: STATE                            */
@@ -572,7 +578,7 @@
         return;
       }
 
-      const { error } = await supabase
+      /*const { error } = await supabase
         .from('bookings')
         .insert([
           {
@@ -580,7 +586,32 @@
             start_date,
             end_date
           }
-        ]);
+        ]);*/
+      const fullName = fullNameInput.value.trim();
+
+if (!fullName) {
+  showStatus(bookingStatus, 'Settu inn nafn.', true);
+  return;
+}
+
+const initials = fullName
+  .split(' ')
+  .map(n => n[0])
+  .join('')
+  .toUpperCase();
+
+const { error } = await supabase
+  .from('bookings')
+  .insert([
+    {
+      user_id: user.id,
+      start_date,
+      end_date,
+      booked_by_name: fullName,
+      booked_by_email: user.email,
+      booked_by_initials: initials
+    }
+  ]);
 
       if (error) {
         showStatus(bookingStatus, error.message, true);
