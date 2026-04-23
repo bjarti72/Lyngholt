@@ -328,7 +328,7 @@
     <button id="logoutBtn">Skrá út</button>
   </div>
 
-  <div id="authStatus"></div>
+  <div id="authStatus" class="status"></div>
 </section>
 
       <!-- ========================================= -->
@@ -373,6 +373,7 @@
         </div>
 
         <button id="bookBtn" onclick="window.bookNow()">Bóka valda daga</button>
+        
   
  <!--       <button
   id="bookBtn"
@@ -656,7 +657,7 @@ const { error } = await supabase
       await refreshBookings();
     }
 
-   /* ========================================= */
+    /* ========================================= */
 /* SECTION: AUTH                             */
 /* ========================================= */
 async function signup() {
@@ -681,67 +682,12 @@ async function signup() {
   }
 
   showStatus(authStatus, 'Notandi búinn til.');
-  await updateAuthUI();
 }
 
 async function loginWithPassword() {
-  console.log("login keyrir");
+  clearStatus(authStatus);
 
-  try {
-    clearStatus(authStatus);
-
-    const email = emailInput.value.trim();
-    const password = passwordInput.value;
-
-    console.log("email:", email);
-    console.log("password length:", password.length);
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    console.log("login data:", data);
-    console.log("login error:", error);
-  
-  if (error) {
-  showStatus(authStatus, error.message, true);
-  return;
-}
-
-showStatus(authStatus, 'Innskráning tókst.');
-
-loggedOutBox.classList.add('hidden');
-loggedInBox.classList.remove('hidden');
-userEmail.textContent = data.user.email;
-bookBtn.disabled = false;
-
-await refreshBookings();
-
-   /*if (error) {
-      showStatus(authStatus, error.message, true);
-      return;
-    }
-
-    showStatus(authStatus, 'Innskráning tókst.');
-    await updateAuthUI(); */
-
-    
-
-  } catch (err) {
-    console.error("CRASH:", err);
-    showStatus(authStatus, "Villa í login: " + err.message, true);
-  }
-}
-
-//async function loginWithPassword() {
-// console.log("login keyrir");
-
-
-  
-  //clearStatus(authStatus);
-
-  /*const email = emailInput.value.trim();
+  const email = emailInput.value.trim();
   const password = passwordInput.value;
 
   if (!email || !password) {
@@ -749,13 +695,10 @@ await refreshBookings();
     return;
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
-
-  console.log("login data:", data);
-  console.log("login error:", error);
 
   if (error) {
     showStatus(authStatus, error.message, true);
@@ -763,7 +706,11 @@ await refreshBookings();
   }
 
   showStatus(authStatus, 'Innskráning tókst.');
-  await updateAuthUI();
+
+  loggedOutBox.classList.add('hidden');
+  loggedInBox.classList.remove('hidden');
+  userEmail.textContent = data.user.email;
+  await refreshBookings();
 }
 
 async function logout() {
@@ -787,74 +734,30 @@ async function updateAuthUI() {
     loggedOutBox.classList.add('hidden');
     loggedInBox.classList.remove('hidden');
     userEmail.textContent = user.email;
-    bookBtn.disabled = false;
   } else {
     loggedOutBox.classList.remove('hidden');
     loggedInBox.classList.add('hidden');
     userEmail.textContent = '';
-    bookBtn.disabled = true;
   }
 
   await refreshBookings();
-} */
-    
+}
+
 /* ========================================= */
 /* SECTION: EVENT LISTENERS                  */
 /* ========================================= */
-
 loginBtn.addEventListener('click', loginWithPassword);
 signupBtn.addEventListener('click', signup);
 logoutBtn.addEventListener('click', logout);
-//bookBtn.addEventListener('click', createBooking);
-/*    bookBtn.addEventListener('click', () => {
-  alert('BOOK JS VIRKAR');
-});*/
 
 supabase.auth.onAuthStateChange(async () => {
   await updateAuthUI();
 });
 
 /* ========================================= */
-/* SECTION: STARTUP                          */
+/* SECTION: BOOKING VIA HTML BUTTON          */
 /* ========================================= */
-//window.testLoginClick = async function () {
-//  showStatus(authStatus, 'window.testLoginClick keyrir');
-
-//  try {
-//    await loginWithPassword();
-//  } catch (err) {
-//    showStatus(authStatus, 'Villa: ' + err.message, true);
-//    console.error(err);
-//  }
-//};
-    window.loginNow = async function () {
-  clearStatus(authStatus);
-
-  const email = emailInput.value.trim();
-  const password = passwordInput.value;
-
-  if (!email || !password) {
-    showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
-    return;
-  }
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    showStatus(authStatus, error.message, true);
-    return;
-  }
-
-  showStatus(authStatus, 'Innskráning tókst.');
-  await updateAuthUI();
-};
-
 window.bookNow = async function () {
-  alert("window.bookNow keyrir");
-  console.log("bookNow keyrir");
   clearStatus(bookingStatus);
 
   const start_date = selectedStart;
@@ -915,6 +818,11 @@ window.bookNow = async function () {
   datePicker.clear();
   await refreshBookings();
 };
+
+/* ========================================= */
+/* SECTION: STARTUP                          */
+/* ========================================= */
+updateAuthUI();
     
 updateAuthUI();
   </script>
