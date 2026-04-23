@@ -656,6 +656,9 @@ async function loginWithPassword() {
     password
   });
 
+  console.log("login data:", data);
+  console.log("login error:", error);
+
   if (error) {
     showStatus(authStatus, error.message, true);
     return;
