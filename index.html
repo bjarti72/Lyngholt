@@ -315,8 +315,8 @@
       <input id="password" type="password" placeholder="Lykilorð" />
     </div>
 
- <!--   <button id="loginBtn">Skrá inn</button> -->
-    <button id="loginBtn" onclick="alert('LOGIN HTML VIRKAR')">Skrá inn</button>
+ <button id="loginBtn">Skrá inn</button>
+   <!--  <button id="loginBtn" onclick="alert('LOGIN HTML VIRKAR')">Skrá inn</button> -->
 
     
     
@@ -640,6 +640,7 @@ async function signup() {
 }
 
 async function loginWithPassword() {
+ console.log("login keyrir");
   clearStatus(authStatus);
 
   const email = emailInput.value.trim();
