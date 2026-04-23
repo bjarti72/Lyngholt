@@ -52,6 +52,20 @@
     .muted {
       color: var(--muted);
     }
+    #loggedOutBox,
+#loggedOutBox * {
+  pointer-events: auto !important;
+}
+
+#loggedOutBox {
+  position: relative;
+  z-index: 50;
+}
+
+#loggedInBox {
+  position: relative;
+  z-index: 10;
+}
 
     /* ========================================= */
     /* SECTION: HERO / HEADER                    */
@@ -302,7 +316,9 @@
     </div>
 
  <!--   <button id="loginBtn">Skrá inn</button> -->
-    <button id="loginBtn" onclick="alert('LOGIN HTML VIRKAR')">Skrá inn</button>h
+    <button id="loginBtn" onclick="alert('LOGIN HTML VIRKAR')">Skrá inn</button>
+
+    
     
     <button id="signupBtn" class="secondary">Búa til notanda</button>
   </div>
