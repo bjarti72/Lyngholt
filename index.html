@@ -116,6 +116,37 @@
       gap: 12px;
     }
 
+    .color-picker {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .color-option {
+      position: relative;
+    }
+
+    .color-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .color-swatch {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 14px;
+      border: 3px solid transparent;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px rgba(31, 41, 55, 0.08);
+    }
+
+    .color-option input:checked + .color-swatch {
+      border-color: #111827;
+      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
+    }
+
     label {
       font-weight: bold;
       font-size: 0.95rem;
@@ -189,35 +220,38 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 14px;
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 160px minmax(0, 1fr) 140px;
       gap: 12px;
-      align-items: center;
+      align-items: start;
       background: #fcfcfc;
     }
 
     .booking-main {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
+      display: contents;
     }
 
-    .initials-badge {
-      min-width: 40px;
-      height: 40px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
+    .name-badge {
+      width: 160px;
+      min-height: 48px;
+      padding: 8px 12px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
       flex-shrink: 0;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .booking-details {
+      min-width: 0;
     }
 
     .booking-name {
       font-weight: bold;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .badge {
@@ -229,6 +263,16 @@
       color: var(--accent);
       font-weight: bold;
       margin-bottom: 8px;
+    }
+
+    .badge.responsible {
+      color: #1f2937;
+      margin-right: 8px;
+    }
+
+    .booking-actions {
+      width: 140px;
+      justify-self: end;
     }
 
     .empty {
@@ -257,6 +301,36 @@
       border-radius: 6px;
     }
 
+    #calendar .flatpickr-day {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    #calendar .flatpickr-day.booking-day {
+      font-weight: 700;
+      border-radius: 10px;
+      border-color: transparent !important;
+      opacity: 1 !important;
+    }
+
+    #calendar .flatpickr-day.booking-day.flatpickr-disabled,
+    #calendar .flatpickr-day.booking-day.disabled {
+      opacity: 1 !important;
+    }
+
+    #calendar .flatpickr-day.booking-day .day-number {
+      position: relative;
+      z-index: 2;
+      display: block;
+      margin-top: 2px;
+      font-size: 0.95rem;
+      text-shadow: none;
+    }
+
     .rules ul {
       margin: 0;
       padding-left: 18px;
@@ -269,8 +343,16 @@
       }
 
       .booking-item {
-        flex-direction: column;
-        align-items: stretch;
+        grid-template-columns: 1fr;
+      }
+
+      .name-badge,
+      .booking-actions {
+        width: 100%;
+      }
+
+      .booking-actions {
+        justify-self: stretch;
       }
     }
   </style>
@@ -298,6 +380,16 @@
           <div>
             <label for="password">Lykilorð</label>
             <input id="password" type="password" placeholder="Lykilorð" />
+          </div>
+
+          <div>
+            <label for="signupName">Nafn notanda</label>
+            <input id="signupName" type="text" placeholder="Nafn ábyrgðaraðila" />
+          </div>
+
+          <div>
+            <label>Veldu lit</label>
+            <div id="signupColorPicker" class="color-picker"></div>
           </div>
 
           <button id="loginBtn" type="button">Skrá inn</button>
@@ -413,8 +505,10 @@
 
       const emailInput = document.getElementById('email');
       const passwordInput = document.getElementById('password');
+      const signupNameInput = document.getElementById('signupName');
       const fullNameInput = document.getElementById('fullName');
       const dateRangeInput = document.getElementById('dateRange');
+      const signupColorPicker = document.getElementById('signupColorPicker');
 
       const loginBtn = document.getElementById('loginBtn');
       const signupBtn = document.getElementById('signupBtn');
@@ -435,6 +529,104 @@
       let selectedEnd = null;
       let isLoggingIn = false;
       let isBooking = false;
+      let bookingDayMap = {};
+      const userColorOptions = [
+        { value: '#D97706', label: 'Amber' },
+        { value: '#DC2626', label: 'Red' },
+        { value: '#2563EB', label: 'Blue' },
+        { value: '#059669', label: 'Green' },
+        { value: '#7C3AED', label: 'Violet' },
+        { value: '#DB2777', label: 'Pink' },
+        { value: '#0F766E', label: 'Teal' },
+        { value: '#4F46E5', label: 'Indigo' },
+        { value: '#9333EA', label: 'Purple' },
+        { value: '#EA580C', label: 'Orange' }
+      ];
+
+      function renderColorPicker() {
+        signupColorPicker.innerHTML = userColorOptions.map((option, index) => `
+          <label class="color-option" title="${option.label}">
+            <input type="radio" name="signupColor" value="${option.value}" ${index === 0 ? 'checked' : ''} />
+            <span class="color-swatch" style="background:${option.value}"></span>
+          </label>
+        `).join('');
+      }
+
+      function getSelectedSignupColor() {
+        return document.querySelector('input[name="signupColor"]:checked')?.value || userColorOptions[0].value;
+      }
+
+      function getUserProfile(user) {
+        return {
+          responsibleName: user?.user_metadata?.display_name || user?.email || 'Óþekktur notandi',
+          responsibleColor: user?.user_metadata?.color || userColorOptions[0].value
+        };
+      }
+
+      function getContrastTextColor(hexColor) {
+        const color = (hexColor || '').replace('#', '');
+        if (color.length !== 6) return '#111827';
+
+        const r = parseInt(color.slice(0, 2), 16);
+        const g = parseInt(color.slice(2, 4), 16);
+        const b = parseInt(color.slice(4, 6), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+        return brightness > 150 ? '#111827' : '#ffffff';
+      }
+
+      function formatDateKey(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+
+      function expandBookingDays(bookings) {
+        const dayMap = {};
+
+        bookings.forEach((booking) => {
+          const cursor = new Date(booking.start_date + 'T12:00:00');
+          const end = new Date(booking.end_date + 'T12:00:00');
+
+          while (cursor <= end) {
+            dayMap[formatDateKey(cursor)] = {
+              color: booking.responsible_color || '#d6e4dd',
+              responsibleName: booking.responsible_name || 'Óþekktur'
+            };
+            cursor.setDate(cursor.getDate() + 1);
+          }
+        });
+
+        return dayMap;
+      }
+
+      function decorateCalendarDay(dayElem) {
+        const key = formatDateKey(dayElem.dateObj);
+        const bookingInfo = bookingDayMap[key];
+        const dayNumber = dayElem.dateObj.getDate();
+
+        dayElem.textContent = '';
+        dayElem.classList.remove('booking-day');
+        dayElem.style.background = '';
+        dayElem.title = '';
+
+        const numberSpan = document.createElement('span');
+        numberSpan.className = 'day-number';
+        numberSpan.textContent = dayNumber;
+        dayElem.appendChild(numberSpan);
+
+        if (!bookingInfo) {
+          return;
+        }
+
+        dayElem.classList.add('booking-day');
+        dayElem.style.background = bookingInfo.color;
+        dayElem.style.color = getContrastTextColor(bookingInfo.color);
+        dayElem.title = bookingInfo.responsibleName;
+      }
+
+      renderColorPicker();
 
       const datePicker = flatpickr(dateRangeInput, {
         mode: 'range',
@@ -454,7 +646,10 @@
       const calendar = flatpickr('#calendar', {
         inline: true,
         dateFormat: 'Y-m-d',
-        clickOpens: false
+        clickOpens: false,
+        onDayCreate(_dObj, _dStr, _fp, dayElem) {
+          decorateCalendarDay(dayElem);
+        }
       });
 
       function showStatus(el, text, isError = false) {
@@ -503,20 +698,22 @@
           ? '<button class="danger" type="button" data-delete-id="' + item.id + '">Eyða bókun</button>'
           : '';
 
-        const displayName = item.booked_by_name || item.booked_by_email || 'Óþekktur notandi';
-        const initials = item.booked_by_initials || initialsFromName(displayName);
-
+        const displayName = item.booked_by_name || 'Óþekktur notandi';
+        const bookedByName = item.responsible_name || 'Óþekktur';
+        const bookingOwnerText = displayName === bookedByName ? 'Bókað af ' + bookedByName : 'Bókað fyrir ' + displayName + ' af ' + bookedByName;
         return `
           <div class="booking-item">
             <div class="booking-main">
-              <div class="initials-badge">${initials}</div>
-              <div>
-                <div class="badge">${item.user_id === currentUserId ? 'Þín bókun' : 'Frátekið'}</div>
-                <div class="booking-name">${displayName}</div>
+              <div class="name-badge" style="background:${item.responsible_color || '#d6e4dd'}; color:#111827;">${displayName}</div>
+              <div class="booking-details">
+                <div>
+                  <span class="badge">${item.user_id === currentUserId ? 'Þín bókun' : 'Frátekið'}</span>
+                </div>
+                <div class="booking-name">${bookingOwnerText}</div>
                 <div><strong>${formatDate(item.start_date)}</strong> til <strong>${formatDate(item.end_date)}</strong></div>
               </div>
             </div>
-            <div>${deleteButton}</div>
+            <div class="booking-actions">${deleteButton}</div>
           </div>
         `;
       }).join('');
@@ -529,10 +726,10 @@
       }
 
       async function fetchBookings() {
-      const { data, error } = await supabaseClient
-        .from('bookings')
-        .select('id, user_id, start_date, end_date, created_at, booked_by_name, booked_by_email, booked_by_initials')
-        .order('start_date', { ascending: true });
+        const { data, error } = await supabaseClient
+          .from('bookings')
+          .select('id, user_id, start_date, end_date, created_at, booked_by_name, booked_by_email, booked_by_initials, responsible_name, responsible_color')
+          .order('start_date', { ascending: true });
 
       if (error) {
         showStatus(bookingStatus, error.message, true);
@@ -549,14 +746,17 @@
       renderBookings(bookings, allBookingsEl, user?.id || null, false);
       renderBookings(bookings, myBookingsEl, user?.id || null, true);
 
-      const disabledRanges = bookings.map((b) => ({
-        from: b.start_date,
-        to: b.end_date
-      }));
+        const disabledRanges = bookings.map((b) => ({
+          from: b.start_date,
+          to: b.end_date
+        }));
+
+        bookingDayMap = expandBookingDays(bookings);
 
       datePicker.set('disable', disabledRanges);
       calendar.set('disable', disabledRanges);
-      }
+      calendar.redraw();
+    }
 
       async function deleteBooking(id) {
       clearStatus(bookingStatus);
@@ -578,17 +778,25 @@
       async function signup() {
       clearStatus(authStatus);
 
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        const displayName = signupNameInput.value.trim();
+        const color = getSelectedSignupColor();
 
-      if (!email || !password) {
-        showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
+      if (!email || !password || !displayName) {
+        showStatus(authStatus, 'Settu inn netfang, lykilorð og nafn notanda.', true);
         return;
       }
 
       const { error } = await supabaseClient.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          data: {
+            display_name: displayName,
+            color
+          }
+        }
       });
 
       if (error) {
@@ -596,7 +804,7 @@
         return;
       }
 
-      showStatus(authStatus, 'Notandi búinn til. Athugaðu hvort staðfestingarpóstur hafi verið sendur.');
+        showStatus(authStatus, 'Notandi búinn til. Athugaðu hvort staðfestingarpóstur hafi verið sendur.');
       }
 
       async function loginWithPassword() {
@@ -628,7 +836,7 @@
         showStatus(authStatus, 'Innskráning tókst.');
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
-        userEmail.textContent = data.user.email;
+        userEmail.textContent = data.user.user_metadata?.display_name || data.user.email;
 
         refreshBookings().catch((refreshError) => {
           showStatus(authStatus, 'Innskráning tókst en ekki tókst að hlaða bókanir: ' + refreshError.message, true);
@@ -661,7 +869,7 @@
       if (user) {
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
-        userEmail.textContent = user.email;
+        userEmail.textContent = user.user_metadata?.display_name || user.email;
       } else {
         loggedOutBox.classList.remove('hidden');
         loggedInBox.classList.add('hidden');
@@ -704,6 +912,7 @@
         }
 
         const initials = initialsFromName(fullName);
+        const profile = getUserProfile(user);
 
         const { data: overlappingBookings, error: overlapError } = await supabaseClient
           .from('bookings')
@@ -731,7 +940,9 @@
               end_date,
               booked_by_name: fullName,
               booked_by_email: user.email,
-              booked_by_initials: initials
+              booked_by_initials: initials,
+              responsible_name: profile.responsibleName,
+              responsible_color: profile.responsibleColor
             }
           ]);
 
