@@ -682,25 +682,22 @@ async function updateAuthUI() {
 
   await refreshBookings();
 }
-    /* ========================================= */
-    /* SECTION: EVENT LISTENERS                  */
-    /* ========================================= */
-//  loginBtn.addEventListener('click', () => {
-  //alert('JS smellur virkar');
+/* ========================================= */
+/* SECTION: EVENT LISTENERS                  */
+/* ========================================= */
+loginBtn.addEventListener('click', loginWithPassword);
+signupBtn.addEventListener('click', signup);
+logoutBtn.addEventListener('click', logout);
+bookBtn.addEventListener('click', createBooking);
 
-    loginBtn.addEventListener('click', loginWithPassword);
-    signupBtn.addEventListener('click', signup);
-    logoutBtn.addEventListener('click', logout);
-    bookBtn.addEventListener('click', createBooking);
+supabase.auth.onAuthStateChange(async () => {
+  await updateAuthUI();
+});
 
-    supabase.auth.onAuthStateChange(async () => {
-      await updateAuthUI();
-    });
-
-    /* ========================================= */
-    /* SECTION: STARTUP                          */
-    /* ========================================= */
-    updateAuthUI();
+/* ========================================= */
+/* SECTION: STARTUP                          */
+/* ========================================= */
+updateAuthUI();
   </script>
 </body>
 </html>
