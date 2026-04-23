@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="is">
 <head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sumarbústaður fjölskyldunnar</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
   <style>
     :root {
       --bg: #f6f3ee;
@@ -249,7 +251,7 @@
         <h2>Hvernig þetta virkar</h2>
         <ul>
           <li>Allir innskráðir notendur geta séð bókaða daga.</li>
-          <li>Þú velur upphafsdag og lokadag og sendir bókun.</li>
+          <li>Þú velur dagabil og sendir bókun.</li>
           <li>Kerfið hafnar sjálfkrafa ef dagarnir skarast við eldri bókun.</li>
           <li>Þú getur eytt eigin bókunum neðst á síðunni.</li>
         </ul>
@@ -261,12 +263,13 @@
       <p class="muted">Skráðu þig fyrst inn. Þegar þú ert innskráð(ur) geturðu bókað dagabil.</p>
 
       <div class="booking-row">
-  <div>
-    <label for="dateRange">Veldu dagabil</label>
-    <input id="dateRange" placeholder="Veldu dagabil" />
-  </div>
-  <button id="bookBtn" disabled>Bóka valda daga</button>
-</div>
+        <div>
+          <label for="dateRange">Veldu dagabil</label>
+          <input id="dateRange" type="text" placeholder="Veldu dagabil" />
+        </div>
+        <button id="bookBtn" disabled>Bóka valda daga</button>
+      </div>
+
       <div id="bookingStatus" class="status"></div>
     </section>
 
@@ -281,12 +284,13 @@
     </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
   <script type="module">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
     const SUPABASE_URL = 'https://fabkvblawbavbmozlutj.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_eC_30Wnq3C9B7lM46mfGkw_7rNcV-aG';
+    const SUPABASE_KEY = 'SETTU_NYJAN_PUBLISHABLE_KEY_HER';
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -294,10 +298,6 @@
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const bookBtn = document.getElementById('bookBtn');
-
-   const dateRangeInput = document.getElementById('dateRange');
-  let selectedStart = null;
-  let selectedEnd = null;
 
     const authStatus = document.getElementById('authStatus');
     const bookingStatus = document.getElementById('bookingStatus');
@@ -308,6 +308,9 @@
 
     const allBookingsEl = document.getElementById('allBookings');
     const myBookingsEl = document.getElementById('myBookings');
+
+    let selectedStart = null;
+    let selectedEnd = null;
 
     function showStatus(el, text, isError = false) {
       el.textContent = text;
@@ -323,6 +326,21 @@
     function formatDate(dateStr) {
       return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
     }
+
+    const datePicker = flatpickr('#dateRange', {
+      mode: 'range',
+      dateFormat: 'Y-m-d',
+      minDate: 'today',
+      onChange(selectedDates) {
+        if (selectedDates.length === 2) {
+          selectedStart = selectedDates[0].toISOString().split('T')[0];
+          selectedEnd = selectedDates[1].toISOString().split('T')[0];
+        } else {
+          selectedStart = null;
+          selectedEnd = null;
+        }
+      }
+    });
 
     function renderBookings(list, container, currentUserId, ownOnly = false) {
       if (!list.length) {
@@ -379,8 +397,16 @@
     async function refreshBookings() {
       const { data: { user } } = await supabase.auth.getUser();
       const bookings = await fetchBookings();
+
       renderBookings(bookings, allBookingsEl, user?.id || null, false);
       renderBookings(bookings, myBookingsEl, user?.id || null, true);
+
+      const disabledRanges = bookings.map(b => ({
+        from: b.start_date,
+        to: b.end_date
+      }));
+
+      datePicker.set('disable', disabledRanges);
     }
 
     async function updateAuthUI() {
@@ -427,6 +453,7 @@
 
     async function logout() {
       clearStatus(authStatus);
+
       const { error } = await supabase.auth.signOut();
 
       if (error) {
@@ -441,11 +468,11 @@
     async function createBooking() {
       clearStatus(bookingStatus);
 
-      const start_date = startDateInput.value;
-      const end_date = endDateInput.value;
+      const start_date = selectedStart;
+      const end_date = selectedEnd;
 
       if (!start_date || !end_date) {
-        showStatus(bookingStatus, 'Veldu bæði upphafsdag og lokadag.', true);
+        showStatus(bookingStatus, 'Veldu dagabil fyrst.', true);
         return;
       }
 
@@ -477,8 +504,9 @@
       }
 
       showStatus(bookingStatus, 'Bókun vistuð.');
-      startDateInput.value = '';
-      endDateInput.value = '';
+      selectedStart = null;
+      selectedEnd = null;
+      datePicker.clear();
       await refreshBookings();
     }
 
