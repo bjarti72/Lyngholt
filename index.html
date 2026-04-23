@@ -379,6 +379,7 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
   <script type="module">
+    console.log("JS STARTAR");
     /* ========================================= */
     /* SECTION: IMPORTS / CONFIG                 */
     /* ========================================= */
@@ -392,6 +393,7 @@
     /* ========================================= */
     /* SECTION: ELEMENT REFERENCES               */
     /* ========================================= */
+    
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
 
@@ -623,6 +625,7 @@
     }
 
     async function loginWithPassword() {
+      console.log("login takkinn keyrir");
       clearStatus(authStatus);
 
       const email = emailInput.value.trim();
