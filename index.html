@@ -372,8 +372,9 @@
           <input id="dateRange" type="text" placeholder="Veldu dagabil" />
         </div>
 
-       <button id="bookBtn" disabled>Bóka valda daga</button>
-       <!--  <button id="bookBtn" onclick="alert('BOOK HTML VIRKAR')">Bóka valda daga</button>  -->
+      <button id="bookBtn">Bóka valda daga</button>
+        <!--  <button id="bookBtn" disabled>Bóka valda daga</button>
+       <button id="bookBtn" onclick="alert('BOOK HTML VIRKAR')">Bóka valda daga</button>  -->
       </div>
 
       <div id="bookingStatus" class="status"></div>
@@ -557,7 +558,10 @@
     }
 
     async function createBooking() {
-      clearStatus(bookingStatus);
+      console.log("createBooking keyrir");
+
+  clearStatus(bookingStatus);
+  showStatus(bookingStatus, "Smellt á bókunarhnapp");
 
       const start_date = selectedStart;
       const end_date = selectedEnd;
@@ -792,10 +796,10 @@ async function updateAuthUI() {
 loginBtn.addEventListener('click', loginWithPassword);
 signupBtn.addEventListener('click', signup);
 logoutBtn.addEventListener('click', logout);
-//bookBtn.addEventListener('click', createBooking);
-    bookBtn.addEventListener('click', () => {
+bookBtn.addEventListener('click', createBooking);
+/*    bookBtn.addEventListener('click', () => {
   alert('BOOK JS VIRKAR');
-});
+});*/
 
 supabase.auth.onAuthStateChange(async () => {
   await updateAuthUI();
