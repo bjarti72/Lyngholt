@@ -685,7 +685,9 @@
     /* ========================================= */
     /* SECTION: EVENT LISTENERS                  */
     /* ========================================= */
-    loginBtn.addEventListener('click', loginWithPassword);
+  loginBtn.addEventListener('click', () => {
+  alert('JS smellur virkar');
+});
     signupBtn.addEventListener('click', signup);
     logoutBtn.addEventListener('click', logout);
     bookBtn.addEventListener('click', createBooking);
