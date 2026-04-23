@@ -247,13 +247,20 @@
         <h2>Innskráning</h2>
         <p class="muted">Skráðu þig inn með netfangi. Þú færð innskráningarhlekk í tölvupósti.</p>
 
-        <div id="loggedOutBox" class="auth-row">
-          <div>
-            <label for="email">Netfang</label>
-            <input id="email" type="email" placeholder="nafn@example.com" />
-          </div>
-          <button id="loginBtn">Senda innskráningarhlekk</button>
-        </div>
+       <div id="loggedOutBox" class="auth-row">
+  <div>
+    <label for="email">Netfang</label>
+    <input id="email" type="email" placeholder="Netfang" />
+  </div>
+
+  <div>
+    <label for="password">Lykilorð</label>
+    <input id="password" type="password" placeholder="Lykilorð" />
+  </div>
+
+  <button id="loginBtn">Skrá inn</button>
+  <button id="signupBtn" class="secondary">Búa til notanda</button>
+</div>
 
         <div id="loggedInBox" class="hidden">
           <p><strong>Innskráð(ur):</strong> <span id="userEmail"></span></p>
@@ -458,30 +465,47 @@
       await refreshBookings();
     }
 
-    async function loginWithMagicLink() {
-      clearStatus(authStatus);
-      const email = emailInput.value.trim();
+   async function loginWithPassword() {
+  clearStatus(authStatus);
 
-      if (!email) {
-        showStatus(authStatus, 'Settu inn netfang fyrst.', true);
-        return;
-      }
+  const email = emailInput.value.trim();
+  const password = document.getElementById('password').value;
 
-      const redirectTo = window.location.origin + window.location.pathname;
+  if (!email || !password) {
+    showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
+    return;
+  }
 
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: redirectTo }
-      });
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
 
-      if (error) {
-        showStatus(authStatus, error.message, true);
-        return;
-      }
+  if (error) {
+    showStatus(authStatus, error.message, true);
+    return;
+  }
 
-      showStatus(authStatus, 'Innskráningarhlekkur var sendur í tölvupósti.');
-    }
+  showStatus(authStatus, 'Innskráning tókst.');
+}
+    async function signup() {
+  clearStatus(authStatus);
 
+  const email = emailInput.value.trim();
+  const password = document.getElementById('password').value;
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password
+  });
+
+  if (error) {
+    showStatus(authStatus, error.message, true);
+    return;
+  }
+
+  showStatus(authStatus, 'Notandi búinn til.');
+}
     async function logout() {
       clearStatus(authStatus);
 
