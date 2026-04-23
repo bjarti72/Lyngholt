@@ -627,7 +627,10 @@
     }
 
     async function loginWithPassword() {
+  
       console.log("login takkinn keyrir");
+      alert("loginWithPassword keyrir");
+
       clearStatus(authStatus);
 
       const email = emailInput.value.trim();
@@ -687,8 +690,10 @@
     /* ========================================= */
     /* SECTION: EVENT LISTENERS                  */
     /* ========================================= */
-  loginBtn.addEventListener('click', () => {
-  alert('JS smellur virkar');
+//  loginBtn.addEventListener('click', () => {
+  //alert('JS smellur virkar');
+
+    loginBtn.addEventListener('click', loginWithPassword);
 });
     signupBtn.addEventListener('click', signup);
     logoutBtn.addEventListener('click', logout);
