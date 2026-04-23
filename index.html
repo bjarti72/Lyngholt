@@ -52,6 +52,22 @@
       color: var(--muted);
     }
 
+    #loggedOutBox,
+    #loggedOutBox *,
+    #loggedInBox,
+    #loggedInBox *,
+    .booking-row,
+    .booking-row * {
+      pointer-events: auto !important;
+    }
+
+    #loggedOutBox,
+    #loggedInBox,
+    .booking-row {
+      position: relative;
+      z-index: 20;
+    }
+
     /* ========================================= */
     /* SECTION: HERO / HEADER                    */
     /* ========================================= */
@@ -681,7 +697,10 @@
     /* ========================================= */
     /* SECTION: EVENT LISTENERS                  */
     /* ========================================= */
-    // loginBtn.addEventListener('click', loginWithPassword);
+    loginBtn.addEventListener('click', async (event) => {
+      event.preventDefault();
+      await window.loginNow();
+    });
     signupBtn.addEventListener('click', signup);
     logoutBtn.addEventListener('click', logout);
 
@@ -695,6 +714,11 @@
     window.loginNow = async function () {
       await loginWithPassword();
     };
+
+    bookBtn.addEventListener('click', async (event) => {
+      event.preventDefault();
+      await window.bookNow();
+    });
 
     window.bookNow = async function () {
       clearStatus(bookingStatus);
