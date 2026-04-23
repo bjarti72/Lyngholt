@@ -287,41 +287,31 @@
       <!-- ========================================= -->
       <!-- SECTION: AUTH CARD                       -->
       <!-- ========================================= -->
-      <section class="card">
-        <h2>Innskráning</h2>
-        <p>TEST 126
-      </p>
-        <p class="muted">Skráðu þig inn með netfangi og lykilorði.</p>
+   <section class="card">
+  <h2>Innskráning</h2>
 
-        <div id="loggedOutBox" class="auth-row">
-          <div>
-            <label for="email">Netfang</label>
-            <input id="email" type="email" placeholder="Netfang" />
-          </div>
+  <div id="loggedOutBox" class="auth-row">
+    <div>
+      <label for="email">Netfang</label>
+      <input id="email" type="email" placeholder="Netfang" />
+    </div>
 
-          <div>
-            <label for="password">Lykilorð</label>
-            <input id="password" type="password" placeholder="Lykilorð" />
-          </div>
+    <div>
+      <label for="password">Lykilorð</label>
+      <input id="password" type="password" placeholder="Lykilorð" />
+    </div>
 
-        
-         <!--  <button id="loginBtn">Skrá inn</button> -->
-         <!--  <button id="loginBtn" onclick="window.testLoginClick()">Skrá inn</button> -->
-         <!-- <button id="loginBtn" onclick="alert('HTML TAKKI VIRKAR NUNA')">Skrá inn</button> -->
-          <button id="loginBtn" onclick="loginNow()">Skrá inn</button>
-          
-          <button id="signupBtn" class="secondary">Búa til notanda</button>
-        </div>
+    <button id="loginBtn">Skrá inn</button>
+    <button id="signupBtn" class="secondary">Búa til notanda</button>
+  </div>
 
-        <div id="loggedInBox" class="hidden">
-          <p><strong>Innskráð(ur):</strong> <span id="userEmail"></span></p>
-          <div class="top-actions">
-            <button id="logoutBtn" class="secondary">Skrá út</button>
-          </div>
-        </div>
+  <div id="loggedInBox" class="hidden">
+    <p><strong>Innskráð(ur):</strong> <span id="userEmail"></span></p>
+    <button id="logoutBtn">Skrá út</button>
+  </div>
 
-        <div id="authStatus" class="status"></div>
-      </section>
+  <div id="authStatus"></div>
+</section>
 
       <!-- ========================================= -->
       <!-- SECTION: RULES CARD                      -->
@@ -690,12 +680,8 @@ async function updateAuthUI() {
 /* ========================================= */
 /* SECTION: EVENT LISTENERS                  */
 /* ========================================= */
-//loginBtn.addEventListener('click', loginWithPassword);
-loginBtn.addEventListener('click', async () => {
-  showStatus(authStatus, 'Smellt á Skrá inn...');
-  await loginWithPassword();
-});
-    
+
+loginBtn.addEventListener('click', loginWithPassword);
 signupBtn.addEventListener('click', signup);
 logoutBtn.addEventListener('click', logout);
 bookBtn.addEventListener('click', createBooking);
