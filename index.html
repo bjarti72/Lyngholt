@@ -659,4 +659,124 @@
       const { data: { user } } = await supabaseClient.auth.getUser();
 
       if (user) {
-        loggedOutBox.classList.add('hidden
+        loggedOutBox.classList.add('hidden');
+        loggedInBox.classList.remove('hidden');
+        userEmail.textContent = user.email;
+      } else {
+        loggedOutBox.classList.remove('hidden');
+        loggedInBox.classList.add('hidden');
+        userEmail.textContent = '';
+      }
+
+      await refreshBookings();
+      }
+
+      async function createBooking() {
+      if (isBooking) return;
+      isBooking = true;
+      clearStatus(bookingStatus);
+
+      try {
+        const start_date = selectedStart;
+        const end_date = selectedEnd;
+        const fullName = fullNameInput.value.trim();
+
+        if (!fullName) {
+          showStatus(bookingStatus, 'Settu inn nafn.', true);
+          return;
+        }
+
+        if (!start_date || !end_date) {
+          showStatus(bookingStatus, 'Veldu dagabil fyrst.', true);
+          return;
+        }
+
+        if (end_date < start_date) {
+          showStatus(bookingStatus, 'Lokadagur má ekki vera á undan upphafsdegi.', true);
+          return;
+        }
+
+        const { data: { user } } = await supabaseClient.auth.getUser();
+
+        if (!user) {
+          showStatus(bookingStatus, 'Þú þarft að vera skráð(ur) inn til að bóka.', true);
+          return;
+        }
+
+        const initials = initialsFromName(fullName);
+
+        const { data: overlappingBookings, error: overlapError } = await supabaseClient
+          .from('bookings')
+          .select('id')
+          .lte('start_date', end_date)
+          .gte('end_date', start_date)
+          .limit(1);
+
+        if (overlapError) {
+          showStatus(bookingStatus, overlapError.message, true);
+          return;
+        }
+
+        if (overlappingBookings && overlappingBookings.length > 0) {
+          showStatus(bookingStatus, 'Þetta tímabil skarast við bókun sem er þegar til.', true);
+          return;
+        }
+
+        const { error } = await supabaseClient
+          .from('bookings')
+          .insert([
+            {
+              user_id: user.id,
+              start_date,
+              end_date,
+              booked_by_name: fullName,
+              booked_by_email: user.email,
+              booked_by_initials: initials
+            }
+          ]);
+
+        if (error) {
+          showStatus(bookingStatus, error.message, true);
+          return;
+        }
+
+        showStatus(bookingStatus, 'Bókun vistuð.');
+        fullNameInput.value = '';
+        selectedStart = null;
+        selectedEnd = null;
+        datePicker.clear();
+        await refreshBookings();
+      } catch (error) {
+        showStatus(bookingStatus, error.message || 'Óvænt villa kom upp við bókun.', true);
+      } finally {
+        isBooking = false;
+      }
+      }
+
+      window.loginNow = loginWithPassword;
+      window.bookNow = createBooking;
+
+      signupBtn.addEventListener('click', signup);
+      logoutBtn.addEventListener('click', logout);
+      loginBtn.addEventListener('click', () => {
+        window.loginNow();
+      });
+      bookBtn.addEventListener('click', () => {
+        window.bookNow();
+      });
+
+      supabaseClient.auth.onAuthStateChange(() => {
+        window.setTimeout(() => {
+          updateAuthUI().catch((error) => {
+            showStatus(authStatus, error.message || 'Ekki tókst að uppfæra innskráningarstöðu.', true);
+          });
+        }, 0);
+      });
+
+      updateAuthUI().catch((error) => {
+        showBootError(error.message || 'Ekki tókst að hlaða notandastöðu.');
+      });
+    }
+  </script>
+</body>
+</html>
