@@ -203,6 +203,24 @@
       display: none !important;
     }
 
+#calendar {
+  margin-top: 10px;
+}
+
+#calendar .flatpickr-calendar {
+  box-shadow: none;
+  border: none;
+  width: 100%;
+}
+
+#calendar .flatpickr-day.flatpickr-disabled,
+#calendar .flatpickr-day.disabled {
+  background: #f3c6c6 !important;
+  color: #8b0000 !important;
+  border-color: #f3c6c6 !important;
+  border-radius: 6px;
+}
+    
     @media (max-width: 860px) {
       .grid {
         grid-template-columns: 1fr;
@@ -257,6 +275,12 @@
         </ul>
       </section>
     </div>
+
+  <section class="card" style="margin-top:20px;">
+     <h2>Dagatal</h2>
+    <p class="muted">Uppteknir dagar eru merktir í dagatalinu hér fyrir neðan.</p>
+    <div id="calendar"></div>
+  </section>
 
     <section class="card" style="margin-top:20px;">
       <h2>Bóka dvöl</h2>
@@ -342,6 +366,12 @@
       }
     });
 
+    const calendar = flatpickr('#calendar', {
+  inline: true,
+  dateFormat: 'Y-m-d',
+  clickOpens: false
+});
+
     function renderBookings(list, container, currentUserId, ownOnly = false) {
       if (!list.length) {
         container.innerHTML = '<div class="empty">Engar bókanir enn.</div>';
@@ -394,20 +424,21 @@
       return data || [];
     }
 
-    async function refreshBookings() {
-      const { data: { user } } = await supabase.auth.getUser();
-      const bookings = await fetchBookings();
+ async function refreshBookings() {
+  const { data: { user } } = await supabase.auth.getUser();
+  const bookings = await fetchBookings();
 
-      renderBookings(bookings, allBookingsEl, user?.id || null, false);
-      renderBookings(bookings, myBookingsEl, user?.id || null, true);
+  renderBookings(bookings, allBookingsEl, user?.id || null, false);
+  renderBookings(bookings, myBookingsEl, user?.id || null, true);
 
-      const disabledRanges = bookings.map(b => ({
-        from: b.start_date,
-        to: b.end_date
-      }));
+  const disabledRanges = bookings.map(b => ({
+    from: b.start_date,
+    to: b.end_date
+  }));
 
-      datePicker.set('disable', disabledRanges);
-    }
+  datePicker.set('disable', disabledRanges);
+  calendar.set('disable', disabledRanges);
+}
 
     async function updateAuthUI() {
       const { data: { user } } = await supabase.auth.getUser();
