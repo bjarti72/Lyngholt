@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="is">
 <head>
   <meta charset="UTF-8" />
@@ -197,7 +197,8 @@
 
     .auth-strip-user {
       font-weight: bold;
-      color: #5b4735;
+      color: rgba(255, 248, 240, 0.96);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
     }
 
     .auth-strip-actions {
@@ -212,13 +213,15 @@
       appearance: none;
       border: none;
       background: transparent;
-      color: var(--accent);
+      color: rgba(255, 248, 240, 0.96);
       font: inherit;
       font-weight: bold;
       cursor: pointer;
       padding: 0;
       text-decoration: underline;
       text-underline-offset: 3px;
+      text-decoration-color: rgba(255, 248, 240, 0.72);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
       width: auto;
     }
 
@@ -402,43 +405,13 @@
       gap: 16px;
     }
 
-    .color-picker {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(42px, 1fr));
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .color-option {
-      position: relative;
-    }
-
-    .color-option input {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .color-swatch {
-      width: 100%;
-      aspect-ratio: 1;
-      border-radius: 14px;
-      border: 3px solid transparent;
-      cursor: pointer;
-      box-shadow: inset 0 0 0 1px rgba(31, 41, 55, 0.08);
-    }
-
-    .color-option input:checked + .color-swatch {
-      border-color: #111827;
-      box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
-    }
-
     label {
       font-weight: bold;
       font-size: 0.95rem;
     }
 
     input,
+    select,
     button {
       width: 100%;
       padding: 12px 14px;
@@ -447,7 +420,8 @@
       font-size: 1rem;
     }
 
-    input {
+    input,
+    select {
       background: rgba(255, 255, 255, 0.92);
     }
 
@@ -527,6 +501,45 @@
       font-weight: bold;
       color: #7a5a2d;
       margin-bottom: 4px;
+    }
+
+    .notice-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .notice-type-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      letter-spacing: 0.01em;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .notice-type-pill.important {
+      background: rgba(175, 90, 74, 0.12);
+      border-color: rgba(175, 90, 74, 0.2);
+      color: #8c4338;
+    }
+
+    .notice-type-pill.info {
+      background: rgba(110, 126, 93, 0.12);
+      border-color: rgba(110, 126, 93, 0.18);
+      color: #4e6244;
+    }
+
+    .notice-body {
+      color: var(--text);
+      line-height: 1.45;
     }
 
     .notice-meta {
@@ -623,6 +636,36 @@
 
     #calendar {
       margin-top: 10px;
+    }
+
+    #calendar .calendar-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    #calendar .calendar-nav-label {
+      font-weight: bold;
+      color: #6a4e38;
+      text-transform: capitalize;
+    }
+
+    #calendar .calendar-nav-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    #calendar .calendar-nav-btn {
+      width: auto;
+      min-width: 40px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(163, 127, 86, 0.18);
+      background: rgba(255, 248, 239, 0.9);
+      color: #6a4e38;
+      font-weight: bold;
     }
 
     #calendar .calendar-months {
@@ -847,6 +890,25 @@
       font-size: 0.94rem;
     }
 
+    .task-assignee {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(217, 185, 143, 0.18);
+      border: 1px solid rgba(163, 127, 86, 0.16);
+      color: #6a4e38;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .task-assignee-label {
+      color: #8a6a11;
+      font-weight: normal;
+    }
+
     .task-meta-row {
       color: #8a6a11;
       font-size: 0.88rem;
@@ -899,6 +961,17 @@
     }
 
     @media (max-width: 860px) {
+      header {
+        min-height: auto;
+        padding: 24px 16px 20px;
+        align-items: stretch;
+      }
+
+      main {
+        margin: 12px auto 32px;
+        padding: 0 14px;
+      }
+
       .grid {
         grid-template-columns: 1fr;
       }
@@ -917,11 +990,30 @@
 
       .hero {
         grid-template-columns: 1fr;
+        gap: 14px;
+        align-items: start;
       }
 
       .hero-weather {
-        justify-self: start;
+        justify-self: stretch;
         max-width: 100%;
+      }
+
+      .hero-weather .weather-card {
+        padding: 12px;
+      }
+
+      .hero-weather .weather-main {
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .hero-weather .weather-icon {
+        font-size: 1.7rem;
+      }
+
+      .hero-weather .weather-temp {
+        font-size: 1.45rem;
       }
 
       .booking-item {
@@ -1044,11 +1136,7 @@
           </div>
           <div>
             <label for="signupName">Nafn notanda</label>
-            <input id="signupName" type="text" placeholder="Nafn ábyrgðaraðila" />
-          </div>
-          <div>
-            <label>Veldu lit</label>
-            <div id="signupColorPicker" class="color-picker"></div>
+            <input id="signupName" type="text" placeholder="Nafn" />
           </div>
           <button id="signupBtn" class="secondary" type="button">Búa til notanda</button>
         </div>
@@ -1071,6 +1159,14 @@
           <div>
             <label for="noticeBody">Nánari texti</label>
             <input id="noticeBody" type="text" placeholder="Til dæmis: Unnið er að viðgerð, notið vatn sparlega" />
+          </div>
+
+          <div>
+            <label for="noticeType">Tegund</label>
+            <select id="noticeType">
+              <option value="important">Mikilvægt</option>
+              <option value="info" selected>Upplýsingar</option>
+            </select>
           </div>
 
           <button id="addNoticeBtn" type="button">Birta tilkynningu</button>
@@ -1237,12 +1333,12 @@
       const signupNameInput = document.getElementById('signupName');
       const fullNameInput = document.getElementById('fullName');
       const dateRangeInput = document.getElementById('dateRange');
-      const signupColorPicker = document.getElementById('signupColorPicker');
       const taskTitleInput = document.getElementById('taskTitle');
       const taskNotesInput = document.getElementById('taskNotes');
       const taskForm = document.getElementById('taskForm');
       const noticeTitleInput = document.getElementById('noticeTitle');
       const noticeBodyInput = document.getElementById('noticeBody');
+      const noticeTypeInput = document.getElementById('noticeType');
       const noticeForm = document.getElementById('noticeForm');
 
       const loginBtn = document.getElementById('loginBtn');
@@ -1284,6 +1380,12 @@
       let currentUser = null;
       let currentUserIsAdmin = false;
       let bookingDayMap = {};
+      let availabilityMonthOffset = 0;
+      let profilesById = {};
+      const NOTICE_TYPES = {
+        important: { label: 'Mikilvægt', className: 'important' },
+        info: { label: 'Upplýsingar', className: 'info' }
+      };
       const userColorOptions = [
         { value: '#D97706', label: 'Amber' },
         { value: '#DC2626', label: 'Red' },
@@ -1297,23 +1399,42 @@
         { value: '#EA580C', label: 'Orange' }
       ];
 
-      function renderColorPicker() {
-        signupColorPicker.innerHTML = userColorOptions.map((option, index) => `
-          <label class="color-option" title="${option.label}">
-            <input type="radio" name="signupColor" value="${option.value}" ${index === 0 ? 'checked' : ''} />
-            <span class="color-swatch" style="background:${option.value}"></span>
-          </label>
-        `).join('');
+      async function fetchProfiles() {
+        const { data, error } = await supabaseClient
+          .from('profiles')
+          .select('id, email, display_name, color');
+
+        if (error) {
+          throw error;
+        }
+
+        profilesById = Object.fromEntries((data || []).map((profile) => [profile.id, profile]));
+        return data || [];
       }
 
-      function getSelectedSignupColor() {
-        return document.querySelector('input[name="signupColor"]:checked')?.value || userColorOptions[0].value;
+      function getNextAvailableColor() {
+        const usedColors = new Set(
+          Object.values(profilesById)
+            .map((profile) => profile?.color)
+            .filter(Boolean)
+        );
+
+        return userColorOptions.find((option) => !usedColors.has(option.value))?.value || userColorOptions[0].value;
       }
 
       function getUserProfile(user) {
+        const profile = user?.id ? profilesById[user.id] : null;
         return {
-          responsibleName: user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || 'Óþekktur notandi',
-          responsibleColor: user?.user_metadata?.color || userColorOptions[0].value
+          responsibleName: profile?.display_name || user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || 'Óþekktur notandi',
+          responsibleColor: profile?.color || user?.user_metadata?.color || userColorOptions[0].value
+        };
+      }
+
+      function resolveBookingPresentation(booking) {
+        const profile = booking?.user_id ? profilesById[booking.user_id] : null;
+        return {
+          responsibleName: profile?.display_name || booking?.responsible_name || 'Óþekktur',
+          responsibleColor: profile?.color || booking?.responsible_color || '#d6e4dd'
         };
       }
 
@@ -1336,6 +1457,44 @@
         return `${year}-${month}-${day}`;
       }
 
+      const icelandicMonthLabels = ['janúar', 'febrúar', 'mars', 'apríl', 'maí', 'júní', 'júlí', 'ágúst', 'september', 'október', 'nóvember', 'desember'];
+
+      function formatIcelandicMonthYear(date) {
+        return `${icelandicMonthLabels[date.getMonth()]} ${date.getFullYear()}`;
+      }
+
+      function formatIcelandicMonth(date) {
+        return icelandicMonthLabels[date.getMonth()];
+      }
+
+      function parseDateString(dateStr) {
+        return new Date(`${dateStr}T00:00:00`);
+      }
+
+      function formatDisplayDate(dateStr, includeYear = false) {
+        const date = typeof dateStr === 'string' ? parseDateString(dateStr) : dateStr;
+        const base = `${date.getDate()}. ${formatIcelandicMonth(date)}`;
+        return includeYear ? `${base} ${date.getFullYear()}` : base;
+      }
+
+      function formatDateRange(startDateStr, endDateStr) {
+        if (!startDateStr || !endDateStr) return '';
+
+        const startDate = parseDateString(startDateStr);
+        const endDate = parseDateString(endDateStr);
+        const sameYear = startDate.getFullYear() === endDate.getFullYear();
+
+        if (startDateStr === endDateStr) {
+          return formatDisplayDate(startDate);
+        }
+
+        if (sameYear) {
+          return `${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`;
+        }
+
+        return `${formatDisplayDate(startDate, true)} - ${formatDisplayDate(endDate, true)}`;
+      }
+
       function expandBookingDays(bookings) {
         const dayMap = {};
 
@@ -1344,9 +1503,10 @@
           const end = new Date(booking.end_date + 'T12:00:00');
 
           while (cursor <= end) {
+            const presentation = resolveBookingPresentation(booking);
             dayMap[formatDateKey(cursor)] = {
-              color: booking.responsible_color || '#d6e4dd',
-              responsibleName: booking.responsible_name || 'Óþekktur'
+              color: presentation.responsibleColor,
+              responsibleName: presentation.responsibleName
             };
             cursor.setDate(cursor.getDate() + 1);
           }
@@ -1368,6 +1528,14 @@
         return window.matchMedia('(max-width: 860px)').matches ? 1 : 2;
       }
 
+      function normalizeNoticeType(value) {
+        return Object.prototype.hasOwnProperty.call(NOTICE_TYPES, value) ? value : 'info';
+      }
+
+      function getNoticeTypeMeta(value) {
+        return NOTICE_TYPES[normalizeNoticeType(value)];
+      }
+
       function renderAvailabilityCalendar() {
         const monthCount = getAvailabilityMonthCount();
         const weekdayLabels = ['Mán', 'Þri', 'Mið', 'Fim', 'Fös', 'Lau', 'Sun'];
@@ -1376,13 +1544,10 @@
         let monthsHtml = '';
 
         for (let offset = 0; offset < monthCount; offset += 1) {
-          const monthDate = new Date(today.getFullYear(), today.getMonth() + offset, 1, 12, 0, 0);
+          const monthDate = new Date(today.getFullYear(), today.getMonth() + availabilityMonthOffset + offset, 1, 12, 0, 0);
           const year = monthDate.getFullYear();
           const month = monthDate.getMonth();
-          const monthLabel = monthDate.toLocaleDateString('is-IS', {
-            month: 'long',
-            year: 'numeric'
-          });
+          const monthLabel = formatIcelandicMonthYear(monthDate);
           const firstWeekday = (monthDate.getDay() + 6) % 7;
           const daysInMonth = new Date(year, month + 1, 0).getDate();
           const weekdayHtml = weekdayLabels.map((label) => `<div class="calendar-weekday">${label}</div>`).join('');
@@ -1432,13 +1597,37 @@
           `;
         }
 
-        calendarEl.innerHTML = `<div class="calendar-months">${monthsHtml}</div>`;
-      }
+        const startMonth = new Date(today.getFullYear(), today.getMonth() + availabilityMonthOffset, 1, 12, 0, 0);
+        const endMonth = new Date(today.getFullYear(), today.getMonth() + availabilityMonthOffset + monthCount - 1, 1, 12, 0, 0);
+        const navLabel = monthCount === 1
+          ? formatIcelandicMonthYear(startMonth)
+          : `${formatIcelandicMonth(startMonth)} - ${formatIcelandicMonthYear(endMonth)}`;
 
-      renderColorPicker();
+        calendarEl.innerHTML = `
+          <div class="calendar-nav">
+            <div class="calendar-nav-label">${navLabel}</div>
+            <div class="calendar-nav-buttons">
+              <button type="button" class="calendar-nav-btn" data-calendar-nav="prev">‹</button>
+              <button type="button" class="calendar-nav-btn" data-calendar-nav="next">›</button>
+            </div>
+          </div>
+          <div class="calendar-months">${monthsHtml}</div>
+        `;
+
+        calendarEl.querySelector('[data-calendar-nav="prev"]')?.addEventListener('click', () => {
+          availabilityMonthOffset -= monthCount;
+          renderAvailabilityCalendar();
+        });
+
+        calendarEl.querySelector('[data-calendar-nav="next"]')?.addEventListener('click', () => {
+          availabilityMonthOffset += monthCount;
+          renderAvailabilityCalendar();
+        });
+      }
 
       const flatpickrLocale = {
         firstDayOfWeek: 1,
+        rangeSeparator: ' - ',
         weekdays: {
           shorthand: ['Sun', 'Mán', 'Þri', 'Mið', 'Fim', 'Fös', 'Lau'],
           longhand: ['Sunnudagur', 'Mánudagur', 'Þriðjudagur', 'Miðvikudagur', 'Fimmtudagur', 'Föstudagur', 'Laugardagur']
@@ -1452,23 +1641,37 @@
       const datePicker = flatpickr(dateRangeInput, {
         mode: 'range',
         dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'j. F',
         minDate: 'today',
         locale: flatpickrLocale,
         prevArrow: '&#8249;',
         nextArrow: '&#8250;',
-        onChange(selectedDates) {
+        onReady(selectedDates, dateStr, instance) {
+          instance.altInput.placeholder = 'Veldu dagabil';
+        },
+        onChange(selectedDates, dateStr, instance) {
           if (selectedDates.length === 2) {
             selectedStart = selectedDates[0].toISOString().split('T')[0];
             selectedEnd = selectedDates[1].toISOString().split('T')[0];
+            instance.altInput.value = formatDateRange(selectedStart, selectedEnd);
+          } else if (selectedDates.length === 1) {
+            selectedStart = selectedDates[0].toISOString().split('T')[0];
+            selectedEnd = null;
+            instance.altInput.value = formatDisplayDate(selectedStart);
           } else {
             selectedStart = null;
             selectedEnd = null;
+            instance.altInput.value = '';
           }
         }
       });
 
       renderAvailabilityCalendar();
       refreshWeather();
+      fetchProfiles().catch((error) => {
+        console.error(error);
+      });
 
       let lastAvailabilityMonthCount = getAvailabilityMonthCount();
       window.addEventListener('resize', () => {
@@ -1492,7 +1695,7 @@
       }
 
       function formatDate(dateStr) {
-        return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
+        return formatDisplayDate(dateStr, true);
       }
 
       function formatShortDate(dateStr) {
@@ -1706,14 +1909,15 @@
           : '';
 
         const guestNames = item.booked_by_name || 'Óþekktir gestir';
-        const bookedByName = item.responsible_name || 'Óþekktur';
+        const presentation = resolveBookingPresentation(item);
+        const bookedByName = presentation.responsibleName;
         return `
           <div class="booking-item">
             <div class="booking-main">
-              <div class="name-badge" style="background:${item.responsible_color || '#d6e4dd'}; color:#111827;">${bookedByName}</div>
+              <div class="name-badge" style="background:${presentation.responsibleColor}; color:#111827;">${bookedByName}</div>
               <div class="booking-details">
                 <div class="booking-line">Gestir: ${guestNames}</div>
-                <div class="booking-dates">${formatDate(item.start_date)} til ${formatDate(item.end_date)}</div>
+                <div class="booking-dates">${formatDateRange(item.start_date, item.end_date)}</div>
               </div>
             </div>
             <div class="booking-actions">${deleteButton}</div>
@@ -1745,8 +1949,9 @@
               const isCurrent = item.start_date <= todayKey && item.end_date >= todayKey;
               const statusText = isCurrent ? 'Í bústaðnum núna' : index === 0 ? 'Næst á dagskrá' : 'Síðar';
               const guestNames = item.booked_by_name || 'Óþekktir gestir';
-              const bookedByName = item.responsible_name || 'Óþekktur';
-              const badgeColor = item.responsible_color || '#d6e4dd';
+              const presentation = resolveBookingPresentation(item);
+              const bookedByName = presentation.responsibleName;
+              const badgeColor = presentation.responsibleColor;
 
               return `
                 <div class="agenda-item">
@@ -1754,7 +1959,7 @@
                   <div>
                     <div class="agenda-status">${statusText}</div>
                     <div class="summary-line">Gestir: ${guestNames}</div>
-                    <div class="summary-dates">${formatDate(item.start_date)} til ${formatDate(item.end_date)}</div>
+                    <div class="summary-dates">${formatDateRange(item.start_date, item.end_date)}</div>
                   </div>
                 </div>
               `;
@@ -1780,22 +1985,41 @@
         return 'Óúthlutað';
       }
 
+      function taskStatusSortValue(status) {
+        if (status === 'open') return 0;
+        if (status === 'claimed') return 1;
+        if (status === 'done') return 2;
+        return 3;
+      }
+
       function renderTasks(list, currentUser) {
         if (!list.length) {
           taskListEl.innerHTML = '<div class="empty">Engin verkefni enn.</div>';
           return;
         }
 
-        taskListEl.innerHTML = list.map((task) => {
+        const sortedTasks = [...list].sort((a, b) => {
+          const statusDiff = taskStatusSortValue(a.status || 'open') - taskStatusSortValue(b.status || 'open');
+          if (statusDiff !== 0) return statusDiff;
+
+          const dateA = new Date(a.created_at || 0).getTime();
+          const dateB = new Date(b.created_at || 0).getTime();
+          return dateB - dateA;
+        });
+
+        taskListEl.innerHTML = sortedTasks.map((task) => {
           const status = task.status || 'open';
           const canClaim = currentUser && status === 'open';
           const canComplete = currentUser && status === 'claimed' && task.claimed_by_user_id === currentUser.id;
           const canDelete = currentUser && status === 'done';
           const notesText = task.notes ? `<div class="task-notes">${task.notes}</div>` : '';
+          const assigneeText = task.claimed_by_name
+            ? `<div class="task-assignee"><span class="task-assignee-label">${task.claimed_by_name}</span>tók að sér</div>`
+            : '';
           const metaParts = [`Skráð ${formatDateTime(task.created_at)}`];
 
           if (task.claimed_by_name) {
-            metaParts.push(`${task.claimed_by_name} tók að sér`);
+            metaParts.push(`${task.claimed_by_name} tók þetta að sér`);
           } else {
             metaParts.push('Óúthlutað');
           }
@@ -1810,6 +2034,7 @@
               <div class="task-top">
                 <div class="task-title">${task.title}</div>
                 ${notesText}
+                ${assigneeText}
                 ${metaText}
               </div>
               <div class="task-side">
@@ -1850,6 +2075,9 @@
         }
 
         noticeListEl.innerHTML = list.map((notice) => {
+          const safeTitle = escapeHtml(notice.title);
+          const safeBody = notice.body ? `<div class="notice-body">${escapeHtml(notice.body)}</div>` : '';
+          const typeMeta = getNoticeTypeMeta(notice.type);
           const deleteButton = currentUserIsAdmin
             ? `<button class="danger" type="button" data-delete-notice="${notice.id}">Eyða tilkynningu</button>`
             : '';
@@ -1858,8 +2086,11 @@
             <div class="notice-item">
               <div class="task-top">
                 <div>
-                  <div class="notice-title">${notice.title}</div>
-                  <div>${notice.body || ''}</div>
+                  <div class="notice-heading">
+                    <div class="notice-title">${safeTitle}</div>
+                    <span class="notice-type-pill ${typeMeta.className}">${typeMeta.label}</span>
+                  </div>
+                  ${safeBody}
                   <div class="notice-meta">${formatDateTime(notice.created_at)}${notice.created_by_name ? ' · frá ' + notice.created_by_name : ''}</div>
                 </div>
                 <div class="booking-actions">${deleteButton}</div>
@@ -1924,7 +2155,7 @@
       async function fetchNotices() {
         const { data, error } = await supabaseClient
           .from('notices')
-          .select('id, title, body, created_at, created_by_name')
+          .select('id, title, body, type, created_at, created_by_name')
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -2039,6 +2270,7 @@
       try {
         const title = noticeTitleInput.value.trim();
         const body = noticeBodyInput.value.trim();
+        const type = normalizeNoticeType(noticeTypeInput.value);
         const user = await resolveCurrentUser();
 
         if (!user) {
@@ -2058,6 +2290,7 @@
             {
               title,
               body: body || null,
+              type,
               created_by_name: profile.responsibleName
             }
           ]);
@@ -2069,6 +2302,7 @@
 
         noticeTitleInput.value = '';
         noticeBodyInput.value = '';
+        noticeTypeInput.value = 'info';
         showStatus(noticeStatus, 'Tilkynningu bætt við.');
         toggleNoticeForm(false);
         await refreshNotices();
@@ -2182,14 +2416,14 @@
         const email = signupEmailInput.value.trim();
         const password = signupPasswordInput.value;
         const displayName = signupNameInput.value.trim();
-        const color = getSelectedSignupColor();
+        const color = getNextAvailableColor();
 
       if (!email || !password || !displayName) {
         showStatus(authStatus, 'Settu inn netfang, lykilorð og nafn notanda.', true);
         return;
       }
 
-      const { error } = await supabaseClient.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: {
@@ -2205,7 +2439,27 @@
         return;
       }
 
-      showStatus(authStatus, 'Notandi búinn til. Athugaðu hvort staðfestingarpóstur hafi verið sendur.');
+      const newUserId = data?.user?.id;
+      if (newUserId) {
+        const { error: profileError } = await supabaseClient
+          .from('profiles')
+          .upsert({
+            id: newUserId,
+            email,
+            display_name: displayName,
+            color
+          });
+
+        if (profileError) {
+          showStatus(authStatus, profileError.message, true);
+          return;
+        }
+
+        await fetchProfiles();
+      }
+
+      const colorLabel = userColorOptions.find((option) => option.value === color)?.label || 'valinn';
+      showStatus(authStatus, `Notandi búinn til. Liturinn þinn er ${colorLabel.toLowerCase()}. Athugaðu hvort staðfestingarpóstur hafi verið sendur.`);
       signupEmailInput.value = '';
       signupPasswordInput.value = '';
       signupNameInput.value = '';
@@ -2275,6 +2529,7 @@
 
       async function updateAuthUI() {
       const user = await resolveCurrentUser();
+      await fetchProfiles().catch(() => []);
       currentUser = user;
       currentUserIsAdmin = isAdmin(user);
 
@@ -2428,3 +2683,5 @@
   </script>
 </body>
 </html>
+
+
