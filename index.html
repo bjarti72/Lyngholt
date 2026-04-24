@@ -995,25 +995,54 @@
       }
 
       .hero-weather {
-        justify-self: stretch;
-        max-width: 100%;
+        justify-self: end;
+        width: min(78vw, 280px);
+        max-width: 280px;
       }
 
       .hero-weather .weather-card {
-        padding: 12px;
+        padding: 10px;
       }
 
       .hero-weather .weather-main {
-        gap: 10px;
-        margin-bottom: 10px;
+        gap: 8px;
+        margin-bottom: 8px;
       }
 
       .hero-weather .weather-icon {
-        font-size: 1.7rem;
+        font-size: 1.45rem;
       }
 
       .hero-weather .weather-temp {
-        font-size: 1.45rem;
+        font-size: 1.2rem;
+      }
+
+      .hero-weather .weather-desc,
+      .hero-weather .weather-meta {
+        font-size: 0.82rem;
+        line-height: 1.35;
+      }
+
+      .hero-weather .weather-forecast {
+        gap: 8px;
+      }
+
+      .hero-weather .weather-day {
+        padding: 8px 6px;
+      }
+
+      .hero-weather .weather-day-label {
+        font-size: 0.74rem;
+        margin-bottom: 4px;
+      }
+
+      .hero-weather .weather-day-icon {
+        font-size: 1rem;
+        margin-bottom: 4px;
+      }
+
+      .hero-weather .weather-day-temp {
+        font-size: 0.82rem;
       }
 
       .booking-item {
@@ -1213,7 +1242,7 @@
         <div class="booking-row">
           <div>
             <label for="fullName">Gestir</label>
-            <input id="fullName" type="text" placeholder="Til dæmis: Anna og Jón" />
+            <input id="fullName" type="text" placeholder="Nöfn gesta" />
           </div>
 
           <div>
