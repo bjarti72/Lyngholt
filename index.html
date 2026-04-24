@@ -680,6 +680,9 @@
     function initializePage() {
       const SUPABASE_URL = 'https://fabkvblawbavbmozlutj.supabase.co';
       const SUPABASE_KEY = 'sb_publishable_eC_30Wnq3C9B7lM46mfGkw_7rNcV-aG';
+      const ADMIN_EMAILS = [
+        'ingibjarturj@simnet.is'
+      ];
 
       const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -707,7 +710,6 @@
       const loggedOutBox = document.getElementById('loggedOutBox');
       const loggedInBox = document.getElementById('loggedInBox');
       const userEmail = document.getElementById('userEmail');
-
       const allBookingsEl = document.getElementById('allBookings');
       const myBookingsEl = document.getElementById('myBookings');
       const taskListEl = document.getElementById('taskList');
@@ -717,6 +719,8 @@
       let isLoggingIn = false;
       let isBooking = false;
       let isSavingTask = false;
+      let currentUser = null;
+      let currentUserIsAdmin = false;
       let bookingDayMap = {};
       const userColorOptions = [
         { value: '#D97706', label: 'Amber' },
@@ -746,7 +750,7 @@
 
       function getUserProfile(user) {
         return {
-          responsibleName: user?.user_metadata?.display_name || user?.email || 'Óþekktur notandi',
+          responsibleName: user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || 'Óþekktur notandi',
           responsibleColor: user?.user_metadata?.color || userColorOptions[0].value
         };
       }
@@ -856,7 +860,42 @@
         return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
       }
 
-      function renderBookings(list, container, currentUserId, ownOnly = false) {
+      function normalizeEmail(value) {
+        return (value || '').trim().toLowerCase();
+      }
+
+      function getUserEmails(user) {
+        const emails = [
+          user?.email,
+          user?.user_metadata?.email
+        ];
+
+        if (Array.isArray(user?.identities)) {
+          user.identities.forEach((identity) => {
+            emails.push(identity?.email);
+            emails.push(identity?.identity_data?.email);
+          });
+        }
+
+        return [...new Set(emails.map(normalizeEmail).filter(Boolean))];
+      }
+
+      function isAdmin(user) {
+        const allowedEmails = ADMIN_EMAILS.map(normalizeEmail);
+        return getUserEmails(user).some((email) => allowedEmails.includes(email));
+      }
+
+      async function resolveCurrentUser() {
+        const { data: userData } = await supabaseClient.auth.getUser();
+        if (userData?.user) {
+          return userData.user;
+        }
+
+        const { data: sessionData } = await supabaseClient.auth.getSession();
+        return sessionData?.session?.user || null;
+      }
+
+      function renderBookings(list, container, currentUserId, ownOnly = false, canDeleteAll = false) {
       if (!list.length) {
         container.innerHTML = '<div class="empty">Engar bókanir enn.</div>';
         return;
@@ -872,7 +911,7 @@
       }
 
       container.innerHTML = filtered.map((item) => {
-        const deleteButton = ownOnly
+        const deleteButton = ownOnly || canDeleteAll
           ? '<button class="danger" type="button" data-delete-id="' + item.id + '">Eyða bókun</button>'
           : '';
 
@@ -995,12 +1034,12 @@
       }
 
       async function refreshBookings() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      const user = session?.user || null;
+      const user = currentUser || await resolveCurrentUser();
       const bookings = await fetchBookings();
+      const adminUser = currentUserIsAdmin || isAdmin(user);
 
-      renderBookings(bookings, allBookingsEl, user?.id || null, false);
-      renderBookings(bookings, myBookingsEl, user?.id || null, true);
+      renderBookings(bookings, allBookingsEl, user?.id || null, false, adminUser);
+      renderBookings(bookings, myBookingsEl, user?.id || null, true, adminUser);
 
         const disabledRanges = bookings.map((b) => ({
           from: b.start_date,
@@ -1015,8 +1054,7 @@
     }
 
       async function refreshTasks() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      const user = session?.user || null;
+      const user = currentUser || await resolveCurrentUser();
       const tasks = await fetchTasks();
       renderTasks(tasks, user || null);
       }
@@ -1223,9 +1261,11 @@
         }
 
         showStatus(authStatus, 'Innskráning tókst.');
+        currentUser = data.user;
+        currentUserIsAdmin = isAdmin(data.user);
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
-        userEmail.textContent = data.user.user_metadata?.display_name || data.user.email;
+        userEmail.textContent = (data.user.user_metadata?.display_name || data.user.email) + (currentUserIsAdmin ? ' (admin)' : '');
 
         Promise.all([refreshBookings(), refreshTasks()]).catch((refreshError) => {
           showStatus(authStatus, 'Innskráning tókst en ekki tókst að hlaða gögn: ' + refreshError.message, true);
@@ -1253,17 +1293,20 @@
       }
 
       async function updateAuthUI() {
-      const { data: { session } } = await supabaseClient.auth.getSession();
-      const user = session?.user || null;
+      const user = await resolveCurrentUser();
+      currentUser = user;
+      currentUserIsAdmin = isAdmin(user);
 
       if (user) {
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
-        userEmail.textContent = user.user_metadata?.display_name || user.email;
+        userEmail.textContent = (user.user_metadata?.display_name || user.email) + (currentUserIsAdmin ? ' (admin)' : '');
       } else {
         loggedOutBox.classList.remove('hidden');
         loggedInBox.classList.add('hidden');
         userEmail.textContent = '';
+        currentUser = null;
+        currentUserIsAdmin = false;
       }
 
       await refreshBookings();
