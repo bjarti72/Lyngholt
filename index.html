@@ -101,6 +101,13 @@
       gap: 20px;
     }
 
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+      align-items: start;
+    }
+
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -114,6 +121,23 @@
     .booking-row {
       display: grid;
       gap: 12px;
+    }
+
+    .auth-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .auth-panel {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #faf9f6;
+    }
+
+    .auth-panel h3 {
+      margin-bottom: 8px;
     }
 
     .color-picker {
@@ -219,12 +243,12 @@
     .booking-item {
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 14px;
+      padding: 10px 12px;
       display: grid;
-      grid-template-columns: 160px minmax(0, 1fr) 140px;
-      gap: 12px;
-      align-items: start;
-      background: #fcfcfc;
+      grid-template-columns: 120px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      background: #fdfcf9;
     }
 
     .booking-main {
@@ -232,10 +256,10 @@
     }
 
     .name-badge {
-      width: 160px;
-      min-height: 48px;
-      padding: 8px 12px;
-      border-radius: 14px;
+      width: 120px;
+      min-height: 38px;
+      padding: 6px 10px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -251,18 +275,25 @@
 
     .booking-name {
       font-weight: bold;
-      margin-bottom: 6px;
+      margin-bottom: 2px;
+      font-size: 0.96rem;
+      line-height: 1.25;
+    }
+
+    .booking-dates {
+      font-size: 0.92rem;
+      color: var(--muted);
     }
 
     .badge {
       display: inline-block;
-      font-size: 0.85rem;
-      padding: 6px 10px;
+      font-size: 0.78rem;
+      padding: 4px 8px;
       border-radius: 999px;
       background: var(--accent-soft);
       color: var(--accent);
       font-weight: bold;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
     .badge.responsible {
@@ -271,8 +302,14 @@
     }
 
     .booking-actions {
-      width: 140px;
+      width: auto;
       justify-self: end;
+    }
+
+    .booking-actions button {
+      width: auto;
+      min-width: 110px;
+      padding: 10px 12px;
     }
 
     .empty {
@@ -337,8 +374,78 @@
       line-height: 1.7;
     }
 
+    .task-form {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .task-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fcfcfc;
+      display: grid;
+      gap: 10px;
+    }
+
+    .task-top {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .task-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .task-meta {
+      color: var(--muted);
+      line-height: 1.4;
+      font-size: 0.94rem;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .task-status {
+      display: inline-block;
+      font-size: 0.82rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: bold;
+    }
+
+    .task-status.open {
+      background: #eef2ff;
+      color: #3730a3;
+    }
+
+    .task-status.claimed {
+      background: #fff4cc;
+      color: #7a5d00;
+    }
+
+    .task-status.done {
+      background: #dff5e8;
+      color: #166534;
+    }
+
     @media (max-width: 860px) {
       .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .split-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .auth-split {
         grid-template-columns: 1fr;
       }
 
@@ -369,31 +476,59 @@
     <div class="grid">
       <section class="card">
         <h2>Innskráning</h2>
-        <p class="muted">Skráðu þig inn með netfangi og lykilorði.</p>
+        <p class="muted">Skráðu þig inn með netfangi og lykilorði. Þegar búið er til nýjan notanda er nafn og litur valið einu sinni og það fylgir svo öllum bókunum frá þeim notanda.</p>
 
         <div id="loggedOutBox" class="auth-row">
-          <div>
-            <label for="email">Netfang</label>
-            <input id="email" type="email" placeholder="Netfang" />
-          </div>
+          <div class="auth-split">
+            <div class="auth-panel">
+              <h3>Skrá inn</h3>
+              <p class="muted">Fyrir notendur sem eru þegar til.</p>
 
-          <div>
-            <label for="password">Lykilorð</label>
-            <input id="password" type="password" placeholder="Lykilorð" />
-          </div>
+              <div class="auth-row">
+                <div>
+                  <label for="loginEmail">Netfang</label>
+                  <input id="loginEmail" type="email" placeholder="Netfang" />
+                </div>
 
-          <div>
-            <label for="signupName">Nafn notanda</label>
-            <input id="signupName" type="text" placeholder="Nafn ábyrgðaraðila" />
-          </div>
+                <div>
+                  <label for="loginPassword">Lykilorð</label>
+                  <input id="loginPassword" type="password" placeholder="Lykilorð" />
+                </div>
 
-          <div>
-            <label>Veldu lit</label>
-            <div id="signupColorPicker" class="color-picker"></div>
-          </div>
+                <button id="loginBtn" type="button">Skrá inn</button>
+              </div>
+            </div>
 
-          <button id="loginBtn" type="button">Skrá inn</button>
-          <button id="signupBtn" class="secondary" type="button">Búa til notanda</button>
+            <div class="auth-panel">
+              <h3>Stofna notanda</h3>
+              <p class="muted">Veldu nafn og lit einu sinni við stofnun.</p>
+
+              <div class="auth-row">
+                <div>
+                  <label for="signupEmail">Netfang</label>
+                  <input id="signupEmail" type="email" placeholder="Netfang" />
+                </div>
+
+                <div>
+                  <label for="signupPassword">Lykilorð</label>
+                  <input id="signupPassword" type="password" placeholder="Lykilorð" />
+                </div>
+
+                <div>
+                  <label for="signupName">Nafn notanda</label>
+                  <input id="signupName" type="text" placeholder="Nafn ábyrgðaraðila" />
+                </div>
+
+                <div>
+                  <label>Veldu lit</label>
+                  <div id="signupColorPicker" class="color-picker"></div>
+                  <p class="muted">Liturinn er valinn aðeins þegar notandi er stofnaður.</p>
+                </div>
+
+                <button id="signupBtn" class="secondary" type="button">Búa til notanda</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div id="loggedInBox" class="hidden">
@@ -415,42 +550,87 @@
       </section>
     </div>
 
-    <section class="card">
-      <h2>Dagatal</h2>
-      <p class="muted">Uppteknir dagar eru litamerktir hér fyrir neðan.</p>
-      <div id="calendar"></div>
+    <section class="card rules">
+      <h2>Húsreglur</h2>
+      <ul>
+        <li>Skildu við bústaðinn hreinan og taktu með þér rusl ef þarf.</li>
+        <li>Fylltu á helstu nauðsynjar ef þær klárast, til dæmis klósettpappír og sápu.</li>
+        <li>Lokaðu gluggum og læstu hurðum þegar farið er.</li>
+        <li>Skráðu verkefni eða athugasemdir neðar á síðunni svo næsti aðili sjái það.</li>
+      </ul>
     </section>
 
-    <section id="bokanir" class="card">
-      <h2>Bóka dvöl</h2>
-      <p class="muted">Veldu dagabil og smelltu svo á bókunarhnappinn.</p>
+    <div class="split-grid">
+      <section class="card">
+        <h2>Dagatal</h2>
+        <p class="muted">Uppteknir dagar eru litamerktir hér fyrir neðan.</p>
+        <div id="calendar"></div>
+      </section>
 
-      <div class="booking-row">
-        <div>
-          <label for="fullName">Nafn</label>
-          <input id="fullName" type="text" placeholder="Fullt nafn" />
+      <section id="bokanir" class="card">
+        <h2>Bóka dvöl</h2>
+        <p class="muted">Veldu dagabil og smelltu svo á bókunarhnappinn.</p>
+
+        <div class="booking-row">
+          <div>
+            <label for="fullName">Nafn</label>
+            <input id="fullName" type="text" placeholder="Fullt nafn" />
+          </div>
+
+          <div>
+            <label for="dateRange">Veldu dagabil</label>
+            <input id="dateRange" type="text" placeholder="Veldu dagabil" />
+          </div>
+
+          <button id="bookBtn" type="button">Bóka valda daga</button>
         </div>
 
-        <div>
-          <label for="dateRange">Veldu dagabil</label>
-          <input id="dateRange" type="text" placeholder="Veldu dagabil" />
+        <div id="bookingStatus" class="status"></div>
+      </section>
+    </div>
+
+    <div class="split-grid">
+      <section class="card">
+        <h2>Nýtt verkefni</h2>
+        <p class="muted">Skráðu verk sem þarf að gera svo einhver geti tekið það að sér.</p>
+
+        <div class="task-form">
+          <div>
+            <label for="taskTitle">Verkefni</label>
+            <input id="taskTitle" type="text" placeholder="Til dæmis: kaupa klósettpappír" />
+          </div>
+
+          <div>
+            <label for="taskNotes">Athugasemd (valfrjálst)</label>
+            <input id="taskNotes" type="text" placeholder="Til dæmis: vantar fyrir næstu ferð" />
+          </div>
+
+          <button id="addTaskBtn" type="button">Bæta við verkefni</button>
         </div>
 
-        <button id="bookBtn" type="button">Bóka valda daga</button>
-      </div>
+        <div id="taskStatus" class="status"></div>
+      </section>
 
-      <div id="bookingStatus" class="status"></div>
-    </section>
+      <section class="card">
+        <h2>Verkefnalisti</h2>
+        <p class="muted">Innskráður notandi getur tekið verk að sér og merkt það lokið.</p>
+        <div id="taskList" class="calendar-list">
+          <div class="empty">Engin verkefni enn.</div>
+        </div>
+      </section>
+    </div>
 
-    <section class="card">
-      <h2>Allar bókanir</h2>
-      <div id="allBookings" class="calendar-list"></div>
-    </section>
+    <div class="split-grid">
+      <section class="card">
+        <h2>Allar bókanir</h2>
+        <div id="allBookings" class="calendar-list"></div>
+      </section>
 
-    <section class="card">
-      <h2>Mínar bókanir</h2>
-      <div id="myBookings" class="calendar-list"></div>
-    </section>
+      <section class="card">
+        <h2>Mínar bókanir</h2>
+        <div id="myBookings" class="calendar-list"></div>
+      </section>
+    </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -503,20 +683,26 @@
 
       const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
+      const loginEmailInput = document.getElementById('loginEmail');
+      const loginPasswordInput = document.getElementById('loginPassword');
+      const signupEmailInput = document.getElementById('signupEmail');
+      const signupPasswordInput = document.getElementById('signupPassword');
       const signupNameInput = document.getElementById('signupName');
       const fullNameInput = document.getElementById('fullName');
       const dateRangeInput = document.getElementById('dateRange');
       const signupColorPicker = document.getElementById('signupColorPicker');
+      const taskTitleInput = document.getElementById('taskTitle');
+      const taskNotesInput = document.getElementById('taskNotes');
 
       const loginBtn = document.getElementById('loginBtn');
       const signupBtn = document.getElementById('signupBtn');
       const logoutBtn = document.getElementById('logoutBtn');
       const bookBtn = document.getElementById('bookBtn');
+      const addTaskBtn = document.getElementById('addTaskBtn');
 
       const authStatus = document.getElementById('authStatus');
       const bookingStatus = document.getElementById('bookingStatus');
+      const taskStatus = document.getElementById('taskStatus');
 
       const loggedOutBox = document.getElementById('loggedOutBox');
       const loggedInBox = document.getElementById('loggedInBox');
@@ -524,11 +710,13 @@
 
       const allBookingsEl = document.getElementById('allBookings');
       const myBookingsEl = document.getElementById('myBookings');
+      const taskListEl = document.getElementById('taskList');
 
       let selectedStart = null;
       let selectedEnd = null;
       let isLoggingIn = false;
       let isBooking = false;
+      let isSavingTask = false;
       let bookingDayMap = {};
       const userColorOptions = [
         { value: '#D97706', label: 'Amber' },
@@ -668,16 +856,6 @@
         return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
       }
 
-      function initialsFromName(name) {
-        if (!name) return '?';
-        return name
-          .split(' ')
-          .filter(Boolean)
-          .map((part) => part[0])
-          .join('')
-          .toUpperCase();
-      }
-
       function renderBookings(list, container, currentUserId, ownOnly = false) {
       if (!list.length) {
         container.innerHTML = '<div class="empty">Engar bókanir enn.</div>';
@@ -710,7 +888,7 @@
                   <span class="badge">${item.user_id === currentUserId ? 'Þín bókun' : 'Frátekið'}</span>
                 </div>
                 <div class="booking-name">${bookingOwnerText}</div>
-                <div><strong>${formatDate(item.start_date)}</strong> til <strong>${formatDate(item.end_date)}</strong></div>
+                <div class="booking-dates">${formatDate(item.start_date)} til ${formatDate(item.end_date)}</div>
               </div>
             </div>
             <div class="booking-actions">${deleteButton}</div>
@@ -725,10 +903,73 @@
       });
       }
 
+      function taskStatusLabel(status) {
+        if (status === 'claimed') return 'Tekið að sér';
+        if (status === 'done') return 'Lokið';
+        return 'Laust verkefni';
+      }
+
+      function renderTasks(list, currentUser) {
+        if (!list.length) {
+          taskListEl.innerHTML = '<div class="empty">Engin verkefni enn.</div>';
+          return;
+        }
+
+        taskListEl.innerHTML = list.map((task) => {
+          const status = task.status || 'open';
+          const canClaim = currentUser && status === 'open';
+          const canComplete = currentUser && status === 'claimed' && task.claimed_by_user_id === currentUser.id;
+          const canDelete = currentUser && status === 'done';
+          const notesText = task.notes ? `<div class="task-meta">${task.notes}</div>` : '';
+          const claimedByText = task.claimed_by_name
+            ? `Tekið að sér af ${task.claimed_by_name}`
+            : 'Enginn hefur tekið þetta að sér enn.';
+          const claimButton = canClaim ? `<button type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
+          const completeButton = canComplete ? `<button type="button" data-complete-task="${task.id}">Merkja lokið</button>` : '';
+          const deleteButton = canDelete ? `<button class="danger" type="button" data-delete-task="${task.id}">Eyða úr lista</button>` : '';
+
+          return `
+            <div class="task-item">
+              <div class="task-top">
+                <div>
+                  <div class="task-title">${task.title}</div>
+                  ${notesText}
+                  <div class="task-meta">${claimedByText}</div>
+                </div>
+                <span class="task-status ${status}">${taskStatusLabel(status)}</span>
+              </div>
+              <div class="task-actions">
+                ${claimButton}
+                ${completeButton}
+                ${deleteButton}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        taskListEl.querySelectorAll('[data-claim-task]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            await claimTask(btn.dataset.claimTask);
+          });
+        });
+
+        taskListEl.querySelectorAll('[data-complete-task]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            await completeTask(btn.dataset.completeTask);
+          });
+        });
+
+        taskListEl.querySelectorAll('[data-delete-task]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            await deleteTask(btn.dataset.deleteTask);
+          });
+        });
+      }
+
       async function fetchBookings() {
         const { data, error } = await supabaseClient
           .from('bookings')
-          .select('id, user_id, start_date, end_date, created_at, booked_by_name, booked_by_email, booked_by_initials, responsible_name, responsible_color')
+          .select('id, user_id, start_date, end_date, created_at, booked_by_name, booked_by_email, responsible_name, responsible_color')
           .order('start_date', { ascending: true });
 
       if (error) {
@@ -739,8 +980,23 @@
       return data || [];
       }
 
+      async function fetchTasks() {
+        const { data, error } = await supabaseClient
+          .from('tasks')
+          .select('id, title, notes, status, created_at, claimed_by_user_id, claimed_by_name, completed_at')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          showStatus(taskStatus, error.message, true);
+          return [];
+        }
+
+        return data || [];
+      }
+
       async function refreshBookings() {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const user = session?.user || null;
       const bookings = await fetchBookings();
 
       renderBookings(bookings, allBookingsEl, user?.id || null, false);
@@ -758,6 +1014,13 @@
       calendar.redraw();
     }
 
+      async function refreshTasks() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const user = session?.user || null;
+      const tasks = await fetchTasks();
+      renderTasks(tasks, user || null);
+      }
+
       async function deleteBooking(id) {
       clearStatus(bookingStatus);
 
@@ -772,14 +1035,137 @@
       }
 
       showStatus(bookingStatus, 'Bókun eytt.');
-      await refreshBookings();
+      await Promise.all([refreshBookings(), refreshTasks()]);
+      }
+
+      async function addTask() {
+      if (isSavingTask) return;
+      isSavingTask = true;
+      clearStatus(taskStatus);
+      addTaskBtn.disabled = true;
+
+      try {
+        const title = taskTitleInput.value.trim();
+        const notes = taskNotesInput.value.trim();
+        const { data: { user } } = await supabaseClient.auth.getUser();
+
+        if (!user) {
+          showStatus(taskStatus, 'Þú þarft að vera skráð(ur) inn til að bæta við verkefni.', true);
+          return;
+        }
+
+        if (!title) {
+          showStatus(taskStatus, 'Skráðu fyrst heiti verkefnis.', true);
+          return;
+        }
+
+        const { error } = await supabaseClient
+          .from('tasks')
+          .insert([
+            {
+              title,
+              notes: notes || null,
+              status: 'open'
+            }
+          ]);
+
+        if (error) {
+          showStatus(taskStatus, error.message, true);
+          return;
+        }
+
+        taskTitleInput.value = '';
+        taskNotesInput.value = '';
+        showStatus(taskStatus, 'Verkefni bætt við.');
+        await refreshTasks();
+      } finally {
+        isSavingTask = false;
+        addTaskBtn.disabled = false;
+      }
+      }
+
+      async function claimTask(id) {
+      clearStatus(taskStatus);
+
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        showStatus(taskStatus, 'Þú þarft að vera skráð(ur) inn til að taka verk að þér.', true);
+        return;
+      }
+
+      const profile = getUserProfile(user);
+      const { error } = await supabaseClient
+        .from('tasks')
+        .update({
+          status: 'claimed',
+          claimed_by_user_id: user.id,
+          claimed_by_name: profile.responsibleName
+        })
+        .eq('id', id)
+        .eq('status', 'open');
+
+      if (error) {
+        showStatus(taskStatus, error.message, true);
+        return;
+      }
+
+      await refreshTasks();
+      }
+
+      async function completeTask(id) {
+      clearStatus(taskStatus);
+
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        showStatus(taskStatus, 'Þú þarft að vera skráð(ur) inn til að klára verkefni.', true);
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from('tasks')
+        .update({
+          status: 'done',
+          completed_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .eq('claimed_by_user_id', user.id);
+
+      if (error) {
+        showStatus(taskStatus, error.message, true);
+        return;
+      }
+
+      await refreshTasks();
+      }
+
+      async function deleteTask(id) {
+      clearStatus(taskStatus);
+
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        showStatus(taskStatus, 'Þú þarft að vera skráð(ur) inn til að eyða verkefni.', true);
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from('tasks')
+        .delete()
+        .eq('id', id)
+        .eq('status', 'done');
+
+      if (error) {
+        showStatus(taskStatus, error.message, true);
+        return;
+      }
+
+      await refreshTasks();
       }
 
       async function signup() {
       clearStatus(authStatus);
 
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
+        const email = signupEmailInput.value.trim();
+        const password = signupPasswordInput.value;
         const displayName = signupNameInput.value.trim();
         const color = getSelectedSignupColor();
 
@@ -804,7 +1190,10 @@
         return;
       }
 
-        showStatus(authStatus, 'Notandi búinn til. Athugaðu hvort staðfestingarpóstur hafi verið sendur.');
+      showStatus(authStatus, 'Notandi búinn til. Athugaðu hvort staðfestingarpóstur hafi verið sendur.');
+      signupEmailInput.value = '';
+      signupPasswordInput.value = '';
+      signupNameInput.value = '';
       }
 
       async function loginWithPassword() {
@@ -815,8 +1204,8 @@
       showStatus(authStatus, 'Reyni að skrá inn...');
 
       try {
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
+        const email = loginEmailInput.value.trim();
+        const password = loginPasswordInput.value;
 
         if (!email || !password) {
           showStatus(authStatus, 'Settu inn netfang og lykilorð.', true);
@@ -838,8 +1227,8 @@
         loggedInBox.classList.remove('hidden');
         userEmail.textContent = data.user.user_metadata?.display_name || data.user.email;
 
-        refreshBookings().catch((refreshError) => {
-          showStatus(authStatus, 'Innskráning tókst en ekki tókst að hlaða bókanir: ' + refreshError.message, true);
+        Promise.all([refreshBookings(), refreshTasks()]).catch((refreshError) => {
+          showStatus(authStatus, 'Innskráning tókst en ekki tókst að hlaða gögn: ' + refreshError.message, true);
         });
       } catch (error) {
         showStatus(authStatus, error.message || 'Óvænt villa kom upp í innskráningu.', true);
@@ -864,7 +1253,8 @@
       }
 
       async function updateAuthUI() {
-      const { data: { user } } = await supabaseClient.auth.getUser();
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      const user = session?.user || null;
 
       if (user) {
         loggedOutBox.classList.add('hidden');
@@ -911,7 +1301,6 @@
           return;
         }
 
-        const initials = initialsFromName(fullName);
         const profile = getUserProfile(user);
 
         const { data: overlappingBookings, error: overlapError } = await supabaseClient
@@ -940,7 +1329,6 @@
               end_date,
               booked_by_name: fullName,
               booked_by_email: user.email,
-              booked_by_initials: initials,
               responsible_name: profile.responsibleName,
               responsible_color: profile.responsibleColor
             }
@@ -969,6 +1357,7 @@
 
       signupBtn.addEventListener('click', signup);
       logoutBtn.addEventListener('click', logout);
+      addTaskBtn.addEventListener('click', addTask);
       loginBtn.addEventListener('click', () => {
         window.loginNow();
       });
@@ -987,6 +1376,10 @@
       updateAuthUI().catch((error) => {
         showBootError(error.message || 'Ekki tókst að hlaða notandastöðu.');
       });
+
+      window.setTimeout(() => {
+        refreshTasks().catch(() => {});
+      }, 300);
     }
   </script>
 </body>
