@@ -87,6 +87,10 @@
       margin: 0 auto;
       width: 100%;
       color: white;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 20px;
+      align-items: end;
     }
 
     .hero h1 {
@@ -100,6 +104,37 @@
       color: rgba(255, 248, 240, 0.94);
     }
 
+    .hero-weather {
+      justify-self: end;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .hero-weather .weather-card {
+      border-color: rgba(255, 255, 255, 0.14);
+      background: rgba(33, 43, 40, 0.34);
+      backdrop-filter: blur(10px);
+      color: white;
+    }
+
+    .hero-weather .muted,
+    .hero-weather .weather-desc,
+    .hero-weather .weather-meta,
+    .hero-weather .weather-day-label,
+    .hero-weather .weather-day-temp {
+      color: rgba(255, 248, 240, 0.92);
+    }
+
+    .hero-weather .weather-day {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .hero-weather .weather-forecast {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
     main {
       max-width: var(--max-width);
       margin: -34px auto 40px;
@@ -108,7 +143,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-columns: 1.18fr 0.82fr;
       gap: 20px;
     }
 
@@ -129,6 +164,232 @@
       backdrop-filter: blur(6px);
     }
 
+    .summary-card {
+      background: linear-gradient(135deg, rgba(252, 244, 234, 0.98), rgba(242, 227, 210, 0.94));
+      border-color: rgba(163, 127, 86, 0.18);
+    }
+
+    .summary-card h2 {
+      margin-bottom: 6px;
+      color: #6a4e38;
+    }
+
+    .summary-top-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .auth-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 6px 2px 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(223, 211, 195, 0.8);
+    }
+
+    .auth-strip-left {
+      min-width: 0;
+    }
+
+    .auth-strip-user {
+      font-weight: bold;
+      color: #5b4735;
+    }
+
+    .auth-strip-actions {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .auth-link {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--accent);
+      font: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      width: auto;
+    }
+
+    .auth-inline-forms {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .auth-compact-panel {
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(255, 250, 245, 0.92), rgba(245, 236, 223, 0.84));
+    }
+
+    .auth-compact-panel h3 {
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .auth-compact-panel .muted {
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+
+    .summary-panel {
+      min-width: 0;
+    }
+
+    .summary-main {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+
+    .summary-name {
+      min-height: 44px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .summary-line {
+      font-weight: bold;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .summary-meta {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 4px;
+    }
+
+    .summary-dates {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .agenda-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .agenda-item {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0;
+      border-top: 1px solid rgba(203, 177, 148, 0.48);
+    }
+
+    .agenda-item:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .agenda-status {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 3px;
+    }
+
+    .weather-card {
+      height: 100%;
+      border: 1px solid rgba(176, 141, 104, 0.16);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255, 248, 239, 0.54);
+    }
+
+    .weather-label {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #6a4e38;
+    }
+
+    .weather-main {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .weather-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .weather-temp {
+      font-size: 1.7rem;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .weather-desc {
+      color: var(--muted);
+      font-size: 0.94rem;
+      margin-top: 4px;
+    }
+
+    .weather-meta {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .weather-forecast {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(60px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .weather-day {
+      border: 1px solid rgba(73, 107, 91, 0.1);
+      border-radius: 12px;
+      padding: 10px 8px;
+      background: rgba(255, 255, 255, 0.45);
+      text-align: center;
+    }
+
+    .weather-day-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .weather-day-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .weather-day-temp {
+      font-size: 0.92rem;
+      font-weight: bold;
+      color: var(--text);
+    }
+
     .auth-row,
     .booking-row {
       display: grid;
@@ -139,17 +400,6 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
-    }
-
-    .auth-panel {
-      padding: 18px;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: linear-gradient(180deg, rgba(255, 250, 245, 0.98), rgba(245, 236, 223, 0.9));
-    }
-
-    .auth-panel h3 {
-      margin-bottom: 8px;
     }
 
     .color-picker {
@@ -251,12 +501,13 @@
     }
 
     .notice-card {
-      border: 1px solid #f0d28a;
-      background: linear-gradient(135deg, #fff7dc, #fff1bf);
+      border: 1px solid rgba(198, 151, 88, 0.26);
+      background: linear-gradient(135deg, rgba(255, 245, 224, 0.98), rgba(245, 226, 192, 0.96));
     }
 
     .notice-card h2 {
       margin-bottom: 8px;
+      color: #765433;
     }
 
     .notice-list {
@@ -266,20 +517,20 @@
     }
 
     .notice-item {
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(122, 93, 0, 0.14);
+      background: rgba(255, 251, 242, 0.6);
+      border: 1px solid rgba(160, 123, 73, 0.16);
       border-radius: 12px;
       padding: 12px 14px;
     }
 
     .notice-title {
       font-weight: bold;
-      color: #7a5d00;
+      color: #7a5a2d;
       margin-bottom: 4px;
     }
 
     .notice-meta {
-      color: #8a6a11;
+      color: #8a6e43;
       font-size: 0.88rem;
       margin-top: 6px;
     }
@@ -295,8 +546,8 @@
       gap: 12px;
       margin-top: 14px;
       padding: 14px;
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid rgba(122, 93, 0, 0.14);
+      background: rgba(255, 249, 239, 0.68);
+      border: 1px solid rgba(160, 123, 73, 0.16);
       border-radius: 12px;
     }
 
@@ -557,16 +808,6 @@
       cursor: not-allowed;
     }
 
-    .rules ul {
-      margin: 0;
-      padding-left: 18px;
-      line-height: 1.7;
-    }
-
-    .rules {
-      background: linear-gradient(180deg, rgba(255, 248, 239, 0.96), rgba(241, 232, 220, 0.94));
-    }
-
     .task-form {
       display: grid;
       gap: 12px;
@@ -670,8 +911,41 @@
         grid-template-columns: 1fr;
       }
 
+      .auth-inline-forms {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-weather {
+        justify-self: start;
+        max-width: 100%;
+      }
+
       .booking-item {
         grid-template-columns: 1fr;
+      }
+
+      .summary-main {
+        grid-template-columns: 1fr;
+      }
+
+      .agenda-item {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-top-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .weather-forecast {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .name-badge,
@@ -696,6 +970,14 @@
         grid-template-columns: 1fr;
       }
 
+      .auth-strip {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .auth-strip-actions {
+        justify-content: flex-start;
+      }
 
       .booking-actions {
         justify-self: stretch;
@@ -706,115 +988,110 @@
 <body>
   <header>
     <div class="hero">
-      <h1>Lyngholt</h1>
-      <p>Sjáðu hvaða dagar eru uppteknir, skráðu þig inn og bókaðu dvölina beint á síðunni.</p>
+      <div>
+        <h1>Lyngholt</h1>
+        <p>Sjáðu hvaða dagar eru uppteknir, skráðu þig inn og bókaðu dvölina beint á síðunni.</p>
+      </div>
+      <div id="weatherCard" class="hero-weather">
+        <div class="weather-card">
+          <div class="muted">Sæki veðurspá...</div>
+        </div>
+      </div>
     </div>
   </header>
 
   <main>
-    <div class="grid">
-      <section class="card">
-        <h2>Innskráning</h2>
-        <p class="muted">Skráðu þig inn með netfangi og lykilorði. Þegar búið er til nýjan notanda er nafn og litur valið einu sinni og það fylgir svo öllum bókunum frá þeim notanda.</p>
+    <section class="auth-strip">
+      <div class="auth-strip-left">
+        <div id="loggedInBox" class="auth-strip-user hidden">Innskráð(ur): <span id="userEmail"></span></div>
+        <div id="loggedOutBox" class="auth-strip-user">Ekki innskráð(ur)</div>
+      </div>
+      <div class="auth-strip-actions">
+        <button id="toggleLoginBtn" class="auth-link" type="button">Skrá inn</button>
+        <button id="toggleSignupBtn" class="auth-link" type="button">Stofna notanda</button>
+        <button id="logoutBtn" class="auth-link hidden" type="button">Skrá út</button>
+      </div>
+    </section>
 
-        <div id="loggedOutBox" class="auth-row">
-          <div class="auth-split">
-            <div class="auth-panel">
-              <h3>Skrá inn</h3>
-              <p class="muted">Fyrir notendur sem eru þegar til.</p>
-
-              <div class="auth-row">
-                <div>
-                  <label for="loginEmail">Netfang</label>
-                  <input id="loginEmail" type="email" placeholder="Netfang" />
-                </div>
-
-                <div>
-                  <label for="loginPassword">Lykilorð</label>
-                  <input id="loginPassword" type="password" placeholder="Lykilorð" />
-                </div>
-
-                <button id="loginBtn" type="button">Skrá inn</button>
-              </div>
-            </div>
-
-            <div class="auth-panel">
-              <h3>Stofna notanda</h3>
-              <p class="muted">Veldu nafn og lit einu sinni við stofnun.</p>
-
-              <div class="auth-row">
-                <div>
-                  <label for="signupEmail">Netfang</label>
-                  <input id="signupEmail" type="email" placeholder="Netfang" />
-                </div>
-
-                <div>
-                  <label for="signupPassword">Lykilorð</label>
-                  <input id="signupPassword" type="password" placeholder="Lykilorð" />
-                </div>
-
-                <div>
-                  <label for="signupName">Nafn notanda</label>
-                  <input id="signupName" type="text" placeholder="Nafn ábyrgðaraðila" />
-                </div>
-
-                <div>
-                  <label>Veldu lit</label>
-                  <div id="signupColorPicker" class="color-picker"></div>
-                  <p class="muted">Liturinn er valinn aðeins þegar notandi er stofnaður.</p>
-                </div>
-
-                <button id="signupBtn" class="secondary" type="button">Búa til notanda</button>
-              </div>
-            </div>
+    <div id="authForms" class="auth-inline-forms hidden">
+      <section id="loginPanel" class="auth-compact-panel hidden">
+        <h3>Skrá inn</h3>
+        <p class="muted">Fyrir notendur sem eru þegar til.</p>
+        <div class="auth-row">
+          <div>
+            <label for="loginEmail">Netfang</label>
+            <input id="loginEmail" type="email" placeholder="Netfang" />
           </div>
+          <div>
+            <label for="loginPassword">Lykilorð</label>
+            <input id="loginPassword" type="password" placeholder="Lykilorð" />
+          </div>
+          <button id="loginBtn" type="button">Skrá inn</button>
         </div>
-
-        <div id="loggedInBox" class="hidden">
-          <p><strong>Innskráð(ur):</strong> <span id="userEmail"></span></p>
-          <button id="logoutBtn" class="secondary" type="button">Skrá út</button>
-        </div>
-
-        <div id="authStatus" class="status"></div>
       </section>
 
-      <section class="card rules">
-        <h2>Hvernig þetta virkar</h2>
-        <ul>
-          <li>Allir innskráðir notendur geta séð bókaða daga.</li>
-          <li>Þú velur dagabil og sendir bókun.</li>
-          <li>Kerfið hafnar sjálfkrafa ef dagarnir skarast við eldri bókun.</li>
-          <li>Þú getur eytt eigin bókunum neðst á síðunni.</li>
-        </ul>
+      <section id="signupPanel" class="auth-compact-panel hidden">
+        <h3>Stofna notanda</h3>
+        <p class="muted">Veldu nafn og lit einu sinni við stofnun.</p>
+        <div class="auth-row">
+          <div>
+            <label for="signupEmail">Netfang</label>
+            <input id="signupEmail" type="email" placeholder="Netfang" />
+          </div>
+          <div>
+            <label for="signupPassword">Lykilorð</label>
+            <input id="signupPassword" type="password" placeholder="Lykilorð" />
+          </div>
+          <div>
+            <label for="signupName">Nafn notanda</label>
+            <input id="signupName" type="text" placeholder="Nafn ábyrgðaraðila" />
+          </div>
+          <div>
+            <label>Veldu lit</label>
+            <div id="signupColorPicker" class="color-picker"></div>
+          </div>
+          <button id="signupBtn" class="secondary" type="button">Búa til notanda</button>
+        </div>
       </section>
     </div>
 
-    <section class="card notice-card">
-      <h2>Tilkynningar</h2>
-      <p class="muted">Mikilvægar upplýsingar sem gott er að sjá strax við komu á síðuna.</p>
+    <div id="authStatus" class="status"></div>
 
-      <div id="noticeForm" class="notice-form hidden">
-        <div>
-          <label for="noticeTitle">Ný tilkynning</label>
-          <input id="noticeTitle" type="text" placeholder="Til dæmis: Vatnslaust fram á kvöld" />
+    <div class="summary-top-grid">
+      <section class="card notice-card">
+        <h2>Tilkynningar</h2>
+        <p class="muted">Mikilvægar upplýsingar sem gott er að sjá strax við komu á síðuna.</p>
+
+        <div id="noticeForm" class="notice-form hidden">
+          <div>
+            <label for="noticeTitle">Ný tilkynning</label>
+            <input id="noticeTitle" type="text" placeholder="Til dæmis: Vatnslaust fram á kvöld" />
+          </div>
+
+          <div>
+            <label for="noticeBody">Nánari texti</label>
+            <input id="noticeBody" type="text" placeholder="Til dæmis: Unnið er að viðgerð, notið vatn sparlega" />
+          </div>
+
+          <button id="addNoticeBtn" type="button">Birta tilkynningu</button>
         </div>
 
-        <div>
-          <label for="noticeBody">Nánari texti</label>
-          <input id="noticeBody" type="text" placeholder="Til dæmis: Unnið er að viðgerð, notið vatn sparlega" />
+        <div id="noticeStatus" class="status"></div>
+        <div id="noticeList" class="notice-list">
+          <div class="empty">Engar tilkynningar eins og er.</div>
         </div>
+        <div class="notice-toolbar">
+          <button id="toggleNoticeFormBtn" type="button">Skrifa nýja tilkynningu</button>
+        </div>
+      </section>
 
-        <button id="addNoticeBtn" type="button">Birta tilkynningu</button>
-      </div>
-
-      <div id="noticeStatus" class="status"></div>
-      <div id="noticeList" class="notice-list">
-        <div class="empty">Engar tilkynningar eins og er.</div>
-      </div>
-      <div class="notice-toolbar">
-        <button id="toggleNoticeFormBtn" type="button">Skrifa nýja tilkynningu</button>
-      </div>
-    </section>
+      <section class="card summary-card">
+        <h2>Á döfinni</h2>
+        <div id="nextStayCard" class="summary-panel">
+          <div class="empty">Engar komandi bókanir eins og er.</div>
+        </div>
+      </section>
+    </div>
 
     <section class="card rules">
       <h2>Húsreglur</h2>
@@ -942,6 +1219,11 @@
     function initializePage() {
       const SUPABASE_URL = 'https://fabkvblawbavbmozlutj.supabase.co';
       const SUPABASE_KEY = 'sb_publishable_eC_30Wnq3C9B7lM46mfGkw_7rNcV-aG';
+      const WEATHER_LOCATION = {
+        label: 'Munaðarnes',
+        lat: 64.70242,
+        lon: -21.62151
+      };
       const ADMIN_EMAILS = [
         'ingibjarturj@simnet.is'
       ];
@@ -966,6 +1248,8 @@
       const loginBtn = document.getElementById('loginBtn');
       const signupBtn = document.getElementById('signupBtn');
       const logoutBtn = document.getElementById('logoutBtn');
+      const toggleLoginBtn = document.getElementById('toggleLoginBtn');
+      const toggleSignupBtn = document.getElementById('toggleSignupBtn');
       const bookBtn = document.getElementById('bookBtn');
       const addTaskBtn = document.getElementById('addTaskBtn');
       const toggleTaskFormBtn = document.getElementById('toggleTaskFormBtn');
@@ -977,6 +1261,11 @@
       const taskStatus = document.getElementById('taskStatus');
       const noticeStatus = document.getElementById('noticeStatus');
       const calendarEl = document.getElementById('calendar');
+      const nextStayCardEl = document.getElementById('nextStayCard');
+      const weatherCardEl = document.getElementById('weatherCard');
+      const authFormsEl = document.getElementById('authForms');
+      const loginPanelEl = document.getElementById('loginPanel');
+      const signupPanelEl = document.getElementById('signupPanel');
 
       const loggedOutBox = document.getElementById('loggedOutBox');
       const loggedInBox = document.getElementById('loggedInBox');
@@ -1179,6 +1468,7 @@
       });
 
       renderAvailabilityCalendar();
+      refreshWeather();
 
       let lastAvailabilityMonthCount = getAvailabilityMonthCount();
       window.addEventListener('resize', () => {
@@ -1205,6 +1495,15 @@
         return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
       }
 
+      function formatShortDate(dateStr) {
+        const date = new Date(dateStr);
+        const weekdayLabels = ['sun', 'mán', 'þri', 'mið', 'fim', 'fös', 'lau'];
+        const weekday = weekdayLabels[date.getDay()];
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        return `${weekday} ${day}.${month}`;
+      }
+
       function formatDateTime(dateStr) {
         return new Date(dateStr).toLocaleString('is-IS', {
           year: 'numeric',
@@ -1213,6 +1512,142 @@
           hour: '2-digit',
           minute: '2-digit'
         });
+      }
+
+      function weatherSymbolToEmoji(symbolCode) {
+        const code = String(symbolCode || '');
+
+        if (code.includes('thunder')) return '⛈';
+        if (code.includes('snow')) return '❄';
+        if (code.includes('sleet')) return '🌨';
+        if (code.includes('rain')) return '🌧';
+        if (code.includes('fog')) return '🌫';
+        if (code.includes('cloudy')) return '☁';
+        if (code.includes('partlycloudy')) return '⛅';
+        if (code.includes('fair')) return '🌤';
+        if (code.includes('clearsky')) return '☀';
+        return '☁';
+      }
+
+      function weatherSymbolToText(symbolCode) {
+        const code = String(symbolCode || '');
+
+        if (code.includes('thunder')) return 'Þrumuveður';
+        if (code.includes('heavyrain')) return 'Mikil rigning';
+        if (code.includes('rain')) return 'Rigning';
+        if (code.includes('snow')) return 'Snjókoma';
+        if (code.includes('sleet')) return 'Éljagangur';
+        if (code.includes('fog')) return 'Þoka';
+        if (code.includes('partlycloudy')) return 'Hálfskýjað';
+        if (code.includes('cloudy')) return 'Skýjað';
+        if (code.includes('fair')) return 'Bjart með köflum';
+        if (code.includes('clearsky')) return 'Heiðskírt';
+        return 'Veðurspá';
+      }
+
+      function renderWeatherCard(weather) {
+        if (!weather) {
+          weatherCardEl.innerHTML = `
+            <div class="weather-card">
+              <div class="muted">Veðurspá ekki tiltæk í augnablikinu.</div>
+            </div>
+          `;
+          return;
+        }
+
+        const forecastHtml = (weather.days || []).map((day) => `
+          <div class="weather-day">
+            <div class="weather-day-label">${day.label}</div>
+            <div class="weather-day-icon">${day.icon}</div>
+            <div class="weather-day-temp">${day.temp}°C</div>
+          </div>
+        `).join('');
+
+        weatherCardEl.innerHTML = `
+          <div class="weather-card">
+            <div class="weather-main">
+              <div class="weather-icon">${weather.icon}</div>
+              <div>
+                <div class="weather-temp">${weather.temperature}°C</div>
+                <div class="weather-desc">${weather.description}</div>
+              </div>
+            </div>
+            <div class="weather-meta">
+              Vindur: ${weather.wind} m/s<br />
+              Úrkoma næsta klst.: ${weather.precipitation} mm
+            </div>
+            <div class="weather-forecast">${forecastHtml}</div>
+          </div>
+        `;
+      }
+
+      async function refreshWeather() {
+        try {
+          const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${WEATHER_LOCATION.lat}&lon=${WEATHER_LOCATION.lon}`;
+          const response = await fetch(url, {
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error('Weather request failed');
+          }
+
+          const payload = await response.json();
+          const timeseries = payload?.properties?.timeseries || [];
+          const now = timeseries[0];
+          const instant = now?.data?.instant?.details;
+          const nextHour = now?.data?.next_1_hours;
+
+          if (!instant) {
+            throw new Error('Weather data missing');
+          }
+
+          const dailyMap = new Map();
+          timeseries.forEach((entry) => {
+            const isoTime = entry.time;
+            const dateKey = isoTime.slice(0, 10);
+            const hour = new Date(isoTime).getHours();
+
+            if (dailyMap.has(dateKey)) {
+              return;
+            }
+
+            if (hour >= 11 && hour <= 14) {
+              dailyMap.set(dateKey, entry);
+            }
+          });
+
+          if (dailyMap.size < 4) {
+            timeseries.forEach((entry) => {
+              const dateKey = entry.time.slice(0, 10);
+              if (!dailyMap.has(dateKey)) {
+                dailyMap.set(dateKey, entry);
+              }
+            });
+          }
+
+          const forecastDays = Array.from(dailyMap.values())
+            .slice(0, 4)
+            .map((entry) => ({
+              label: formatShortDate(entry.time),
+              temp: Math.round(entry?.data?.instant?.details?.air_temperature ?? 0),
+              icon: weatherSymbolToEmoji(entry?.data?.next_6_hours?.summary?.symbol_code || entry?.data?.next_1_hours?.summary?.symbol_code)
+            }));
+
+          renderWeatherCard({
+            temperature: Math.round(instant.air_temperature ?? 0),
+            wind: Math.round((instant.wind_speed ?? 0) * 10) / 10,
+            precipitation: Math.round(((nextHour?.details?.precipitation_amount ?? 0) * 10)) / 10,
+            description: weatherSymbolToText(nextHour?.summary?.symbol_code),
+            icon: weatherSymbolToEmoji(nextHour?.summary?.symbol_code),
+            days: forecastDays
+          });
+        } catch (error) {
+          console.error(error);
+          renderWeatherCard(null);
+        }
       }
 
       function normalizeEmail(value) {
@@ -1291,6 +1726,52 @@
           await deleteBooking(btn.dataset.deleteId);
         });
       });
+      }
+
+      function renderNextStay(bookings) {
+        const todayKey = formatDateKey(new Date());
+        const upcoming = bookings
+          .filter((item) => item.end_date >= todayKey)
+          .slice(0, 3);
+
+        if (!upcoming.length) {
+          nextStayCardEl.innerHTML = '<div class="empty">Ekkert á döfinni eins og er.</div>';
+          return;
+        }
+
+        nextStayCardEl.innerHTML = `
+          <div class="agenda-list">
+            ${upcoming.map((item, index) => {
+              const isCurrent = item.start_date <= todayKey && item.end_date >= todayKey;
+              const statusText = isCurrent ? 'Í bústaðnum núna' : index === 0 ? 'Næst á dagskrá' : 'Síðar';
+              const guestNames = item.booked_by_name || 'Óþekktir gestir';
+              const bookedByName = item.responsible_name || 'Óþekktur';
+              const badgeColor = item.responsible_color || '#d6e4dd';
+
+              return `
+                <div class="agenda-item">
+                  <div class="summary-name" style="background:${badgeColor}; color:#111827;">${bookedByName}</div>
+                  <div>
+                    <div class="agenda-status">${statusText}</div>
+                    <div class="summary-line">Gestir: ${guestNames}</div>
+                    <div class="summary-dates">${formatDate(item.start_date)} til ${formatDate(item.end_date)}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+
+      function toggleAuthPanel(panel) {
+        const showingLogin = !authFormsEl.classList.contains('hidden') && !loginPanelEl.classList.contains('hidden');
+        const showingSignup = !authFormsEl.classList.contains('hidden') && !signupPanelEl.classList.contains('hidden');
+        const openLogin = panel === 'login' && !showingLogin;
+        const openSignup = panel === 'signup' && !showingSignup;
+
+        authFormsEl.classList.toggle('hidden', !(openLogin || openSignup));
+        loginPanelEl.classList.toggle('hidden', !openLogin);
+        signupPanelEl.classList.toggle('hidden', !openSignup);
       }
 
       function taskStatusLabel(status) {
@@ -1461,6 +1942,7 @@
 
       renderBookings(bookings, allBookingsEl, user?.id || null, false, adminUser);
       renderBookings(bookings, myBookingsEl, user?.id || null, true, adminUser);
+      renderNextStay(bookings);
 
         const disabledRanges = bookings.map((b) => ({
           from: b.start_date,
@@ -1727,6 +2209,8 @@
       signupEmailInput.value = '';
       signupPasswordInput.value = '';
       signupNameInput.value = '';
+      authFormsEl.classList.add('hidden');
+      signupPanelEl.classList.add('hidden');
       }
 
       async function loginWithPassword() {
@@ -1761,6 +2245,8 @@
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
         userEmail.textContent = (data.user.user_metadata?.display_name || data.user.email) + (currentUserIsAdmin ? ' (admin)' : '');
+        authFormsEl.classList.add('hidden');
+        loginPanelEl.classList.add('hidden');
 
         Promise.all([refreshBookings(), refreshTasks(), refreshNotices()]).catch((refreshError) => {
           showStatus(authStatus, 'Innskráning tókst en ekki tókst að hlaða gögn: ' + refreshError.message, true);
@@ -1796,12 +2282,19 @@
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
         userEmail.textContent = (user.user_metadata?.display_name || user.email) + (currentUserIsAdmin ? ' (admin)' : '');
+        logoutBtn.classList.remove('hidden');
+        toggleLoginBtn.classList.add('hidden');
+        toggleSignupBtn.classList.add('hidden');
+        authFormsEl.classList.add('hidden');
       } else {
         loggedOutBox.classList.remove('hidden');
         loggedInBox.classList.add('hidden');
         userEmail.textContent = '';
         currentUser = null;
         currentUserIsAdmin = false;
+        logoutBtn.classList.add('hidden');
+        toggleLoginBtn.classList.remove('hidden');
+        toggleSignupBtn.classList.remove('hidden');
       }
 
       await refreshBookings();
@@ -1895,6 +2388,12 @@
 
       signupBtn.addEventListener('click', signup);
       logoutBtn.addEventListener('click', logout);
+      toggleLoginBtn.addEventListener('click', () => {
+        toggleAuthPanel('login');
+      });
+      toggleSignupBtn.addEventListener('click', () => {
+        toggleAuthPanel('signup');
+      });
       addTaskBtn.addEventListener('click', addTask);
       toggleTaskFormBtn.addEventListener('click', () => {
         toggleTaskForm();
