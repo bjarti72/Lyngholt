@@ -9,16 +9,19 @@
 
   <style>
     :root {
-      --bg: #f6f3ee;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --accent: #2f5d50;
-      --accent-soft: #d6e4dd;
+      --bg: #efe6d7;
+      --bg-soft: #f7f1e7;
+      --card: rgba(255, 250, 244, 0.94);
+      --card-strong: #fff8f0;
+      --text: #2f261d;
+      --muted: #74685a;
+      --accent: #496b5b;
+      --accent-soft: #dbe7de;
+      --accent-warm: #d9b98f;
       --danger: #9f3a38;
       --danger-soft: #f3c6c6;
-      --border: #e5e7eb;
-      --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --border: #dfd3c3;
+      --shadow: 0 18px 38px rgba(89, 64, 36, 0.10);
       --radius: 18px;
       --max-width: 1100px;
     }
@@ -30,12 +33,19 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: var(--bg);
+      background:
+        radial-gradient(circle at top left, rgba(217, 185, 143, 0.32), transparent 30%),
+        radial-gradient(circle at top right, rgba(73, 107, 91, 0.16), transparent 26%),
+        linear-gradient(180deg, #f4ebde 0%, var(--bg) 44%, var(--bg-soft) 100%);
       color: var(--text);
     }
 
     h1, h2, h3, p {
       margin-top: 0;
+    }
+
+    h2 {
+      color: #5b4735;
     }
 
     .hidden {
@@ -87,6 +97,7 @@
     .hero p {
       max-width: 650px;
       line-height: 1.5;
+      color: rgba(255, 248, 240, 0.94);
     }
 
     main {
@@ -115,6 +126,7 @@
       box-shadow: var(--shadow);
       padding: 22px;
       margin-bottom: 20px;
+      backdrop-filter: blur(6px);
     }
 
     .auth-row,
@@ -133,7 +145,7 @@
       padding: 18px;
       border: 1px solid var(--border);
       border-radius: 16px;
-      background: #faf9f6;
+      background: linear-gradient(180deg, rgba(255, 250, 245, 0.98), rgba(245, 236, 223, 0.9));
     }
 
     .auth-panel h3 {
@@ -186,7 +198,7 @@
     }
 
     input {
-      background: white;
+      background: rgba(255, 255, 255, 0.92);
     }
 
     button {
@@ -198,7 +210,7 @@
     }
 
     button.secondary {
-      background: white;
+      background: rgba(255, 248, 240, 0.9);
       color: var(--accent);
       border: 1px solid var(--accent);
     }
@@ -298,7 +310,7 @@
       grid-template-columns: 120px minmax(0, 1fr) auto;
       gap: 10px;
       align-items: center;
-      background: #fdfcf9;
+      background: linear-gradient(180deg, rgba(255, 251, 246, 0.96), rgba(247, 239, 228, 0.92));
     }
 
     .booking-main {
@@ -351,7 +363,7 @@
       border: 1px dashed var(--border);
       border-radius: 14px;
       color: var(--muted);
-      background: #fff;
+      background: rgba(255, 250, 244, 0.88);
     }
 
     #calendar {
@@ -408,26 +420,36 @@
       line-height: 1.7;
     }
 
+    .rules {
+      background: linear-gradient(180deg, rgba(255, 248, 239, 0.96), rgba(241, 232, 220, 0.94));
+    }
+
     .task-form {
       display: grid;
       gap: 12px;
       margin-top: 14px;
     }
 
+    .task-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
     .task-item {
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 14px;
-      background: #fcfcfc;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(255, 251, 246, 0.96), rgba(244, 236, 226, 0.92));
       display: grid;
-      gap: 10px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
     }
 
     .task-top {
-      display: flex;
-      align-items: start;
-      justify-content: space-between;
-      gap: 12px;
+      display: block;
+      min-width: 0;
     }
 
     .task-title {
@@ -435,16 +457,38 @@
       margin-bottom: 4px;
     }
 
-    .task-meta {
+    .task-notes {
       color: var(--muted);
       line-height: 1.4;
       font-size: 0.94rem;
     }
 
+    .task-meta-row {
+      color: #8a6a11;
+      font-size: 0.88rem;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .task-side {
+      display: grid;
+      justify-items: end;
+      gap: 8px;
+      width: auto;
+    }
+
     .task-actions {
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      width: auto;
+    }
+
+    .task-actions button {
+      width: auto;
+      min-width: 110px;
+      padding: 10px 12px;
     }
 
     .task-status {
@@ -492,6 +536,19 @@
         width: 100%;
       }
 
+      .task-item {
+        grid-template-columns: 1fr;
+      }
+
+      .task-side,
+      .task-actions {
+        width: 100%;
+      }
+
+      .task-actions button {
+        width: 100%;
+      }
+
       .booking-actions {
         justify-self: stretch;
       }
@@ -501,7 +558,7 @@
 <body>
   <header>
     <div class="hero">
-      <h1>Sumarbústaður fjölskyldunnar</h1>
+      <h1>Lyngholt</h1>
       <p>Sjáðu hvaða dagar eru uppteknir, skráðu þig inn og bókaðu dvölina beint á síðunni.</p>
     </div>
   </header>
@@ -650,36 +707,32 @@
       </section>
     </div>
 
-    <div class="split-grid">
-      <section class="card">
-        <h2>Nýtt verkefni</h2>
-        <p class="muted">Skráðu verk sem þarf að gera svo einhver geti tekið það að sér.</p>
+    <section class="card">
+      <h2>Verkefnalisti</h2>
+      <p class="muted">Innskráður notandi getur tekið verk að sér og merkt það lokið.</p>
+      <div id="taskList" class="calendar-list">
+        <div class="empty">Engin verkefni enn.</div>
+      </div>
+      <div class="task-toolbar">
+        <button id="toggleTaskFormBtn" type="button">Skrá nýtt verkefni</button>
+      </div>
 
-        <div class="task-form">
-          <div>
-            <label for="taskTitle">Verkefni</label>
-            <input id="taskTitle" type="text" placeholder="Til dæmis: kaupa klósettpappír" />
-          </div>
-
-          <div>
-            <label for="taskNotes">Athugasemd (valfrjálst)</label>
-            <input id="taskNotes" type="text" placeholder="Til dæmis: vantar fyrir næstu ferð" />
-          </div>
-
-          <button id="addTaskBtn" type="button">Bæta við verkefni</button>
+      <div id="taskForm" class="task-form hidden">
+        <div>
+          <label for="taskTitle">Verkefni</label>
+          <input id="taskTitle" type="text" placeholder="Til dæmis: kaupa klósettpappír" />
         </div>
 
-        <div id="taskStatus" class="status"></div>
-      </section>
-
-      <section class="card">
-        <h2>Verkefnalisti</h2>
-        <p class="muted">Innskráður notandi getur tekið verk að sér og merkt það lokið.</p>
-        <div id="taskList" class="calendar-list">
-          <div class="empty">Engin verkefni enn.</div>
+        <div>
+          <label for="taskNotes">Athugasemd (valfrjálst)</label>
+          <input id="taskNotes" type="text" placeholder="Til dæmis: vantar fyrir næstu ferð" />
         </div>
-      </section>
-    </div>
+
+        <button id="addTaskBtn" type="button">Bæta við verkefni</button>
+      </div>
+
+      <div id="taskStatus" class="status"></div>
+    </section>
 
     <div class="split-grid">
       <section class="card">
@@ -757,6 +810,7 @@
       const signupColorPicker = document.getElementById('signupColorPicker');
       const taskTitleInput = document.getElementById('taskTitle');
       const taskNotesInput = document.getElementById('taskNotes');
+      const taskForm = document.getElementById('taskForm');
       const noticeTitleInput = document.getElementById('noticeTitle');
       const noticeBodyInput = document.getElementById('noticeBody');
       const noticeForm = document.getElementById('noticeForm');
@@ -766,6 +820,7 @@
       const logoutBtn = document.getElementById('logoutBtn');
       const bookBtn = document.getElementById('bookBtn');
       const addTaskBtn = document.getElementById('addTaskBtn');
+      const toggleTaskFormBtn = document.getElementById('toggleTaskFormBtn');
       const addNoticeBtn = document.getElementById('addNoticeBtn');
       const toggleNoticeFormBtn = document.getElementById('toggleNoticeFormBtn');
 
@@ -1034,10 +1089,16 @@
           const canClaim = currentUser && status === 'open';
           const canComplete = currentUser && status === 'claimed' && task.claimed_by_user_id === currentUser.id;
           const canDelete = currentUser && status === 'done';
-          const notesText = task.notes ? `<div class="task-meta">${task.notes}</div>` : '';
-          const claimedByText = task.claimed_by_name
-            ? `${task.claimed_by_name} tók að sér`
-            : 'Óúthlutað';
+          const notesText = task.notes ? `<div class="task-notes">${task.notes}</div>` : '';
+          const metaParts = [`Skráð ${formatDateTime(task.created_at)}`];
+
+          if (task.claimed_by_name) {
+            metaParts.push(`${task.claimed_by_name} tók að sér`);
+          } else {
+            metaParts.push('Óúthlutað');
+          }
+
+          const metaText = `<div class="task-meta-row">${metaParts.join(' · ')}</div>`;
           const claimButton = canClaim ? `<button type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
           const completeButton = canComplete ? `<button type="button" data-complete-task="${task.id}">Merkja lokið</button>` : '';
           const deleteButton = canDelete ? `<button class="danger" type="button" data-delete-task="${task.id}">Eyða úr lista</button>` : '';
@@ -1045,17 +1106,17 @@
           return `
             <div class="task-item">
               <div class="task-top">
-                <div>
-                  <div class="task-title">${task.title}</div>
-                  ${notesText}
-                  <div class="task-meta">${claimedByText}</div>
-                </div>
-                <span class="task-status ${status}">${taskStatusLabel(status)}</span>
+                <div class="task-title">${task.title}</div>
+                ${notesText}
+                ${metaText}
               </div>
-              <div class="task-actions">
-                ${claimButton}
-                ${completeButton}
-                ${deleteButton}
+              <div class="task-side">
+                <span class="task-status ${status}">${taskStatusLabel(status)}</span>
+                <div class="task-actions">
+                  ${claimButton}
+                  ${completeButton}
+                  ${deleteButton}
+                </div>
               </div>
             </div>
           `;
@@ -1119,6 +1180,15 @@
 
         noticeForm.classList.toggle('hidden', !shouldOpen);
         toggleNoticeFormBtn.textContent = shouldOpen ? 'Loka' : 'Skrifa nýja tilkynningu';
+      }
+
+      function toggleTaskForm(forceOpen = null) {
+        const shouldOpen = forceOpen === null
+          ? taskForm.classList.contains('hidden')
+          : forceOpen;
+
+        taskForm.classList.toggle('hidden', !shouldOpen);
+        toggleTaskFormBtn.textContent = shouldOpen ? 'Loka' : 'Skrá nýtt verkefni';
       }
 
       async function fetchBookings() {
@@ -1250,6 +1320,7 @@
         taskTitleInput.value = '';
         taskNotesInput.value = '';
         showStatus(taskStatus, 'Verkefni bætt við.');
+        toggleTaskForm(false);
         await refreshTasks();
       } finally {
         isSavingTask = false;
@@ -1605,6 +1676,9 @@
       signupBtn.addEventListener('click', signup);
       logoutBtn.addEventListener('click', logout);
       addTaskBtn.addEventListener('click', addTask);
+      toggleTaskFormBtn.addEventListener('click', () => {
+        toggleTaskForm();
+      });
       addNoticeBtn.addEventListener('click', addNotice);
       toggleNoticeFormBtn.addEventListener('click', () => {
         toggleNoticeForm();
