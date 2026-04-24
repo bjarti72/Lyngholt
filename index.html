@@ -234,6 +234,56 @@
       color: #7a5d00;
     }
 
+    .notice-card {
+      border: 1px solid #f0d28a;
+      background: linear-gradient(135deg, #fff7dc, #fff1bf);
+    }
+
+    .notice-card h2 {
+      margin-bottom: 8px;
+    }
+
+    .notice-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .notice-item {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(122, 93, 0, 0.14);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+
+    .notice-title {
+      font-weight: bold;
+      color: #7a5d00;
+      margin-bottom: 4px;
+    }
+
+    .notice-meta {
+      color: #8a6a11;
+      font-size: 0.88rem;
+      margin-top: 6px;
+    }
+
+    .notice-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    .notice-form {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(122, 93, 0, 0.14);
+      border-radius: 12px;
+    }
+
     .calendar-list {
       display: grid;
       gap: 10px;
@@ -273,7 +323,7 @@
       min-width: 0;
     }
 
-    .booking-name {
+    .booking-line {
       font-weight: bold;
       margin-bottom: 2px;
       font-size: 0.96rem;
@@ -283,22 +333,6 @@
     .booking-dates {
       font-size: 0.92rem;
       color: var(--muted);
-    }
-
-    .badge {
-      display: inline-block;
-      font-size: 0.78rem;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-
-    .badge.responsible {
-      color: #1f2937;
-      margin-right: 8px;
     }
 
     .booking-actions {
@@ -550,6 +584,33 @@
       </section>
     </div>
 
+    <section class="card notice-card">
+      <h2>Tilkynningar</h2>
+      <p class="muted">Mikilvægar upplýsingar sem gott er að sjá strax við komu á síðuna.</p>
+
+      <div id="noticeForm" class="notice-form hidden">
+        <div>
+          <label for="noticeTitle">Ný tilkynning</label>
+          <input id="noticeTitle" type="text" placeholder="Til dæmis: Vatnslaust fram á kvöld" />
+        </div>
+
+        <div>
+          <label for="noticeBody">Nánari texti</label>
+          <input id="noticeBody" type="text" placeholder="Til dæmis: Unnið er að viðgerð, notið vatn sparlega" />
+        </div>
+
+        <button id="addNoticeBtn" type="button">Birta tilkynningu</button>
+      </div>
+
+      <div id="noticeStatus" class="status"></div>
+      <div id="noticeList" class="notice-list">
+        <div class="empty">Engar tilkynningar eins og er.</div>
+      </div>
+      <div class="notice-toolbar">
+        <button id="toggleNoticeFormBtn" type="button">Skrifa nýja tilkynningu</button>
+      </div>
+    </section>
+
     <section class="card rules">
       <h2>Húsreglur</h2>
       <ul>
@@ -573,8 +634,8 @@
 
         <div class="booking-row">
           <div>
-            <label for="fullName">Nafn</label>
-            <input id="fullName" type="text" placeholder="Fullt nafn" />
+            <label for="fullName">Gestir</label>
+            <input id="fullName" type="text" placeholder="Til dæmis: Anna og Jón" />
           </div>
 
           <div>
@@ -696,16 +757,22 @@
       const signupColorPicker = document.getElementById('signupColorPicker');
       const taskTitleInput = document.getElementById('taskTitle');
       const taskNotesInput = document.getElementById('taskNotes');
+      const noticeTitleInput = document.getElementById('noticeTitle');
+      const noticeBodyInput = document.getElementById('noticeBody');
+      const noticeForm = document.getElementById('noticeForm');
 
       const loginBtn = document.getElementById('loginBtn');
       const signupBtn = document.getElementById('signupBtn');
       const logoutBtn = document.getElementById('logoutBtn');
       const bookBtn = document.getElementById('bookBtn');
       const addTaskBtn = document.getElementById('addTaskBtn');
+      const addNoticeBtn = document.getElementById('addNoticeBtn');
+      const toggleNoticeFormBtn = document.getElementById('toggleNoticeFormBtn');
 
       const authStatus = document.getElementById('authStatus');
       const bookingStatus = document.getElementById('bookingStatus');
       const taskStatus = document.getElementById('taskStatus');
+      const noticeStatus = document.getElementById('noticeStatus');
 
       const loggedOutBox = document.getElementById('loggedOutBox');
       const loggedInBox = document.getElementById('loggedInBox');
@@ -713,12 +780,14 @@
       const allBookingsEl = document.getElementById('allBookings');
       const myBookingsEl = document.getElementById('myBookings');
       const taskListEl = document.getElementById('taskList');
+      const noticeListEl = document.getElementById('noticeList');
 
       let selectedStart = null;
       let selectedEnd = null;
       let isLoggingIn = false;
       let isBooking = false;
       let isSavingTask = false;
+      let isSavingNotice = false;
       let currentUser = null;
       let currentUserIsAdmin = false;
       let bookingDayMap = {};
@@ -860,6 +929,16 @@
         return new Date(dateStr + 'T00:00:00').toLocaleDateString('is-IS');
       }
 
+      function formatDateTime(dateStr) {
+        return new Date(dateStr).toLocaleString('is-IS', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+
       function normalizeEmail(value) {
         return (value || '').trim().toLowerCase();
       }
@@ -915,18 +994,14 @@
           ? '<button class="danger" type="button" data-delete-id="' + item.id + '">Eyða bókun</button>'
           : '';
 
-        const displayName = item.booked_by_name || 'Óþekktur notandi';
+        const guestNames = item.booked_by_name || 'Óþekktir gestir';
         const bookedByName = item.responsible_name || 'Óþekktur';
-        const bookingOwnerText = displayName === bookedByName ? 'Bókað af ' + bookedByName : 'Bókað fyrir ' + displayName + ' af ' + bookedByName;
         return `
           <div class="booking-item">
             <div class="booking-main">
-              <div class="name-badge" style="background:${item.responsible_color || '#d6e4dd'}; color:#111827;">${displayName}</div>
+              <div class="name-badge" style="background:${item.responsible_color || '#d6e4dd'}; color:#111827;">${bookedByName}</div>
               <div class="booking-details">
-                <div>
-                  <span class="badge">${item.user_id === currentUserId ? 'Þín bókun' : 'Frátekið'}</span>
-                </div>
-                <div class="booking-name">${bookingOwnerText}</div>
+                <div class="booking-line">Gestir: ${guestNames}</div>
                 <div class="booking-dates">${formatDate(item.start_date)} til ${formatDate(item.end_date)}</div>
               </div>
             </div>
@@ -943,9 +1018,9 @@
       }
 
       function taskStatusLabel(status) {
-        if (status === 'claimed') return 'Tekið að sér';
+        if (status === 'claimed') return 'Úthlutað';
         if (status === 'done') return 'Lokið';
-        return 'Laust verkefni';
+        return 'Óúthlutað';
       }
 
       function renderTasks(list, currentUser) {
@@ -961,8 +1036,8 @@
           const canDelete = currentUser && status === 'done';
           const notesText = task.notes ? `<div class="task-meta">${task.notes}</div>` : '';
           const claimedByText = task.claimed_by_name
-            ? `Tekið að sér af ${task.claimed_by_name}`
-            : 'Enginn hefur tekið þetta að sér enn.';
+            ? `${task.claimed_by_name} tók að sér`
+            : 'Óúthlutað';
           const claimButton = canClaim ? `<button type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
           const completeButton = canComplete ? `<button type="button" data-complete-task="${task.id}">Merkja lokið</button>` : '';
           const deleteButton = canDelete ? `<button class="danger" type="button" data-delete-task="${task.id}">Eyða úr lista</button>` : '';
@@ -1005,6 +1080,47 @@
         });
       }
 
+      function renderNotices(list) {
+        if (!list.length) {
+          noticeListEl.innerHTML = '<div class="empty">Engar tilkynningar eins og er.</div>';
+          return;
+        }
+
+        noticeListEl.innerHTML = list.map((notice) => {
+          const deleteButton = currentUserIsAdmin
+            ? `<button class="danger" type="button" data-delete-notice="${notice.id}">Eyða tilkynningu</button>`
+            : '';
+
+          return `
+            <div class="notice-item">
+              <div class="task-top">
+                <div>
+                  <div class="notice-title">${notice.title}</div>
+                  <div>${notice.body || ''}</div>
+                  <div class="notice-meta">${formatDateTime(notice.created_at)}${notice.created_by_name ? ' · frá ' + notice.created_by_name : ''}</div>
+                </div>
+                <div class="booking-actions">${deleteButton}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        noticeListEl.querySelectorAll('[data-delete-notice]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            await deleteNotice(btn.dataset.deleteNotice);
+          });
+        });
+      }
+
+      function toggleNoticeForm(forceOpen = null) {
+        const shouldOpen = forceOpen === null
+          ? noticeForm.classList.contains('hidden')
+          : forceOpen;
+
+        noticeForm.classList.toggle('hidden', !shouldOpen);
+        toggleNoticeFormBtn.textContent = shouldOpen ? 'Loka' : 'Skrifa nýja tilkynningu';
+      }
+
       async function fetchBookings() {
         const { data, error } = await supabaseClient
           .from('bookings')
@@ -1027,6 +1143,20 @@
 
         if (error) {
           showStatus(taskStatus, error.message, true);
+          return [];
+        }
+
+        return data || [];
+      }
+
+      async function fetchNotices() {
+        const { data, error } = await supabaseClient
+          .from('notices')
+          .select('id, title, body, created_at, created_by_name')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          showStatus(noticeStatus, error.message, true);
           return [];
         }
 
@@ -1059,6 +1189,11 @@
       renderTasks(tasks, user || null);
       }
 
+      async function refreshNotices() {
+      const notices = await fetchNotices();
+      renderNotices(notices);
+      }
+
       async function deleteBooking(id) {
       clearStatus(bookingStatus);
 
@@ -1073,7 +1208,7 @@
       }
 
       showStatus(bookingStatus, 'Bókun eytt.');
-      await Promise.all([refreshBookings(), refreshTasks()]);
+      await Promise.all([refreshBookings(), refreshTasks(), refreshNotices()]);
       }
 
       async function addTask() {
@@ -1120,6 +1255,75 @@
         isSavingTask = false;
         addTaskBtn.disabled = false;
       }
+      }
+
+      async function addNotice() {
+      if (isSavingNotice) return;
+      isSavingNotice = true;
+      clearStatus(noticeStatus);
+      addNoticeBtn.disabled = true;
+
+      try {
+        const title = noticeTitleInput.value.trim();
+        const body = noticeBodyInput.value.trim();
+        const user = await resolveCurrentUser();
+
+        if (!user) {
+          showStatus(noticeStatus, 'Þú þarft að vera skráð(ur) inn til að bæta við tilkynningu.', true);
+          return;
+        }
+
+        if (!title) {
+          showStatus(noticeStatus, 'Skráðu fyrst heiti tilkynningar.', true);
+          return;
+        }
+
+        const profile = getUserProfile(user);
+        const { error } = await supabaseClient
+          .from('notices')
+          .insert([
+            {
+              title,
+              body: body || null,
+              created_by_name: profile.responsibleName
+            }
+          ]);
+
+        if (error) {
+          showStatus(noticeStatus, error.message, true);
+          return;
+        }
+
+        noticeTitleInput.value = '';
+        noticeBodyInput.value = '';
+        showStatus(noticeStatus, 'Tilkynningu bætt við.');
+        toggleNoticeForm(false);
+        await refreshNotices();
+      } finally {
+        isSavingNotice = false;
+        addNoticeBtn.disabled = false;
+      }
+      }
+
+      async function deleteNotice(id) {
+      clearStatus(noticeStatus);
+
+      if (!currentUserIsAdmin) {
+        showStatus(noticeStatus, 'Aðeins admin getur eytt tilkynningum.', true);
+        return;
+      }
+
+      const { error } = await supabaseClient
+        .from('notices')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        showStatus(noticeStatus, error.message, true);
+        return;
+      }
+
+      await refreshNotices();
       }
 
       async function claimTask(id) {
@@ -1267,7 +1471,7 @@
         loggedInBox.classList.remove('hidden');
         userEmail.textContent = (data.user.user_metadata?.display_name || data.user.email) + (currentUserIsAdmin ? ' (admin)' : '');
 
-        Promise.all([refreshBookings(), refreshTasks()]).catch((refreshError) => {
+        Promise.all([refreshBookings(), refreshTasks(), refreshNotices()]).catch((refreshError) => {
           showStatus(authStatus, 'Innskráning tókst en ekki tókst að hlaða gögn: ' + refreshError.message, true);
         });
       } catch (error) {
@@ -1401,6 +1605,10 @@
       signupBtn.addEventListener('click', signup);
       logoutBtn.addEventListener('click', logout);
       addTaskBtn.addEventListener('click', addTask);
+      addNoticeBtn.addEventListener('click', addNotice);
+      toggleNoticeFormBtn.addEventListener('click', () => {
+        toggleNoticeForm();
+      });
       loginBtn.addEventListener('click', () => {
         window.loginNow();
       });
@@ -1421,7 +1629,7 @@
       });
 
       window.setTimeout(() => {
-        refreshTasks().catch(() => {});
+        Promise.all([refreshTasks(), refreshNotices()]).catch(() => {});
       }, 300);
     }
   </script>
