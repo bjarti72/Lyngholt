@@ -201,6 +201,10 @@
       background: rgba(255, 255, 255, 0.92);
     }
 
+    #dateRange {
+      cursor: pointer;
+    }
+
     button {
       background: var(--accent);
       color: white;
@@ -370,48 +374,187 @@
       margin-top: 10px;
     }
 
-    #calendar .flatpickr-calendar {
-      box-shadow: none;
-      border: none;
-      width: 100%;
+    #calendar .calendar-months {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
     }
 
-    #calendar .flatpickr-day.flatpickr-disabled,
-    #calendar .flatpickr-day.disabled {
-      background: var(--danger-soft) !important;
-      color: #8b0000 !important;
-      border-color: var(--danger-soft) !important;
-      border-radius: 6px;
+    #calendar .calendar-month {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(255, 251, 246, 0.96), rgba(244, 236, 226, 0.92));
     }
 
-    #calendar .flatpickr-day {
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
+    #calendar .calendar-month-header {
+      font-weight: bold;
+      color: #5b4735;
+      margin-bottom: 10px;
+      text-transform: capitalize;
     }
 
-    #calendar .flatpickr-day.booking-day {
-      font-weight: 700;
+    #calendar .calendar-weekdays,
+    #calendar .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    #calendar .calendar-weekdays {
+      margin-bottom: 8px;
+    }
+
+    #calendar .calendar-weekday {
+      text-align: center;
+      font-size: 0.84rem;
+      color: var(--muted);
+      font-weight: bold;
+      padding: 4px 0;
+    }
+
+    #calendar .calendar-cell {
+      min-height: 42px;
       border-radius: 10px;
-      border-color: transparent !important;
-      opacity: 1 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--text);
+      font-weight: 600;
+      border: 1px solid rgba(223, 211, 195, 0.85);
     }
 
-    #calendar .flatpickr-day.booking-day.flatpickr-disabled,
-    #calendar .flatpickr-day.booking-day.disabled {
-      opacity: 1 !important;
+    #calendar .calendar-cell.blank {
+      background: transparent;
+      border-color: transparent;
     }
 
-    #calendar .flatpickr-day.booking-day .day-number {
-      position: relative;
-      z-index: 2;
-      display: block;
-      margin-top: 2px;
-      font-size: 0.95rem;
-      text-shadow: none;
+    #calendar .calendar-cell.booked {
+      font-weight: 700;
+      border-color: transparent;
+    }
+
+    #calendar .calendar-cell.today {
+      box-shadow: inset 0 0 0 2px rgba(73, 107, 91, 0.28);
+    }
+
+    .flatpickr-calendar {
+      background: linear-gradient(180deg, rgba(255, 251, 246, 0.98), rgba(244, 236, 226, 0.98));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 10px 12px;
+    }
+
+    .flatpickr-calendar.arrowTop::before,
+    .flatpickr-calendar.arrowTop::after,
+    .flatpickr-calendar.arrowBottom::before,
+    .flatpickr-calendar.arrowBottom::after {
+      border-bottom-color: rgba(255, 251, 246, 0.98);
+      border-top-color: rgba(244, 236, 226, 0.98);
+    }
+
+    .flatpickr-calendar .flatpickr-months {
+      background: transparent;
+      padding: 4px 0 2px;
+    }
+
+    .flatpickr-calendar .flatpickr-month {
+      background: transparent;
+      color: var(--text);
+      fill: var(--text);
+    }
+
+    .flatpickr-calendar .flatpickr-current-month {
+      color: #5b4735;
+      font-weight: bold;
+      font-size: 1rem;
+      text-transform: capitalize;
+    }
+
+    .flatpickr-calendar .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-calendar .flatpickr-current-month input.cur-year {
+      color: inherit;
+      font-weight: bold;
+    }
+
+    .flatpickr-calendar .flatpickr-weekdays {
+      background: transparent;
+      padding: 0 0 8px;
+    }
+
+    .flatpickr-calendar span.flatpickr-weekday {
+      color: var(--muted);
+      font-weight: bold;
+      font-size: 0.84rem;
+      text-transform: none;
+    }
+
+    .flatpickr-calendar .flatpickr-days {
+      padding: 0;
+    }
+
+    .flatpickr-calendar .dayContainer,
+    .flatpickr-calendar .flatpickr-days {
+      width: 238px;
+      min-width: 238px;
+      max-width: 238px;
+    }
+
+    .flatpickr-calendar .flatpickr-day {
+      width: 32px;
+      max-width: 32px;
+      height: 35px;
+      line-height: 33px;
+      font-size: 0.94rem;
+      border-radius: 10px;
+      border: 1px solid rgba(223, 211, 195, 0.85);
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--text);
+      font-weight: 600;
+      margin-right: 2px;
+      margin-bottom: 3px;
+    }
+
+    .flatpickr-calendar .flatpickr-day.today {
+      border-color: rgba(73, 107, 91, 0.55);
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    .flatpickr-calendar .flatpickr-day.prevMonthDay,
+    .flatpickr-calendar .flatpickr-day.nextMonthDay {
+      color: #9f9487;
+    }
+
+    .flatpickr-calendar .flatpickr-day:hover {
+      background: rgba(217, 185, 143, 0.16);
+      border-color: rgba(217, 185, 143, 0.35);
+    }
+
+    .flatpickr-calendar .flatpickr-day.startRange,
+    .flatpickr-calendar .flatpickr-day.endRange,
+    .flatpickr-calendar .flatpickr-day.selected {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
+    }
+
+    .flatpickr-calendar .flatpickr-day.inRange {
+      background: rgba(73, 107, 91, 0.14);
+      border-color: rgba(73, 107, 91, 0.08);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .flatpickr-calendar .flatpickr-day.flatpickr-disabled,
+    .flatpickr-calendar .flatpickr-day.flatpickr-disabled:hover,
+    .flatpickr-calendar .flatpickr-day.disabled,
+    .flatpickr-calendar .flatpickr-day.disabled:hover {
+      background: rgba(221, 214, 204, 0.58);
+      border-color: rgba(202, 191, 178, 0.8);
+      color: #675d53;
+      cursor: not-allowed;
     }
 
     .rules ul {
@@ -548,6 +691,11 @@
       .task-actions button {
         width: 100%;
       }
+
+      #calendar .calendar-months {
+        grid-template-columns: 1fr;
+      }
+
 
       .booking-actions {
         justify-self: stretch;
@@ -828,6 +976,7 @@
       const bookingStatus = document.getElementById('bookingStatus');
       const taskStatus = document.getElementById('taskStatus');
       const noticeStatus = document.getElementById('noticeStatus');
+      const calendarEl = document.getElementById('calendar');
 
       const loggedOutBox = document.getElementById('loggedOutBox');
       const loggedInBox = document.getElementById('loggedInBox');
@@ -917,37 +1066,107 @@
         return dayMap;
       }
 
-      function decorateCalendarDay(dayElem) {
-        const key = formatDateKey(dayElem.dateObj);
-        const bookingInfo = bookingDayMap[key];
-        const dayNumber = dayElem.dateObj.getDate();
+      function escapeHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
 
-        dayElem.textContent = '';
-        dayElem.classList.remove('booking-day');
-        dayElem.style.background = '';
-        dayElem.title = '';
+      function getAvailabilityMonthCount() {
+        return window.matchMedia('(max-width: 860px)').matches ? 1 : 2;
+      }
 
-        const numberSpan = document.createElement('span');
-        numberSpan.className = 'day-number';
-        numberSpan.textContent = dayNumber;
-        dayElem.appendChild(numberSpan);
+      function renderAvailabilityCalendar() {
+        const monthCount = getAvailabilityMonthCount();
+        const weekdayLabels = ['Mán', 'Þri', 'Mið', 'Fim', 'Fös', 'Lau', 'Sun'];
+        const today = new Date();
+        const todayKey = formatDateKey(today);
+        let monthsHtml = '';
 
-        if (!bookingInfo) {
-          return;
+        for (let offset = 0; offset < monthCount; offset += 1) {
+          const monthDate = new Date(today.getFullYear(), today.getMonth() + offset, 1, 12, 0, 0);
+          const year = monthDate.getFullYear();
+          const month = monthDate.getMonth();
+          const monthLabel = monthDate.toLocaleDateString('is-IS', {
+            month: 'long',
+            year: 'numeric'
+          });
+          const firstWeekday = (monthDate.getDay() + 6) % 7;
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          const weekdayHtml = weekdayLabels.map((label) => `<div class="calendar-weekday">${label}</div>`).join('');
+          let dayCellsHtml = '';
+
+          for (let i = 0; i < firstWeekday; i += 1) {
+            dayCellsHtml += '<div class="calendar-cell blank" aria-hidden="true"></div>';
+          }
+
+          for (let day = 1; day <= daysInMonth; day += 1) {
+            const date = new Date(year, month, day, 12, 0, 0);
+            const key = formatDateKey(date);
+            const bookingInfo = bookingDayMap[key];
+            const isToday = key === todayKey;
+            const classNames = ['calendar-cell'];
+            const styles = [];
+            let titleAttr = '';
+
+            if (bookingInfo) {
+              classNames.push('booked');
+              styles.push(`background:${bookingInfo.color}`);
+              styles.push(`color:${getContrastTextColor(bookingInfo.color)}`);
+              titleAttr = ` title="${escapeHtml(bookingInfo.responsibleName)}"`;
+            }
+
+            if (isToday) {
+              classNames.push('today');
+            }
+
+            const styleAttr = styles.length ? ` style="${styles.join(';')}"` : '';
+            dayCellsHtml += `<div class="${classNames.join(' ')}"${styleAttr}${titleAttr}>${day}</div>`;
+          }
+
+          const totalCells = firstWeekday + daysInMonth;
+          const trailingBlanks = (7 - (totalCells % 7)) % 7;
+
+          for (let i = 0; i < trailingBlanks; i += 1) {
+            dayCellsHtml += '<div class="calendar-cell blank" aria-hidden="true"></div>';
+          }
+
+          monthsHtml += `
+            <div class="calendar-month">
+              <div class="calendar-month-header">${monthLabel}</div>
+              <div class="calendar-weekdays">${weekdayHtml}</div>
+              <div class="calendar-days">${dayCellsHtml}</div>
+            </div>
+          `;
         }
 
-        dayElem.classList.add('booking-day');
-        dayElem.style.background = bookingInfo.color;
-        dayElem.style.color = getContrastTextColor(bookingInfo.color);
-        dayElem.title = bookingInfo.responsibleName;
+        calendarEl.innerHTML = `<div class="calendar-months">${monthsHtml}</div>`;
       }
 
       renderColorPicker();
+
+      const flatpickrLocale = {
+        firstDayOfWeek: 1,
+        weekdays: {
+          shorthand: ['Sun', 'Mán', 'Þri', 'Mið', 'Fim', 'Fös', 'Lau'],
+          longhand: ['Sunnudagur', 'Mánudagur', 'Þriðjudagur', 'Miðvikudagur', 'Fimmtudagur', 'Föstudagur', 'Laugardagur']
+        },
+        months: {
+          shorthand: ['Jan', 'Feb', 'Mar', 'Apr', 'Maí', 'Jún', 'Júl', 'Ágú', 'Sep', 'Okt', 'Nóv', 'Des'],
+          longhand: ['Janúar', 'Febrúar', 'Mars', 'Apríl', 'Maí', 'Júní', 'Júlí', 'Ágúst', 'September', 'Október', 'Nóvember', 'Desember']
+        }
+      };
 
       const datePicker = flatpickr(dateRangeInput, {
         mode: 'range',
         dateFormat: 'Y-m-d',
         minDate: 'today',
+        locale: flatpickrLocale,
+        prevArrow: '&#8249;',
+        nextArrow: '&#8250;',
         onChange(selectedDates) {
           if (selectedDates.length === 2) {
             selectedStart = selectedDates[0].toISOString().split('T')[0];
@@ -959,12 +1178,14 @@
         }
       });
 
-      const calendar = flatpickr('#calendar', {
-        inline: true,
-        dateFormat: 'Y-m-d',
-        clickOpens: false,
-        onDayCreate(_dObj, _dStr, _fp, dayElem) {
-          decorateCalendarDay(dayElem);
+      renderAvailabilityCalendar();
+
+      let lastAvailabilityMonthCount = getAvailabilityMonthCount();
+      window.addEventListener('resize', () => {
+        const nextMonthCount = getAvailabilityMonthCount();
+        if (nextMonthCount !== lastAvailabilityMonthCount) {
+          lastAvailabilityMonthCount = nextMonthCount;
+          renderAvailabilityCalendar();
         }
       });
 
@@ -1247,10 +1468,9 @@
         }));
 
         bookingDayMap = expandBookingDays(bookings);
+        renderAvailabilityCalendar();
 
       datePicker.set('disable', disabledRanges);
-      calendar.set('disable', disabledRanges);
-      calendar.redraw();
     }
 
       async function refreshTasks() {
