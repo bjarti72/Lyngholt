@@ -393,6 +393,15 @@
       color: var(--text);
     }
 
+    .weather-day-wind {
+      font-size: 0.76rem;
+      color: #5e5448;
+      font-weight: bold;
+      margin-top: 4px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
     .auth-row,
     .booking-row {
       display: grid;
@@ -1349,10 +1358,6 @@
         lat: 64.70242,
         lon: -21.62151
       };
-      const ADMIN_EMAILS = [
-        'ingibjarturj@simnet.is'
-      ];
-
       const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
       const loginEmailInput = document.getElementById('loginEmail');
@@ -1431,7 +1436,7 @@
       async function fetchProfiles() {
         const { data, error } = await supabaseClient
           .from('profiles')
-          .select('id, email, display_name, color');
+          .select('id, display_name, color, is_admin');
 
         if (error) {
           throw error;
@@ -1777,6 +1782,27 @@
         return 'Veðurspá';
       }
 
+      function getWindDirectionInfo(degrees) {
+        if (typeof degrees !== 'number' || Number.isNaN(degrees)) {
+          return { label: '', arrow: '' };
+        }
+
+        const directions = [
+          { label: 'N', arrow: '↑' },
+          { label: 'NA', arrow: '↗' },
+          { label: 'A', arrow: '→' },
+          { label: 'SA', arrow: '↘' },
+          { label: 'S', arrow: '↓' },
+          { label: 'SV', arrow: '↙' },
+          { label: 'V', arrow: '←' },
+          { label: 'NV', arrow: '↖' }
+        ];
+
+        const normalized = ((degrees % 360) + 360) % 360;
+        const index = Math.round(normalized / 45) % directions.length;
+        return directions[index];
+      }
+
       function renderWeatherCard(weather) {
         if (!weather) {
           weatherCardEl.innerHTML = `
@@ -1787,11 +1813,16 @@
           return;
         }
 
+        const windDirection = weather.windDirection?.label
+          ? `${weather.windDirection.arrow} ${weather.windDirection.label}`
+          : '';
+
         const forecastHtml = (weather.days || []).map((day) => `
           <div class="weather-day">
             <div class="weather-day-label">${day.label}</div>
             <div class="weather-day-icon">${day.icon}</div>
             <div class="weather-day-temp">${day.temp}°C</div>
+            <div class="weather-day-wind">${day.windDirection.arrow} ${day.windDirection.label} · ${day.wind} m/s</div>
           </div>
         `).join('');
 
@@ -1805,7 +1836,7 @@
               </div>
             </div>
             <div class="weather-meta">
-              Vindur: ${weather.wind} m/s<br />
+              Vindur: ${windDirection ? `${windDirection} · ` : ''}${weather.wind} m/s<br />
               Úrkoma næsta klst.: ${weather.precipitation} mm
             </div>
             <div class="weather-forecast">${forecastHtml}</div>
@@ -1865,12 +1896,15 @@
             .map((entry) => ({
               label: formatShortDate(entry.time),
               temp: Math.round(entry?.data?.instant?.details?.air_temperature ?? 0),
+              wind: Math.round((entry?.data?.instant?.details?.wind_speed ?? 0) * 10) / 10,
+              windDirection: getWindDirectionInfo(entry?.data?.instant?.details?.wind_from_direction),
               icon: weatherSymbolToEmoji(entry?.data?.next_6_hours?.summary?.symbol_code || entry?.data?.next_1_hours?.summary?.symbol_code)
             }));
 
           renderWeatherCard({
             temperature: Math.round(instant.air_temperature ?? 0),
             wind: Math.round((instant.wind_speed ?? 0) * 10) / 10,
+            windDirection: getWindDirectionInfo(instant.wind_from_direction),
             precipitation: Math.round(((nextHour?.details?.precipitation_amount ?? 0) * 10)) / 10,
             description: weatherSymbolToText(nextHour?.summary?.symbol_code),
             icon: weatherSymbolToEmoji(nextHour?.summary?.symbol_code),
@@ -1882,29 +1916,9 @@
         }
       }
 
-      function normalizeEmail(value) {
-        return (value || '').trim().toLowerCase();
-      }
-
-      function getUserEmails(user) {
-        const emails = [
-          user?.email,
-          user?.user_metadata?.email
-        ];
-
-        if (Array.isArray(user?.identities)) {
-          user.identities.forEach((identity) => {
-            emails.push(identity?.email);
-            emails.push(identity?.identity_data?.email);
-          });
-        }
-
-        return [...new Set(emails.map(normalizeEmail).filter(Boolean))];
-      }
-
       function isAdmin(user) {
-        const allowedEmails = ADMIN_EMAILS.map(normalizeEmail);
-        return getUserEmails(user).some((email) => allowedEmails.includes(email));
+        const profile = user?.id ? profilesById[user.id] : null;
+        return Boolean(profile?.is_admin);
       }
 
       async function resolveCurrentUser() {
@@ -2156,7 +2170,7 @@
       async function fetchBookings() {
         const { data, error } = await supabaseClient
           .from('bookings')
-          .select('id, user_id, start_date, end_date, created_at, booked_by_name, booked_by_email, responsible_name, responsible_color')
+          .select('id, user_id, start_date, end_date, created_at, booked_by_name, responsible_name, responsible_color')
           .order('start_date', { ascending: true });
 
       if (error) {
