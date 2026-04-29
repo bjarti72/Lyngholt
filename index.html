@@ -249,6 +249,21 @@
       font-size: 0.9rem;
     }
 
+    .auth-inline-link {
+      display: inline-flex;
+      align-items: center;
+      width: auto;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--accent);
+      font: inherit;
+      font-weight: bold;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+
     .summary-panel {
       min-width: 0;
     }
@@ -1158,6 +1173,7 @@
             <input id="loginPassword" type="password" placeholder="Lykilorð" />
           </div>
           <button id="loginBtn" type="button">Skrá inn</button>
+          <button id="toggleForgotPasswordBtn" class="auth-inline-link" type="button">Gleymt lykilorð?</button>
         </div>
       </section>
 
@@ -1194,6 +1210,18 @@
             <input id="confirmPassword" type="password" placeholder="Staðfesta lykilorð" />
           </div>
           <button id="changePasswordBtn" type="button">Vista nýtt lykilorð</button>
+        </div>
+      </section>
+
+      <section id="forgotPasswordPanel" class="auth-compact-panel hidden">
+        <h3>Gleymt lykilorð</h3>
+        <p class="muted">Sláðu inn netfangið þitt og við sendum þér hlekk til að velja nýtt lykilorð.</p>
+        <div class="auth-row">
+          <div>
+            <label for="forgotPasswordEmail">Netfang</label>
+            <input id="forgotPasswordEmail" type="email" placeholder="Netfang" />
+          </div>
+          <button id="sendResetLinkBtn" type="button">Senda endurstillingarhlekk</button>
         </div>
       </section>
     </div>
@@ -1382,6 +1410,7 @@
       const signupEmailInput = document.getElementById('signupEmail');
       const signupPasswordInput = document.getElementById('signupPassword');
       const signupNameInput = document.getElementById('signupName');
+      const forgotPasswordEmailInput = document.getElementById('forgotPasswordEmail');
       const newPasswordInput = document.getElementById('newPassword');
       const confirmPasswordInput = document.getElementById('confirmPassword');
       const fullNameInput = document.getElementById('fullName');
@@ -1400,7 +1429,9 @@
       const toggleLoginBtn = document.getElementById('toggleLoginBtn');
       const toggleSignupBtn = document.getElementById('toggleSignupBtn');
       const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+      const toggleForgotPasswordBtn = document.getElementById('toggleForgotPasswordBtn');
       const changePasswordBtn = document.getElementById('changePasswordBtn');
+      const sendResetLinkBtn = document.getElementById('sendResetLinkBtn');
       const bookBtn = document.getElementById('bookBtn');
       const addTaskBtn = document.getElementById('addTaskBtn');
       const toggleTaskFormBtn = document.getElementById('toggleTaskFormBtn');
@@ -1418,6 +1449,7 @@
       const loginPanelEl = document.getElementById('loginPanel');
       const signupPanelEl = document.getElementById('signupPanel');
       const passwordPanelEl = document.getElementById('passwordPanel');
+      const forgotPasswordPanelEl = document.getElementById('forgotPasswordPanel');
 
       const loggedOutBox = document.getElementById('loggedOutBox');
       const loggedInBox = document.getElementById('loggedInBox');
@@ -1431,6 +1463,7 @@
       let selectedEnd = null;
       let isLoggingIn = false;
       let isUpdatingPassword = false;
+      let isSendingResetLink = false;
       let isBooking = false;
       let isSavingTask = false;
       let isSavingNotice = false;
@@ -2038,14 +2071,17 @@
         const showingLogin = !authFormsEl.classList.contains('hidden') && !loginPanelEl.classList.contains('hidden');
         const showingSignup = !authFormsEl.classList.contains('hidden') && !signupPanelEl.classList.contains('hidden');
         const showingPassword = !authFormsEl.classList.contains('hidden') && !passwordPanelEl.classList.contains('hidden');
+        const showingForgotPassword = !authFormsEl.classList.contains('hidden') && !forgotPasswordPanelEl.classList.contains('hidden');
         const openLogin = panel === 'login' && !showingLogin;
         const openSignup = panel === 'signup' && !showingSignup;
         const openPassword = panel === 'password' && !showingPassword;
+        const openForgotPassword = panel === 'forgot-password' && !showingForgotPassword;
 
-        authFormsEl.classList.toggle('hidden', !(openLogin || openSignup || openPassword));
+        authFormsEl.classList.toggle('hidden', !(openLogin || openSignup || openPassword || openForgotPassword));
         loginPanelEl.classList.toggle('hidden', !openLogin);
         signupPanelEl.classList.toggle('hidden', !openSignup);
         passwordPanelEl.classList.toggle('hidden', !openPassword);
+        forgotPasswordPanelEl.classList.toggle('hidden', !openForgotPassword);
       }
 
       function taskStatusLabel(status) {
@@ -2571,6 +2607,7 @@
         authFormsEl.classList.add('hidden');
         loginPanelEl.classList.add('hidden');
         passwordPanelEl.classList.add('hidden');
+        forgotPasswordPanelEl.classList.add('hidden');
 
         Promise.all([refreshBookings(), refreshTasks(), refreshNotices()]).catch((refreshError) => {
           showStatus(authStatus, 'Innskráning tókst en ekki tókst að hlaða gögn: ' + refreshError.message, true);
@@ -2580,6 +2617,39 @@
       } finally {
         isLoggingIn = false;
         loginBtn.disabled = false;
+      }
+      }
+
+      async function sendPasswordResetLink() {
+      if (isSendingResetLink) return;
+      isSendingResetLink = true;
+      clearStatus(authStatus);
+      sendResetLinkBtn.disabled = true;
+
+      try {
+        const email = forgotPasswordEmailInput.value.trim();
+
+        if (!email) {
+          showStatus(authStatus, 'Settu inn netfang til að fá endurstillingarhlekk.', true);
+          return;
+        }
+
+        const redirectTo = `${window.location.origin}${window.location.pathname}`;
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo
+        });
+
+        if (error) {
+          showStatus(authStatus, error.message, true);
+          return;
+        }
+
+        forgotPasswordEmailInput.value = '';
+        toggleAuthPanel('forgot-password');
+        showStatus(authStatus, 'Við sendum þér tölvupóst með hlekk til að endurstilla lykilorðið.');
+      } finally {
+        isSendingResetLink = false;
+        sendResetLinkBtn.disabled = false;
       }
       }
 
@@ -2662,6 +2732,7 @@
         toggleLoginBtn.classList.add('hidden');
         toggleSignupBtn.classList.add('hidden');
         authFormsEl.classList.add('hidden');
+        forgotPasswordPanelEl.classList.add('hidden');
       } else {
         loggedOutBox.classList.remove('hidden');
         loggedInBox.classList.add('hidden');
@@ -2673,6 +2744,7 @@
         toggleLoginBtn.classList.remove('hidden');
         toggleSignupBtn.classList.remove('hidden');
         passwordPanelEl.classList.add('hidden');
+        forgotPasswordPanelEl.classList.add('hidden');
       }
 
       await refreshBookings();
@@ -2772,6 +2844,10 @@
       toggleSignupBtn.addEventListener('click', () => {
         toggleAuthPanel('signup');
       });
+      toggleForgotPasswordBtn.addEventListener('click', () => {
+        forgotPasswordEmailInput.value = loginEmailInput.value.trim();
+        toggleAuthPanel('forgot-password');
+      });
       togglePasswordBtn.addEventListener('click', () => {
         toggleAuthPanel('password');
       });
@@ -2787,12 +2863,20 @@
         window.loginNow();
       });
       changePasswordBtn.addEventListener('click', changePassword);
+      sendResetLinkBtn.addEventListener('click', sendPasswordResetLink);
       bookBtn.addEventListener('click', () => {
         window.bookNow();
       });
 
-      supabaseClient.auth.onAuthStateChange(() => {
+      supabaseClient.auth.onAuthStateChange((event) => {
         window.setTimeout(() => {
+          if (event === 'PASSWORD_RECOVERY') {
+            newPasswordInput.value = '';
+            confirmPasswordInput.value = '';
+            toggleAuthPanel('password');
+            showStatus(authStatus, 'Veldu nýtt lykilorð til að klára endurstillingu.');
+          }
+
           updateAuthUI().catch((error) => {
             showStatus(authStatus, error.message || 'Ekki tókst að uppfæra innskráningarstöðu.', true);
           });
