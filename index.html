@@ -186,6 +186,12 @@
           <button id="bookBtn" type="button">Bóka valda daga</button>
         </div>
 
+        <div id="bookingPreview" class="booking-preview">
+          <div class="booking-preview-label">Valið tímabil</div>
+          <div id="bookingPreviewText" class="booking-preview-text"></div>
+          <div id="bookingPreviewMeta" class="booking-preview-meta"></div>
+        </div>
+
         <div id="bookingStatus" class="status"></div>
       </section>
     </div>
@@ -333,6 +339,9 @@
       const loggedOutBox = document.getElementById('loggedOutBox');
       const loggedInBox = document.getElementById('loggedInBox');
       const userEmail = document.getElementById('userEmail');
+      const bookingPreviewEl = document.getElementById('bookingPreview');
+      const bookingPreviewTextEl = document.getElementById('bookingPreviewText');
+      const bookingPreviewMetaEl = document.getElementById('bookingPreviewMeta');
       const allBookingsEl = document.getElementById('allBookings');
       const myBookingsEl = document.getElementById('myBookings');
       const taskListEl = document.getElementById('taskList');
@@ -348,6 +357,7 @@
       let isSavingNotice = false;
       let currentUser = null;
       let currentUserIsAdmin = false;
+      let currentBookings = [];
       let bookingDayMap = {};
       let availabilityMonthOffset = 0;
       let profilesById = {};
@@ -633,9 +643,12 @@
             selectedEnd = null;
             instance.altInput.value = '';
           }
+
+          updateBookingPreview();
         }
       });
 
+      bookBtn.disabled = true;
       renderAvailabilityCalendar();
       refreshWeather();
       fetchProfiles().catch((error) => {
@@ -665,6 +678,66 @@
 
       function formatDate(dateStr) {
         return formatDisplayDate(dateStr, true);
+      }
+
+      function countNights(startDateStr, endDateStr) {
+        if (!startDateStr || !endDateStr) return 0;
+        const startDate = parseDateString(startDateStr);
+        const endDate = parseDateString(endDateStr);
+        const diffMs = endDate.getTime() - startDate.getTime();
+        return diffMs >= 0 ? Math.round(diffMs / 86400000) : 0;
+      }
+
+      function isBookingRangeAvailable(startDateStr, endDateStr) {
+        if (!startDateStr || !endDateStr) return false;
+
+        return !currentBookings.some((booking) => (
+          booking.start_date <= endDateStr && booking.end_date >= startDateStr
+        ));
+      }
+
+      function updateBookingPreview() {
+        const guestText = fullNameInput.value.trim();
+        const hasGuests = Boolean(guestText);
+        const hasRange = Boolean(selectedStart && selectedEnd);
+        const hasStartOnly = Boolean(selectedStart && !selectedEnd);
+
+        if (!hasGuests && !hasRange && !hasStartOnly) {
+          bookingPreviewTextEl.textContent = '';
+          bookingPreviewMetaEl.textContent = '';
+          bookingPreviewEl.classList.remove('show');
+          bookingPreviewEl.classList.remove('available', 'unavailable');
+          bookBtn.disabled = true;
+          return;
+        }
+
+        const canBook = hasGuests && hasRange;
+        const nights = hasRange ? countNights(selectedStart, selectedEnd) : 0;
+        const rangeAvailable = hasRange ? isBookingRangeAvailable(selectedStart, selectedEnd) : false;
+
+        if (hasRange) {
+          const nightLabel = nights === 1 ? '1 nótt' : `${nights} nætur`;
+          bookingPreviewTextEl.textContent = `${formatDateRange(selectedStart, selectedEnd)} · ${nightLabel}`;
+        } else if (hasStartOnly) {
+          bookingPreviewTextEl.textContent = `${formatDisplayDate(selectedStart)} · veldu lokadag`;
+        } else {
+          bookingPreviewTextEl.textContent = guestText;
+        }
+
+        if (hasRange) {
+          bookingPreviewMetaEl.textContent = rangeAvailable
+            ? 'Tímabil laust til bókunar.'
+            : 'Þetta tímabil skarast við bókun sem er þegar til.';
+        } else if (hasGuests) {
+          bookingPreviewMetaEl.textContent = 'Veldu dagabil til að klára bókunina.';
+        } else {
+          bookingPreviewMetaEl.textContent = 'Settu inn nöfn gesta til að halda áfram.';
+        }
+
+        bookingPreviewEl.classList.add('show');
+        bookingPreviewEl.classList.toggle('available', hasRange && rangeAvailable);
+        bookingPreviewEl.classList.toggle('unavailable', hasRange && !rangeAvailable);
+        bookBtn.disabled = !(canBook && rangeAvailable);
       }
 
       function formatShortDate(dateStr) {
@@ -883,7 +956,7 @@
 
       container.innerHTML = filtered.map((item) => {
         const deleteButton = ownOnly || canDeleteAll
-          ? '<button class="danger" type="button" data-delete-id="' + item.id + '">Eyða bókun</button>'
+          ? '<button class="icon-delete-btn" type="button" data-delete-id="' + item.id + '" title="Eyða bókun" aria-label="Eyða bókun">×</button>'
           : '';
 
         const guestNames = item.booked_by_name || 'Óþekktir gestir';
@@ -905,6 +978,7 @@
 
       container.querySelectorAll('[data-delete-id]').forEach((btn) => {
         btn.addEventListener('click', async () => {
+          if (!window.confirm('Eyða bókun?')) return;
           await deleteBooking(btn.dataset.deleteId);
         });
       });
@@ -1011,7 +1085,7 @@
           const metaText = `<div class="task-meta-row">${metaParts.join(' · ')}</div>`;
           const claimButton = canClaim ? `<button type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
           const completeButton = canComplete ? `<button type="button" data-complete-task="${task.id}">Merkja lokið</button>` : '';
-          const deleteButton = canDelete ? `<button class="danger" type="button" data-delete-task="${task.id}">Eyða úr lista</button>` : '';
+          const deleteButton = canDelete ? `<button class="icon-delete-btn" type="button" data-delete-task="${task.id}" title="Eyða úr lista" aria-label="Eyða úr lista">×</button>` : '';
 
           return `
             <div class="task-item">
@@ -1047,6 +1121,7 @@
 
         taskListEl.querySelectorAll('[data-delete-task]').forEach((btn) => {
           btn.addEventListener('click', async () => {
+            if (!window.confirm('Eyða verkefni úr lista?')) return;
             await deleteTask(btn.dataset.deleteTask);
           });
         });
@@ -1063,7 +1138,7 @@
           const safeBody = notice.body ? `<div class="notice-body">${escapeHtml(notice.body)}</div>` : '';
           const typeMeta = getNoticeTypeMeta(notice.type);
           const deleteButton = currentUserIsAdmin
-            ? `<button class="danger" type="button" data-delete-notice="${notice.id}">Eyða tilkynningu</button>`
+            ? `<button class="icon-delete-btn" type="button" data-delete-notice="${notice.id}" title="Eyða tilkynningu" aria-label="Eyða tilkynningu">×</button>`
             : '';
 
           return `
@@ -1085,6 +1160,7 @@
 
         noticeListEl.querySelectorAll('[data-delete-notice]').forEach((btn) => {
           btn.addEventListener('click', async () => {
+            if (!window.confirm('Eyða tilkynningu?')) return;
             await deleteNotice(btn.dataset.deleteNotice);
           });
         });
@@ -1153,6 +1229,7 @@
       async function refreshBookings() {
       const user = currentUser || await resolveCurrentUser();
       const bookings = await fetchBookings();
+      currentBookings = bookings;
       const adminUser = currentUserIsAdmin || isAdmin(user);
 
       renderBookings(bookings, allBookingsEl, user?.id || null, false, adminUser);
@@ -1164,8 +1241,9 @@
           to: b.end_date
         }));
 
-        bookingDayMap = expandBookingDays(bookings);
-        renderAvailabilityCalendar();
+      bookingDayMap = expandBookingDays(bookings);
+      renderAvailabilityCalendar();
+      updateBookingPreview();
 
       datePicker.set('disable', disabledRanges);
     }
@@ -1477,6 +1555,7 @@
           return;
         }
 
+        await fetchProfiles().catch(() => []);
         showStatus(authStatus, 'Innskráning tókst.');
         currentUser = data.user;
         currentUserIsAdmin = isAdmin(data.user);
@@ -1626,7 +1705,7 @@
         forgotPasswordPanelEl.classList.add('hidden');
       }
 
-      await refreshBookings();
+      await Promise.all([refreshBookings(), refreshTasks(), refreshNotices()]);
       }
 
       async function createBooking() {
@@ -1688,7 +1767,6 @@
               start_date,
               end_date,
               booked_by_name: fullName,
-              booked_by_email: user.email,
               responsible_name: profile.responsibleName,
               responsible_color: profile.responsibleColor
             }
@@ -1704,6 +1782,7 @@
         selectedStart = null;
         selectedEnd = null;
         datePicker.clear();
+        updateBookingPreview();
         await refreshBookings();
       } catch (error) {
         showStatus(bookingStatus, error.message || 'Óvænt villa kom upp við bókun.', true);
@@ -1743,6 +1822,7 @@
       });
       changePasswordBtn.addEventListener('click', changePassword);
       sendResetLinkBtn.addEventListener('click', sendPasswordResetLink);
+      fullNameInput.addEventListener('input', updateBookingPreview);
       bookBtn.addEventListener('click', () => {
         window.bookNow();
       });
