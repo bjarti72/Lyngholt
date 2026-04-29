@@ -41,7 +41,7 @@
     <div id="authForms" class="auth-inline-forms hidden">
       <section id="loginPanel" class="auth-compact-panel hidden">
         <h3>Skrá inn</h3>
-        <p class="muted">Fyrir notendur sem eru þegar til.</p>
+        <p class="muted">Fyrir skráða notendur.</p>
         <div class="auth-row">
           <div>
             <label for="loginEmail">Netfang</label>
@@ -58,7 +58,7 @@
 
       <section id="signupPanel" class="auth-compact-panel hidden">
         <h3>Stofna notanda</h3>
-        <p class="muted">Veldu nafn og lit einu sinni við stofnun.</p>
+        <p class="muted">Búðu til aðgang með nafni og netfangi.</p>
         <div class="auth-row">
           <div>
             <label for="signupEmail">Netfang</label>
@@ -78,7 +78,7 @@
 
       <section id="passwordPanel" class="auth-compact-panel hidden">
         <h3>Breyta lykilorði</h3>
-        <p class="muted">Veldu nýtt lykilorð og staðfestu það hér.</p>
+        <p class="muted">Sláðu inn nýtt lykilorð.</p>
         <div class="auth-row">
           <div>
             <label for="newPassword">Nýtt lykilorð</label>
@@ -94,7 +94,7 @@
 
       <section id="forgotPasswordPanel" class="auth-compact-panel hidden">
         <h3>Gleymt lykilorð</h3>
-        <p class="muted">Sláðu inn netfangið þitt og við sendum þér hlekk til að velja nýtt lykilorð.</p>
+        <p class="muted">Sláðu inn netfangið þitt og við sendum þér endurstillingarhlekk.</p>
         <div class="auth-row">
           <div>
             <label for="forgotPasswordEmail">Netfang</label>
@@ -130,7 +130,7 @@
             </select>
           </div>
 
-          <button id="addNoticeBtn" type="button">Birta tilkynningu</button>
+          <button id="addNoticeBtn" type="button">Skrá tilkynningu</button>
         </div>
 
         <div id="noticeStatus" class="status"></div>
@@ -138,7 +138,7 @@
           <div class="empty">Engar tilkynningar eins og er.</div>
         </div>
         <div class="notice-toolbar">
-          <button id="toggleNoticeFormBtn" type="button">Skrifa nýja tilkynningu</button>
+          <button id="toggleNoticeFormBtn" type="button">Ný tilkynning</button>
         </div>
       </section>
 
@@ -202,7 +202,7 @@
         <div class="empty">Engin verkefni enn.</div>
       </div>
       <div class="task-toolbar">
-        <button id="toggleTaskFormBtn" type="button">Skrá nýtt verkefni</button>
+        <button id="toggleTaskFormBtn" type="button">Nýtt verkefni</button>
       </div>
 
       <div id="taskForm" class="task-form hidden">
@@ -216,7 +216,7 @@
           <input id="taskNotes" type="text" placeholder="Til dæmis: vantar fyrir næstu ferð" />
         </div>
 
-        <button id="addTaskBtn" type="button">Bæta við verkefni</button>
+        <button id="addTaskBtn" type="button">Skrá verkefni</button>
       </div>
 
       <div id="taskStatus" class="status"></div>
@@ -789,6 +789,21 @@
         return 'Veðurspá';
       }
 
+      function getWeatherIconClass(symbolCode) {
+        const code = String(symbolCode || '');
+
+        if (code.includes('thunder')) return 'weather-icon-storm';
+        if (code.includes('snow')) return 'weather-icon-snow';
+        if (code.includes('sleet')) return 'weather-icon-sleet';
+        if (code.includes('rain')) return 'weather-icon-rain';
+        if (code.includes('fog')) return 'weather-icon-fog';
+        if (code.includes('cloudy')) return 'weather-icon-cloud';
+        if (code.includes('partlycloudy')) return 'weather-icon-partly';
+        if (code.includes('fair')) return 'weather-icon-fair';
+        if (code.includes('clearsky')) return 'weather-icon-clear';
+        return 'weather-icon-cloud';
+      }
+
       function getTemperatureClass(temp) {
         return Number(temp) > 0 ? 'temp-above-freezing' : 'temp-freezing';
       }
@@ -831,7 +846,7 @@
         const forecastHtml = (weather.days || []).map((day) => `
           <div class="weather-day">
             <div class="weather-day-label">${day.label}</div>
-            <div class="weather-day-icon">${day.icon}</div>
+            <div class="weather-day-icon ${day.iconClass || ''}">${day.icon}</div>
             <div class="weather-day-temp ${getTemperatureClass(day.temp)}">${day.temp}°C</div>
             <div class="weather-day-wind">${day.windDirection.arrow} ${day.windDirection.label} · ${day.wind} m/s</div>
           </div>
@@ -840,7 +855,7 @@
         weatherCardEl.innerHTML = `
           <div class="weather-card">
             <div class="weather-main">
-              <div class="weather-icon">${weather.icon}</div>
+              <div class="weather-icon ${weather.iconClass || ''}">${weather.icon}</div>
               <div>
                 <div class="weather-temp ${getTemperatureClass(weather.temperature)}">${weather.temperature}°C</div>
                 <div class="weather-desc">${weather.description}</div>
@@ -909,7 +924,8 @@
               temp: Math.round(entry?.data?.instant?.details?.air_temperature ?? 0),
               wind: Math.round((entry?.data?.instant?.details?.wind_speed ?? 0) * 10) / 10,
               windDirection: getWindDirectionInfo(entry?.data?.instant?.details?.wind_from_direction),
-              icon: weatherSymbolToEmoji(entry?.data?.next_6_hours?.summary?.symbol_code || entry?.data?.next_1_hours?.summary?.symbol_code)
+              icon: weatherSymbolToEmoji(entry?.data?.next_6_hours?.summary?.symbol_code || entry?.data?.next_1_hours?.summary?.symbol_code),
+              iconClass: getWeatherIconClass(entry?.data?.next_6_hours?.summary?.symbol_code || entry?.data?.next_1_hours?.summary?.symbol_code)
             }));
 
           renderWeatherCard({
@@ -919,6 +935,7 @@
             precipitation: Math.round(((nextHour?.details?.precipitation_amount ?? 0) * 10)) / 10,
             description: weatherSymbolToText(nextHour?.summary?.symbol_code),
             icon: weatherSymbolToEmoji(nextHour?.summary?.symbol_code),
+            iconClass: getWeatherIconClass(nextHour?.summary?.symbol_code),
             days: forecastDays
           });
         } catch (error) {
@@ -1176,7 +1193,7 @@
           : forceOpen;
 
         noticeForm.classList.toggle('hidden', !shouldOpen);
-        toggleNoticeFormBtn.textContent = shouldOpen ? 'Loka' : 'Skrifa nýja tilkynningu';
+        toggleNoticeFormBtn.textContent = shouldOpen ? 'Loka' : 'Ný tilkynning';
       }
 
       function toggleTaskForm(forceOpen = null) {
@@ -1185,7 +1202,7 @@
           : forceOpen;
 
         taskForm.classList.toggle('hidden', !shouldOpen);
-        toggleTaskFormBtn.textContent = shouldOpen ? 'Loka' : 'Skrá nýtt verkefni';
+        toggleTaskFormBtn.textContent = shouldOpen ? 'Loka' : 'Nýtt verkefni';
       }
 
       async function fetchBookings() {
