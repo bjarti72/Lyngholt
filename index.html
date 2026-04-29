@@ -110,7 +110,6 @@
     <div class="summary-top-grid">
       <section class="card notice-card">
         <h2>Tilkynningar</h2>
-        <p class="muted">Mikilvægar upplýsingar sem gott er að sjá strax við komu á síðuna.</p>
 
         <div id="noticeForm" class="notice-form hidden">
           <div>
@@ -164,13 +163,13 @@
     <div class="split-grid">
       <section class="card">
         <h2>Dagatal</h2>
-        <p class="muted">Uppteknir dagar eru litamerktir hér fyrir neðan.</p>
+        <p class="muted">Hér sérðu hvenær bústaðurinn er laus. Bókaðir dagar eru merktir með lit.</p>
         <div id="calendar"></div>
       </section>
 
       <section id="bokanir" class="card">
         <h2>Bóka dvöl</h2>
-        <p class="muted">Veldu dagabil og smelltu svo á bókunarhnappinn.</p>
+        <p class="muted">Skráðu nöfn gesta og veldu daga. Smelltu svo á bóka.</p>
 
         <div class="booking-row">
           <div>
@@ -183,7 +182,7 @@
             <input id="dateRange" type="text" placeholder="Veldu dagabil" />
           </div>
 
-          <button id="bookBtn" type="button">Bóka valda daga</button>
+          <button id="bookBtn" type="button">Bóka</button>
         </div>
 
         <div id="bookingPreview" class="booking-preview">
@@ -198,7 +197,7 @@
 
     <section class="card">
       <h2>Verkefnalisti</h2>
-      <p class="muted">Innskráður notandi getur tekið verk að sér og merkt það lokið.</p>
+      <p class="muted">Taktu að þér verkefni með því að smella á takkann.</p>
       <div id="taskList" class="calendar-list">
         <div class="empty">Engin verkefni enn.</div>
       </div>
@@ -790,6 +789,10 @@
         return 'Veðurspá';
       }
 
+      function getTemperatureClass(temp) {
+        return Number(temp) > 0 ? 'temp-above-freezing' : 'temp-freezing';
+      }
+
       function getWindDirectionInfo(degrees) {
         if (typeof degrees !== 'number' || Number.isNaN(degrees)) {
           return { label: '', arrow: '' };
@@ -829,7 +832,7 @@
           <div class="weather-day">
             <div class="weather-day-label">${day.label}</div>
             <div class="weather-day-icon">${day.icon}</div>
-            <div class="weather-day-temp">${day.temp}°C</div>
+            <div class="weather-day-temp ${getTemperatureClass(day.temp)}">${day.temp}°C</div>
             <div class="weather-day-wind">${day.windDirection.arrow} ${day.windDirection.label} · ${day.wind} m/s</div>
           </div>
         `).join('');
@@ -839,7 +842,7 @@
             <div class="weather-main">
               <div class="weather-icon">${weather.icon}</div>
               <div>
-                <div class="weather-temp">${weather.temperature}°C</div>
+                <div class="weather-temp ${getTemperatureClass(weather.temperature)}">${weather.temperature}°C</div>
                 <div class="weather-desc">${weather.description}</div>
               </div>
             </div>
@@ -1004,9 +1007,10 @@
               const presentation = resolveBookingPresentation(item);
               const bookedByName = presentation.responsibleName;
               const badgeColor = presentation.responsibleColor;
+              const itemClass = index === 0 ? 'agenda-item primary' : 'agenda-item';
 
               return `
-                <div class="agenda-item">
+                <div class="${itemClass}">
                   <div class="summary-name" style="background:${badgeColor}; color:#111827;">${bookedByName}</div>
                   <div>
                     <div class="agenda-status">${statusText}</div>
@@ -1314,7 +1318,7 @@
 
         taskTitleInput.value = '';
         taskNotesInput.value = '';
-        showStatus(taskStatus, 'Verkefni bætt við.');
+        showStatus(taskStatus, 'Verkefni skráð.');
         toggleTaskForm(false);
         await refreshTasks();
       } finally {
@@ -1365,7 +1369,7 @@
         noticeTitleInput.value = '';
         noticeBodyInput.value = '';
         noticeTypeInput.value = 'info';
-        showStatus(noticeStatus, 'Tilkynningu bætt við.');
+        showStatus(noticeStatus, 'Tilkynning skráð.');
         toggleNoticeForm(false);
         await refreshNotices();
       } finally {
@@ -1777,7 +1781,7 @@
           return;
         }
 
-        showStatus(bookingStatus, 'Bókun vistuð.');
+        showStatus(bookingStatus, 'Bókun skráð.');
         fullNameInput.value = '';
         selectedStart = null;
         selectedEnd = null;
