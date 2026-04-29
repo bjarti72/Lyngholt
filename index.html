@@ -360,6 +360,7 @@
       let bookingDayMap = {};
       let availabilityMonthOffset = 0;
       let profilesById = {};
+      let activeDeletePromptEl = null;
       const NOTICE_TYPES = {
         important: { label: 'Mikilvægt', className: 'important' },
         info: { label: 'Upplýsingar', className: 'info' }
@@ -742,9 +743,9 @@
       function formatShortDate(dateStr) {
         const date = new Date(dateStr);
         const weekdayLabels = ['sun', 'mán', 'þri', 'mið', 'fim', 'fös', 'lau'];
-        const weekday = weekdayLabels[date.getDay()];
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
+        const weekday = weekdayLabels[date.getUTCDay()];
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth() + 1;
         return `${weekday} ${day}.${month}`;
       }
 
@@ -897,7 +898,7 @@
           timeseries.forEach((entry) => {
             const isoTime = entry.time;
             const dateKey = isoTime.slice(0, 10);
-            const hour = new Date(isoTime).getHours();
+            const hour = new Date(isoTime).getUTCHours();
 
             if (dailyMap.has(dateKey)) {
               return;
@@ -998,8 +999,10 @@
 
       container.querySelectorAll('[data-delete-id]').forEach((btn) => {
         btn.addEventListener('click', async () => {
-          if (!window.confirm('Eyða bókun?')) return;
-          await deleteBooking(btn.dataset.deleteId);
+          btn.blur();
+          showInlineDeletePrompt(btn, 'Eyða bókun?', async () => {
+            await deleteBooking(btn.dataset.deleteId);
+          });
         });
       });
       }
@@ -1071,6 +1074,48 @@
         return 3;
       }
 
+      function renderTaskItem(task, currentUser) {
+        const status = task.status || 'open';
+        const canClaim = currentUser && status === 'open';
+        const canComplete = currentUser && status === 'claimed' && task.claimed_by_user_id === currentUser.id;
+        const canDelete = currentUser && status === 'done';
+        const notesText = task.notes ? `<div class="task-notes">${task.notes}</div>` : '';
+        const assigneeText = task.claimed_by_name
+          ? `<div class="task-assignee"><span class="task-assignee-label">${task.claimed_by_name}</span>tók að sér</div>`
+          : '';
+        const metaParts = [`Skráð ${formatDateTime(task.created_at)}`];
+
+        if (task.claimed_by_name) {
+          metaParts.push(`${task.claimed_by_name} tók þetta að sér`);
+        } else {
+          metaParts.push('Óúthlutað');
+        }
+
+        const metaText = `<div class="task-meta-row">${metaParts.join(' · ')}</div>`;
+        const claimButton = canClaim ? `<button type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
+        const completeButton = canComplete ? `<button type="button" data-complete-task="${task.id}">Merkja lokið</button>` : '';
+        const deleteButton = canDelete ? `<button class="icon-delete-btn" type="button" data-delete-task="${task.id}" title="Eyða úr lista" aria-label="Eyða úr lista">×</button>` : '';
+
+        return `
+          <div class="task-item">
+            <div class="task-top">
+              <div class="task-title">${task.title}</div>
+              ${notesText}
+              ${assigneeText}
+              ${metaText}
+            </div>
+            <div class="task-side">
+              <span class="task-status ${status}">${taskStatusLabel(status)}</span>
+              <div class="task-actions">
+                ${claimButton}
+                ${completeButton}
+                ${deleteButton}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
       function renderTasks(list, currentUser) {
         if (!list.length) {
           taskListEl.innerHTML = '<div class="empty">Engin verkefni enn.</div>';
@@ -1086,47 +1131,23 @@
           return dateB - dateA;
         });
 
-        taskListEl.innerHTML = sortedTasks.map((task) => {
-          const status = task.status || 'open';
-          const canClaim = currentUser && status === 'open';
-          const canComplete = currentUser && status === 'claimed' && task.claimed_by_user_id === currentUser.id;
-          const canDelete = currentUser && status === 'done';
-          const notesText = task.notes ? `<div class="task-notes">${task.notes}</div>` : '';
-          const assigneeText = task.claimed_by_name
-            ? `<div class="task-assignee"><span class="task-assignee-label">${task.claimed_by_name}</span>tók að sér</div>`
-            : '';
-          const metaParts = [`Skráð ${formatDateTime(task.created_at)}`];
-
-          if (task.claimed_by_name) {
-            metaParts.push(`${task.claimed_by_name} tók þetta að sér`);
-          } else {
-            metaParts.push('Óúthlutað');
-          }
-
-          const metaText = `<div class="task-meta-row">${metaParts.join(' · ')}</div>`;
-          const claimButton = canClaim ? `<button type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
-          const completeButton = canComplete ? `<button type="button" data-complete-task="${task.id}">Merkja lokið</button>` : '';
-          const deleteButton = canDelete ? `<button class="icon-delete-btn" type="button" data-delete-task="${task.id}" title="Eyða úr lista" aria-label="Eyða úr lista">×</button>` : '';
-
-          return `
-            <div class="task-item">
-              <div class="task-top">
-                <div class="task-title">${task.title}</div>
-                ${notesText}
-                ${assigneeText}
-                ${metaText}
+        const activeTasks = sortedTasks.filter((task) => (task.status || 'open') !== 'done');
+        const completedTasks = sortedTasks.filter((task) => (task.status || 'open') === 'done');
+        const activeHtml = activeTasks.length
+          ? activeTasks.map((task) => renderTaskItem(task, currentUser)).join('')
+          : '<div class="empty">Engin opin verkefni eins og er.</div>';
+        const completedHtml = completedTasks.length
+          ? `
+            <details class="completed-tasks">
+              <summary>Lokið (${completedTasks.length})</summary>
+              <div class="completed-tasks-list">
+                ${completedTasks.map((task) => renderTaskItem(task, currentUser)).join('')}
               </div>
-              <div class="task-side">
-                <span class="task-status ${status}">${taskStatusLabel(status)}</span>
-                <div class="task-actions">
-                  ${claimButton}
-                  ${completeButton}
-                  ${deleteButton}
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
+            </details>
+          `
+          : '';
+
+        taskListEl.innerHTML = `${activeHtml}${completedHtml}`;
 
         taskListEl.querySelectorAll('[data-claim-task]').forEach((btn) => {
           btn.addEventListener('click', async () => {
@@ -1142,8 +1163,10 @@
 
         taskListEl.querySelectorAll('[data-delete-task]').forEach((btn) => {
           btn.addEventListener('click', async () => {
-            if (!window.confirm('Eyða verkefni úr lista?')) return;
-            await deleteTask(btn.dataset.deleteTask);
+            btn.blur();
+            showInlineDeletePrompt(btn, 'Eyða verkefni?', async () => {
+              await deleteTask(btn.dataset.deleteTask);
+            });
           });
         });
       }
@@ -1181,11 +1204,71 @@
 
         noticeListEl.querySelectorAll('[data-delete-notice]').forEach((btn) => {
           btn.addEventListener('click', async () => {
-            if (!window.confirm('Eyða tilkynningu?')) return;
-            await deleteNotice(btn.dataset.deleteNotice);
+            btn.blur();
+            showInlineDeletePrompt(btn, 'Eyða tilkynningu?', async () => {
+              await deleteNotice(btn.dataset.deleteNotice);
+            });
           });
         });
       }
+
+      function clearInlineDeletePrompt() {
+        if (!activeDeletePromptEl) return;
+        activeDeletePromptEl.remove();
+        activeDeletePromptEl = null;
+      }
+
+      function showInlineDeletePrompt(button, message, onConfirm) {
+        const host = button.closest('.booking-item, .task-item, .notice-item');
+        if (!host) return;
+
+        if (activeDeletePromptEl && activeDeletePromptEl.parentElement === host) {
+          clearInlineDeletePrompt();
+          return;
+        }
+
+        clearInlineDeletePrompt();
+
+        const prompt = document.createElement('div');
+        prompt.className = 'inline-delete-confirm';
+        prompt.innerHTML = `
+          <div class="inline-delete-confirm-text">${message}</div>
+          <div class="inline-delete-confirm-actions">
+            <button type="button" class="inline-delete-confirm-btn confirm">Eyða</button>
+            <button type="button" class="inline-delete-confirm-btn cancel">Hætta við</button>
+          </div>
+        `;
+
+        const confirmBtn = prompt.querySelector('.confirm');
+        const cancelBtn = prompt.querySelector('.cancel');
+
+        confirmBtn.addEventListener('click', async (event) => {
+          event.stopPropagation();
+          confirmBtn.disabled = true;
+          cancelBtn.disabled = true;
+          await onConfirm();
+          clearInlineDeletePrompt();
+        });
+
+        cancelBtn.addEventListener('click', (event) => {
+          event.stopPropagation();
+          clearInlineDeletePrompt();
+        });
+
+        prompt.addEventListener('click', (event) => {
+          event.stopPropagation();
+        });
+
+        host.appendChild(prompt);
+        activeDeletePromptEl = prompt;
+      }
+
+      document.addEventListener('click', (event) => {
+        if (!activeDeletePromptEl) return;
+        if (activeDeletePromptEl.contains(event.target)) return;
+        if (event.target.closest('.icon-delete-btn')) return;
+        clearInlineDeletePrompt();
+      });
 
       function toggleNoticeForm(forceOpen = null) {
         const shouldOpen = forceOpen === null

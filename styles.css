@@ -783,6 +783,52 @@
       outline-offset: 2px;
     }
 
+    .inline-delete-confirm {
+      position: absolute;
+      top: 8px;
+      right: 38px;
+      z-index: 4;
+      min-width: 172px;
+      padding: 10px 10px 9px;
+      border-radius: 12px;
+      border: 1px solid rgba(163, 127, 86, 0.2);
+      background: rgba(255, 249, 241, 0.98);
+      box-shadow: 0 10px 24px rgba(89, 64, 36, 0.12);
+      color: #5c4634;
+    }
+
+    .inline-delete-confirm-text {
+      font-size: 0.84rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .inline-delete-confirm-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .inline-delete-confirm-btn {
+      width: auto;
+      min-width: 0;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      border-radius: 999px;
+    }
+
+    .inline-delete-confirm-btn.confirm {
+      background: #8d5a45;
+      border-color: #8d5a45;
+      color: #fff9f3;
+    }
+
+    .inline-delete-confirm-btn.cancel {
+      background: rgba(255, 248, 239, 0.92);
+      border-color: rgba(163, 127, 86, 0.18);
+      color: #6a4e38;
+    }
+
     .empty {
       padding: 14px;
       border: 1px dashed var(--border);
@@ -1125,16 +1171,66 @@
       color: #166534;
     }
 
+    .completed-tasks {
+      margin-top: 8px;
+      border: 1px solid rgba(223, 211, 195, 0.92);
+      border-radius: 14px;
+      background: rgba(250, 244, 236, 0.78);
+      overflow: hidden;
+    }
+
+    .completed-tasks summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 14px;
+      font-weight: bold;
+      color: #6a4e38;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .completed-tasks summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .completed-tasks summary::after {
+      content: '+';
+      font-size: 1rem;
+      line-height: 1;
+      color: #8a6a11;
+    }
+
+    .completed-tasks[open] summary {
+      border-bottom: 1px solid rgba(223, 211, 195, 0.72);
+    }
+
+    .completed-tasks[open] summary::after {
+      content: '−';
+    }
+
+    .completed-tasks-list {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
     @media (max-width: 860px) {
       header {
         min-height: auto;
-        padding: 24px 16px 20px;
+        padding: 20px 16px 16px;
         align-items: stretch;
       }
 
       main {
-        margin: 12px auto 32px;
+        margin: 10px auto 28px;
         padding: 0 14px;
+      }
+
+      .card {
+        padding: 18px;
+        margin-bottom: 16px;
       }
 
       .grid {
@@ -1155,8 +1251,19 @@
 
       .hero {
         grid-template-columns: 1fr;
-        gap: 14px;
+        gap: 10px;
         align-items: start;
+      }
+
+      .hero h1 {
+        margin-bottom: 6px;
+      }
+
+      .hero p {
+        margin-bottom: 0;
+        max-width: 28rem;
+        font-size: 0.96rem;
+        line-height: 1.45;
       }
 
       .hero-weather {
@@ -1253,6 +1360,7 @@
 
       .summary-top-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
       }
 
       .weather-forecast {
@@ -1303,13 +1411,42 @@
       .auth-strip {
         flex-direction: column;
         align-items: flex-start;
+        gap: 10px;
+        padding: 2px 0 12px;
+        margin-bottom: 16px;
       }
 
       .auth-strip-actions {
         justify-content: flex-start;
+        gap: 12px;
+      }
+
+      .auth-strip-user {
+        line-height: 1.35;
       }
 
       .booking-actions {
         justify-self: stretch;
+      }
+
+      .inline-delete-confirm {
+        top: 6px;
+        right: 34px;
+        min-width: 158px;
+        padding: 9px;
+      }
+
+      .inline-delete-confirm-text {
+        font-size: 0.78rem;
+        margin-bottom: 7px;
+      }
+
+      .inline-delete-confirm-actions {
+        gap: 6px;
+      }
+
+      .inline-delete-confirm-btn {
+        padding: 6px 9px;
+        font-size: 0.76rem;
       }
     }
