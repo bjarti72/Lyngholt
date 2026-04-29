@@ -1139,6 +1139,7 @@
       <div class="auth-strip-actions">
         <button id="toggleLoginBtn" class="auth-link" type="button">Skrá inn</button>
         <button id="toggleSignupBtn" class="auth-link" type="button">Stofna notanda</button>
+        <button id="togglePasswordBtn" class="auth-link hidden" type="button">Breyta lykilorði</button>
         <button id="logoutBtn" class="auth-link hidden" type="button">Skrá út</button>
       </div>
     </section>
@@ -1177,6 +1178,22 @@
             <input id="signupName" type="text" placeholder="Nafn" />
           </div>
           <button id="signupBtn" class="secondary" type="button">Búa til notanda</button>
+        </div>
+      </section>
+
+      <section id="passwordPanel" class="auth-compact-panel hidden">
+        <h3>Breyta lykilorði</h3>
+        <p class="muted">Veldu nýtt lykilorð og staðfestu það hér.</p>
+        <div class="auth-row">
+          <div>
+            <label for="newPassword">Nýtt lykilorð</label>
+            <input id="newPassword" type="password" placeholder="Nýtt lykilorð" />
+          </div>
+          <div>
+            <label for="confirmPassword">Staðfesta lykilorð</label>
+            <input id="confirmPassword" type="password" placeholder="Staðfesta lykilorð" />
+          </div>
+          <button id="changePasswordBtn" type="button">Vista nýtt lykilorð</button>
         </div>
       </section>
     </div>
@@ -1365,6 +1382,8 @@
       const signupEmailInput = document.getElementById('signupEmail');
       const signupPasswordInput = document.getElementById('signupPassword');
       const signupNameInput = document.getElementById('signupName');
+      const newPasswordInput = document.getElementById('newPassword');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
       const fullNameInput = document.getElementById('fullName');
       const dateRangeInput = document.getElementById('dateRange');
       const taskTitleInput = document.getElementById('taskTitle');
@@ -1380,6 +1399,8 @@
       const logoutBtn = document.getElementById('logoutBtn');
       const toggleLoginBtn = document.getElementById('toggleLoginBtn');
       const toggleSignupBtn = document.getElementById('toggleSignupBtn');
+      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+      const changePasswordBtn = document.getElementById('changePasswordBtn');
       const bookBtn = document.getElementById('bookBtn');
       const addTaskBtn = document.getElementById('addTaskBtn');
       const toggleTaskFormBtn = document.getElementById('toggleTaskFormBtn');
@@ -1396,6 +1417,7 @@
       const authFormsEl = document.getElementById('authForms');
       const loginPanelEl = document.getElementById('loginPanel');
       const signupPanelEl = document.getElementById('signupPanel');
+      const passwordPanelEl = document.getElementById('passwordPanel');
 
       const loggedOutBox = document.getElementById('loggedOutBox');
       const loggedInBox = document.getElementById('loggedInBox');
@@ -1408,6 +1430,7 @@
       let selectedStart = null;
       let selectedEnd = null;
       let isLoggingIn = false;
+      let isUpdatingPassword = false;
       let isBooking = false;
       let isSavingTask = false;
       let isSavingNotice = false;
@@ -2014,12 +2037,15 @@
       function toggleAuthPanel(panel) {
         const showingLogin = !authFormsEl.classList.contains('hidden') && !loginPanelEl.classList.contains('hidden');
         const showingSignup = !authFormsEl.classList.contains('hidden') && !signupPanelEl.classList.contains('hidden');
+        const showingPassword = !authFormsEl.classList.contains('hidden') && !passwordPanelEl.classList.contains('hidden');
         const openLogin = panel === 'login' && !showingLogin;
         const openSignup = panel === 'signup' && !showingSignup;
+        const openPassword = panel === 'password' && !showingPassword;
 
-        authFormsEl.classList.toggle('hidden', !(openLogin || openSignup));
+        authFormsEl.classList.toggle('hidden', !(openLogin || openSignup || openPassword));
         loginPanelEl.classList.toggle('hidden', !openLogin);
         signupPanelEl.classList.toggle('hidden', !openSignup);
+        passwordPanelEl.classList.toggle('hidden', !openPassword);
       }
 
       function taskStatusLabel(status) {
@@ -2544,6 +2570,7 @@
         userEmail.textContent = (data.user.user_metadata?.display_name || data.user.email) + (currentUserIsAdmin ? ' (admin)' : '');
         authFormsEl.classList.add('hidden');
         loginPanelEl.classList.add('hidden');
+        passwordPanelEl.classList.add('hidden');
 
         Promise.all([refreshBookings(), refreshTasks(), refreshNotices()]).catch((refreshError) => {
           showStatus(authStatus, 'Innskráning tókst en ekki tókst að hlaða gögn: ' + refreshError.message, true);
@@ -2570,6 +2597,56 @@
       await updateAuthUI();
       }
 
+      async function changePassword() {
+      if (isUpdatingPassword) return;
+      isUpdatingPassword = true;
+      clearStatus(authStatus);
+      changePasswordBtn.disabled = true;
+
+      try {
+        const user = await resolveCurrentUser();
+        const newPassword = newPasswordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+
+        if (!user) {
+          showStatus(authStatus, 'Þú þarft að vera skráð(ur) inn til að breyta lykilorði.', true);
+          return;
+        }
+
+        if (!newPassword || !confirmPassword) {
+          showStatus(authStatus, 'Settu inn nýtt lykilorð og staðfestingu.', true);
+          return;
+        }
+
+        if (newPassword.length < 6) {
+          showStatus(authStatus, 'Nýja lykilorðið þarf að vera að minnsta kosti 6 stafir.', true);
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          showStatus(authStatus, 'Lykilorðin passa ekki saman.', true);
+          return;
+        }
+
+        const { error } = await supabaseClient.auth.updateUser({
+          password: newPassword
+        });
+
+        if (error) {
+          showStatus(authStatus, error.message, true);
+          return;
+        }
+
+        newPasswordInput.value = '';
+        confirmPasswordInput.value = '';
+        toggleAuthPanel('password');
+        showStatus(authStatus, 'Lykilorði breytt.');
+      } finally {
+        isUpdatingPassword = false;
+        changePasswordBtn.disabled = false;
+      }
+      }
+
       async function updateAuthUI() {
       const user = await resolveCurrentUser();
       await fetchProfiles().catch(() => []);
@@ -2581,6 +2658,7 @@
         loggedInBox.classList.remove('hidden');
         userEmail.textContent = (user.user_metadata?.display_name || user.email) + (currentUserIsAdmin ? ' (admin)' : '');
         logoutBtn.classList.remove('hidden');
+        togglePasswordBtn.classList.remove('hidden');
         toggleLoginBtn.classList.add('hidden');
         toggleSignupBtn.classList.add('hidden');
         authFormsEl.classList.add('hidden');
@@ -2591,8 +2669,10 @@
         currentUser = null;
         currentUserIsAdmin = false;
         logoutBtn.classList.add('hidden');
+        togglePasswordBtn.classList.add('hidden');
         toggleLoginBtn.classList.remove('hidden');
         toggleSignupBtn.classList.remove('hidden');
+        passwordPanelEl.classList.add('hidden');
       }
 
       await refreshBookings();
@@ -2692,6 +2772,9 @@
       toggleSignupBtn.addEventListener('click', () => {
         toggleAuthPanel('signup');
       });
+      togglePasswordBtn.addEventListener('click', () => {
+        toggleAuthPanel('password');
+      });
       addTaskBtn.addEventListener('click', addTask);
       toggleTaskFormBtn.addEventListener('click', () => {
         toggleTaskForm();
@@ -2703,6 +2786,7 @@
       loginBtn.addEventListener('click', () => {
         window.loginNow();
       });
+      changePasswordBtn.addEventListener('click', changePassword);
       bookBtn.addEventListener('click', () => {
         window.bookNow();
       });
