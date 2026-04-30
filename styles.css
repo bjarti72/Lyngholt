@@ -1478,12 +1478,15 @@
       }
 
       .form-actions {
-        justify-content: stretch;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: nowrap;
       }
 
       .form-actions button {
         flex: 1 1 0;
         min-width: 0;
+        padding: 10px 8px;
       }
 
       .auth-strip-user {
