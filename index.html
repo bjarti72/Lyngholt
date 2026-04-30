@@ -360,6 +360,7 @@
       let bookingDayMap = {};
       let availabilityMonthOffset = 0;
       let profilesById = {};
+      let mobileWeatherExpanded = false;
       let activeDeletePromptEl = null;
       const NOTICE_TYPES = {
         important: { label: 'Mikilvægt', className: 'important' },
@@ -843,6 +844,7 @@
         const windDirection = weather.windDirection?.label
           ? `${weather.windDirection.arrow} ${weather.windDirection.label}`
           : '';
+        const isMobile = window.matchMedia('(max-width: 860px)').matches;
 
         const forecastHtml = (weather.days || []).map((day) => `
           <div class="weather-day">
@@ -854,7 +856,7 @@
         `).join('');
 
         weatherCardEl.innerHTML = `
-          <div class="weather-card">
+          <div class="weather-card${isMobile && mobileWeatherExpanded ? ' mobile-forecast-open' : ''}">
             <div class="weather-main">
               <div class="weather-icon ${weather.iconClass || ''}">${weather.icon}</div>
               <div>
@@ -866,9 +868,20 @@
               Vindur: ${windDirection ? `${windDirection} · ` : ''}${weather.wind} m/s<br />
               Úrkoma næsta klst.: ${weather.precipitation} mm
             </div>
+            <button type="button" class="weather-forecast-toggle" aria-expanded="${mobileWeatherExpanded ? 'true' : 'false'}">
+              ${mobileWeatherExpanded ? 'Fela næstu daga' : 'Sjá næstu daga'}
+            </button>
             <div class="weather-forecast">${forecastHtml}</div>
           </div>
         `;
+
+        const toggleBtn = weatherCardEl.querySelector('.weather-forecast-toggle');
+        if (toggleBtn) {
+          toggleBtn.addEventListener('click', () => {
+            mobileWeatherExpanded = !mobileWeatherExpanded;
+            renderWeatherCard(weather);
+          });
+        }
       }
 
       async function refreshWeather() {

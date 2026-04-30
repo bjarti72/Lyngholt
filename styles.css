@@ -426,6 +426,23 @@
       margin-top: 12px;
     }
 
+    .weather-forecast-toggle {
+      display: none;
+      width: auto;
+      margin-top: 6px;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: rgba(255, 248, 240, 0.96);
+      font-size: 0.72rem;
+      font-weight: bold;
+      text-align: left;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      justify-content: flex-start;
+    }
+
     .weather-day {
       border: 1px solid rgba(73, 107, 91, 0.1);
       border-radius: 12px;
@@ -1302,6 +1319,20 @@
 
       .hero-weather .weather-forecast {
         gap: 6px;
+      }
+
+      .hero-weather .weather-forecast-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .hero-weather .weather-forecast {
+        display: none;
+      }
+
+      .hero-weather .weather-card.mobile-forecast-open .weather-forecast {
+        display: grid;
       }
 
       .hero-weather .weather-day {
