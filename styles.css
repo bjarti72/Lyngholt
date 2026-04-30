@@ -1235,7 +1235,7 @@
 
     @media (max-width: 860px) {
       header {
-        min-height: auto;
+        min-height: 46vh;
         padding: 20px 16px 16px;
         align-items: stretch;
       }
