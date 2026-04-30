@@ -130,7 +130,10 @@
             </select>
           </div>
 
-          <button id="addNoticeBtn" type="button">Skrá tilkynningu</button>
+          <div class="form-actions">
+            <button id="addNoticeBtn" type="button">Skrá tilkynningu</button>
+            <button id="cancelNoticeFormBtn" type="button" class="secondary-btn">Hætta við</button>
+          </div>
         </div>
 
         <div id="noticeStatus" class="status"></div>
@@ -216,7 +219,10 @@
           <input id="taskNotes" type="text" placeholder="Til dæmis: vantar fyrir næstu ferð" />
         </div>
 
-        <button id="addTaskBtn" type="button">Skrá verkefni</button>
+        <div class="form-actions">
+          <button id="addTaskBtn" type="button">Skrá verkefni</button>
+          <button id="cancelTaskFormBtn" type="button" class="secondary-btn">Hætta við</button>
+        </div>
       </div>
 
       <div id="taskStatus" class="status"></div>
@@ -321,6 +327,8 @@
       const toggleTaskFormBtn = document.getElementById('toggleTaskFormBtn');
       const addNoticeBtn = document.getElementById('addNoticeBtn');
       const toggleNoticeFormBtn = document.getElementById('toggleNoticeFormBtn');
+      const cancelTaskFormBtn = document.getElementById('cancelTaskFormBtn');
+      const cancelNoticeFormBtn = document.getElementById('cancelNoticeFormBtn');
 
       const authStatus = document.getElementById('authStatus');
       const bookingStatus = document.getElementById('bookingStatus');
@@ -1289,7 +1297,7 @@
           : forceOpen;
 
         noticeForm.classList.toggle('hidden', !shouldOpen);
-        toggleNoticeFormBtn.textContent = shouldOpen ? 'Loka' : 'Ný tilkynning';
+        toggleNoticeFormBtn.classList.toggle('hidden', shouldOpen);
       }
 
       function toggleTaskForm(forceOpen = null) {
@@ -1298,7 +1306,7 @@
           : forceOpen;
 
         taskForm.classList.toggle('hidden', !shouldOpen);
-        toggleTaskFormBtn.textContent = shouldOpen ? 'Loka' : 'Nýtt verkefni';
+        toggleTaskFormBtn.classList.toggle('hidden', shouldOpen);
       }
 
       async function fetchBookings() {
@@ -1930,9 +1938,15 @@
       toggleTaskFormBtn.addEventListener('click', () => {
         toggleTaskForm();
       });
+      cancelTaskFormBtn.addEventListener('click', () => {
+        toggleTaskForm(false);
+      });
       addNoticeBtn.addEventListener('click', addNotice);
       toggleNoticeFormBtn.addEventListener('click', () => {
         toggleNoticeForm();
+      });
+      cancelNoticeFormBtn.addEventListener('click', () => {
+        toggleNoticeForm(false);
       });
       loginBtn.addEventListener('click', () => {
         window.loginNow();
