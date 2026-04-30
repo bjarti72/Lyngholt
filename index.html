@@ -1113,8 +1113,8 @@
         }
 
         const metaText = `<div class="task-meta-row">${metaParts.join(' · ')}</div>`;
-        const claimButton = canClaim ? `<button type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
-        const completeButton = canComplete ? `<button type="button" data-complete-task="${task.id}">Merkja lokið</button>` : '';
+        const claimButton = canClaim ? `<button class="task-action-soft" type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
+        const completeButton = canComplete ? `<button class="task-action-strong" type="button" data-complete-task="${task.id}">Merkja lokið</button>` : '';
         const deleteButton = canDelete ? `<button class="icon-delete-btn" type="button" data-delete-task="${task.id}" title="Eyða úr lista" aria-label="Eyða úr lista">×</button>` : '';
 
         return `

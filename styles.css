@@ -1182,6 +1182,38 @@
       padding: 10px 12px;
     }
 
+    .task-actions .task-action-soft,
+    .task-actions .task-action-strong {
+      min-width: 0;
+      padding: 8px 11px;
+      border-radius: 999px;
+      box-shadow: none;
+      font-size: 0.9rem;
+    }
+
+    .task-actions .task-action-soft {
+      background: rgba(242, 228, 208, 0.96);
+      border: 1px solid rgba(150, 114, 78, 0.26);
+      color: #5b4331;
+    }
+
+    .task-actions .task-action-soft:hover {
+      background: rgba(236, 219, 195, 0.98);
+      border-color: rgba(150, 114, 78, 0.34);
+      color: #4d392b;
+    }
+
+    .task-actions .task-action-strong {
+      background: #b9855b;
+      border: 1px solid #b9855b;
+      color: #fff8f1;
+    }
+
+    .task-actions .task-action-strong:hover {
+      background: #a8744d;
+      border-color: #a8744d;
+    }
+
     .task-actions .icon-delete-btn,
     .booking-actions .icon-delete-btn {
       min-width: 24px;
@@ -1439,6 +1471,11 @@
 
       .task-actions button {
         width: 100%;
+      }
+
+      .task-actions .task-action-soft,
+      .task-actions .task-action-strong {
+        padding: 9px 10px;
       }
 
       .task-actions .icon-delete-btn,
