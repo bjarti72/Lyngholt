@@ -33,7 +33,7 @@
       <div class="auth-strip-actions">
         <button id="toggleLoginBtn" class="auth-link" type="button">Skrá inn</button>
         <button id="toggleSignupBtn" class="auth-link" type="button">Stofna notanda</button>
-        <button id="togglePasswordBtn" class="auth-link hidden" type="button">Breyta lykilorði</button>
+        <button id="togglePasswordBtn" class="auth-link hidden" type="button">Mínar upplýsingar</button>
         <button id="logoutBtn" class="auth-link hidden" type="button">Skrá út</button>
       </div>
     </section>
@@ -77,18 +77,37 @@
       </section>
 
       <section id="passwordPanel" class="auth-compact-panel hidden">
-        <h3>Breyta lykilorði</h3>
-        <p class="muted">Sláðu inn nýtt lykilorð.</p>
-        <div class="auth-row">
-          <div>
-            <label for="newPassword">Nýtt lykilorð</label>
-            <input id="newPassword" type="password" placeholder="Nýtt lykilorð" />
+        <h3>Mínar upplýsingar</h3>
+        <p class="muted">Hér geturðu breytt nafninu þínu og lykilorði.</p>
+
+        <div class="auth-section-block">
+          <div class="auth-section-title">Nafn</div>
+          <div class="auth-row">
+            <div>
+              <label for="profileDisplayName">Nafn notanda</label>
+              <input id="profileDisplayName" type="text" placeholder="Nafn" />
+            </div>
+            <div class="form-actions compact-form-actions">
+              <button id="saveProfileBtn" type="button">Vista</button>
+            </div>
           </div>
-          <div>
-            <label for="confirmPassword">Staðfesta lykilorð</label>
-            <input id="confirmPassword" type="password" placeholder="Staðfesta lykilorð" />
+        </div>
+
+        <div class="auth-section-block">
+          <div class="auth-section-title">Lykilorð</div>
+          <div class="auth-row">
+            <div>
+              <label for="newPassword">Nýtt lykilorð</label>
+              <input id="newPassword" type="password" placeholder="Nýtt lykilorð" />
+            </div>
+            <div>
+              <label for="confirmPassword">Staðfesta lykilorð</label>
+              <input id="confirmPassword" type="password" placeholder="Staðfesta lykilorð" />
+            </div>
+            <div class="form-actions compact-form-actions">
+              <button id="changePasswordBtn" type="button">Vista</button>
+            </div>
           </div>
-          <button id="changePasswordBtn" type="button">Vista nýtt lykilorð</button>
         </div>
       </section>
 
@@ -112,8 +131,9 @@
         <h2>Tilkynningar</h2>
 
         <div id="noticeForm" class="notice-form hidden">
+          <div id="noticeFormHeading" class="task-form-heading">Ný tilkynning</div>
           <div>
-            <label for="noticeTitle">Ný tilkynning</label>
+            <label for="noticeTitle">Heiti</label>
             <input id="noticeTitle" type="text" placeholder="Til dæmis: Vatnslaust fram á kvöld" />
           </div>
 
@@ -209,9 +229,37 @@
       </div>
 
       <div id="taskForm" class="task-form hidden">
+        <div id="taskFormHeading" class="task-form-heading">Nýtt verkefni</div>
         <div>
           <label for="taskTitle">Verkefni</label>
           <input id="taskTitle" type="text" placeholder="Til dæmis: kaupa klósettpappír" />
+        </div>
+
+        <div>
+          <label for="taskCategory">Flokkur</label>
+          <select id="taskCategory">
+            <option value="shopping">Innkaup</option>
+            <option value="maintenance">Viðhald</option>
+            <option value="cleaning">Þrif</option>
+            <option value="other" selected>Annað</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="taskAssignee">Eigandi</label>
+          <select id="taskAssignee">
+            <option value="">Óúthlutað</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="taskStatusSelect">Staða</label>
+          <select id="taskStatusSelect">
+            <option value="not_started" selected>Ekki hafið</option>
+            <option value="in_progress">Í vinnslu</option>
+            <option value="on_hold">Í bið</option>
+            <option value="done">Lokið</option>
+          </select>
         </div>
 
         <div>
@@ -301,17 +349,23 @@
       const signupPasswordInput = document.getElementById('signupPassword');
       const signupNameInput = document.getElementById('signupName');
       const forgotPasswordEmailInput = document.getElementById('forgotPasswordEmail');
+      const profileDisplayNameInput = document.getElementById('profileDisplayName');
       const newPasswordInput = document.getElementById('newPassword');
       const confirmPasswordInput = document.getElementById('confirmPassword');
       const fullNameInput = document.getElementById('fullName');
       const dateRangeInput = document.getElementById('dateRange');
       const taskTitleInput = document.getElementById('taskTitle');
+      const taskCategoryInput = document.getElementById('taskCategory');
+      const taskAssigneeInput = document.getElementById('taskAssignee');
+      const taskStatusSelect = document.getElementById('taskStatusSelect');
       const taskNotesInput = document.getElementById('taskNotes');
       const taskForm = document.getElementById('taskForm');
+      const taskFormHeadingEl = document.getElementById('taskFormHeading');
       const noticeTitleInput = document.getElementById('noticeTitle');
       const noticeBodyInput = document.getElementById('noticeBody');
       const noticeTypeInput = document.getElementById('noticeType');
       const noticeForm = document.getElementById('noticeForm');
+      const noticeFormHeadingEl = document.getElementById('noticeFormHeading');
 
       const loginBtn = document.getElementById('loginBtn');
       const signupBtn = document.getElementById('signupBtn');
@@ -320,6 +374,7 @@
       const toggleSignupBtn = document.getElementById('toggleSignupBtn');
       const togglePasswordBtn = document.getElementById('togglePasswordBtn');
       const toggleForgotPasswordBtn = document.getElementById('toggleForgotPasswordBtn');
+      const saveProfileBtn = document.getElementById('saveProfileBtn');
       const changePasswordBtn = document.getElementById('changePasswordBtn');
       const sendResetLinkBtn = document.getElementById('sendResetLinkBtn');
       const bookBtn = document.getElementById('bookBtn');
@@ -360,8 +415,12 @@
       let isUpdatingPassword = false;
       let isSendingResetLink = false;
       let isBooking = false;
+      let isSavingProfile = false;
       let isSavingTask = false;
       let isSavingNotice = false;
+      let editingTaskId = null;
+      let editingTaskStatus = 'not_started';
+      let editingNoticeId = null;
       let currentUser = null;
       let currentUserIsAdmin = false;
       let currentBookings = [];
@@ -370,9 +429,22 @@
       let profilesById = {};
       let mobileWeatherExpanded = false;
       let activeDeletePromptEl = null;
+      let activeTaskStatusMenuEl = null;
       const NOTICE_TYPES = {
         important: { label: 'Mikilvægt', className: 'important' },
         info: { label: 'Upplýsingar', className: 'info' }
+      };
+      const TASK_CATEGORIES = {
+        shopping: { label: 'Innkaup', className: 'shopping' },
+        maintenance: { label: 'Viðhald', className: 'maintenance' },
+        cleaning: { label: 'Þrif', className: 'cleaning' },
+        other: { label: 'Annað', className: 'other' }
+      };
+      const TASK_CATEGORY_SORT_ORDER = {
+        shopping: 0,
+        cleaning: 1,
+        maintenance: 2,
+        other: 3
       };
       const userColorOptions = [
         { value: '#D97706', label: 'Amber' },
@@ -397,6 +469,7 @@
         }
 
         profilesById = Object.fromEntries((data || []).map((profile) => [profile.id, profile]));
+        renderTaskAssigneeOptions(taskAssigneeInput?.value || '');
         return data || [];
       }
 
@@ -416,6 +489,40 @@
           responsibleName: profile?.display_name || user?.user_metadata?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || 'Óþekktur notandi',
           responsibleColor: profile?.color || user?.user_metadata?.color || userColorOptions[0].value
         };
+      }
+
+      function getSignedInLabel(user) {
+        if (!user) return '';
+        return getUserProfile(user).responsibleName + (currentUserIsAdmin ? ' (admin)' : '');
+      }
+
+      function normalizeTaskCategory(value) {
+        return Object.prototype.hasOwnProperty.call(TASK_CATEGORIES, value) ? value : 'other';
+      }
+
+      function getTaskCategoryMeta(value) {
+        return TASK_CATEGORIES[normalizeTaskCategory(value)];
+      }
+
+      function taskCategorySortValue(category) {
+        return TASK_CATEGORY_SORT_ORDER[normalizeTaskCategory(category)] ?? 99;
+      }
+
+      function populateProfilePanel(user) {
+        if (!profileDisplayNameInput) return;
+        profileDisplayNameInput.value = user ? getUserProfile(user).responsibleName : '';
+      }
+
+      function renderTaskAssigneeOptions(selectedId = '') {
+        if (!taskAssigneeInput) return;
+        const options = Object.values(profilesById)
+          .filter((profile) => profile?.id)
+          .sort((a, b) => (a.display_name || '').localeCompare(b.display_name || '', 'is'))
+          .map((profile) => `<option value="${profile.id}">${escapeHtml(profile.display_name || 'Óþekktur')}</option>`)
+          .join('');
+
+        taskAssigneeInput.innerHTML = `<option value="">Óúthlutað</option>${options}`;
+        taskAssigneeInput.value = selectedId || '';
       }
 
       function resolveBookingPresentation(booking) {
@@ -1080,54 +1187,82 @@
         signupPanelEl.classList.toggle('hidden', !openSignup);
         passwordPanelEl.classList.toggle('hidden', !openPassword);
         forgotPasswordPanelEl.classList.toggle('hidden', !openForgotPassword);
+
+        if (openPassword) {
+          populateProfilePanel(currentUser);
+        }
+
+      }
+
+      function normalizeTaskStatus(status) {
+        if (status === 'open' || status === 'claimed' || !status) return 'not_started';
+        if (status === 'in_progress' || status === 'on_hold' || status === 'done' || status === 'not_started') return status;
+        return 'not_started';
       }
 
       function taskStatusLabel(status) {
-        if (status === 'claimed') return 'Úthlutað';
-        if (status === 'done') return 'Lokið';
-        return 'Óúthlutað';
+        const normalized = normalizeTaskStatus(status);
+        if (normalized === 'in_progress') return 'Í vinnslu';
+        if (normalized === 'on_hold') return 'Í bið';
+        if (normalized === 'done') return 'Lokið';
+        return 'Ekki hafið';
+      }
+
+      function taskStatusOptions() {
+        return [
+          { value: 'not_started', label: 'Ekki hafið' },
+          { value: 'in_progress', label: 'Í vinnslu' },
+          { value: 'on_hold', label: 'Í bið' },
+          { value: 'done', label: 'Lokið' }
+        ];
       }
 
       function taskStatusSortValue(status) {
-        if (status === 'open') return 0;
-        if (status === 'claimed') return 1;
-        if (status === 'done') return 2;
-        return 3;
+        const normalized = normalizeTaskStatus(status);
+        if (normalized === 'not_started') return 0;
+        if (normalized === 'in_progress') return 1;
+        if (normalized === 'on_hold') return 2;
+        if (normalized === 'done') return 3;
+        return 4;
       }
 
       function renderTaskItem(task, currentUser) {
-        const status = task.status || 'open';
-        const canClaim = currentUser && status === 'open';
-        const canComplete = currentUser && status === 'claimed' && task.claimed_by_user_id === currentUser.id;
+        const status = normalizeTaskStatus(task.status);
+        const canClaim = currentUser && !task.claimed_by_user_id && status !== 'done';
+        const canComplete = currentUser && status !== 'done' && task.claimed_by_user_id === currentUser.id;
         const canDelete = currentUser && status === 'done';
+        const canEdit = currentUser;
+        const categoryMeta = getTaskCategoryMeta(task.category);
         const notesText = task.notes ? `<div class="task-notes">${task.notes}</div>` : '';
         const assigneeText = task.claimed_by_name
-          ? `<div class="task-assignee"><span class="task-assignee-label">${task.claimed_by_name}</span>tók að sér</div>`
+          ? `<div class="task-owner-line"><span class="task-owner-label">Eigandi:</span><span class="task-owner-name">${task.claimed_by_name}</span></div>`
           : '';
+        const statusText = canEdit
+          ? `<button class="task-status task-status-toggle ${status}" type="button" data-task-status-menu="${task.id}" aria-label="Breyta stöðu">${taskStatusLabel(status)} <span class="task-status-caret">▾</span></button>`
+          : `<span class="task-status ${status}">${taskStatusLabel(status)}</span>`;
+        const headerMeta = `<div class="task-header-meta"><span class="task-category-label ${categoryMeta.className}">${categoryMeta.label}</span><span class="task-header-separator">•</span>${statusText}</div>`;
         const metaParts = [`Skráð ${formatDateTime(task.created_at)}`];
 
-        if (task.claimed_by_name) {
-          metaParts.push(`${task.claimed_by_name} tók þetta að sér`);
-        } else {
-          metaParts.push('Óúthlutað');
-        }
+        metaParts.push(task.claimed_by_name ? 'Úthlutað' : 'Óúthlutað');
 
         const metaText = `<div class="task-meta-row">${metaParts.join(' · ')}</div>`;
-        const claimButton = canClaim ? `<button class="task-action-soft" type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
+        const editButton = canEdit ? `<button class="task-action-soft task-action-edit" type="button" data-edit-task="${task.id}">Breyta</button>` : '';
+        const claimButton = canClaim ? `<button class="task-action-soft task-action-claim" type="button" data-claim-task="${task.id}">Taka að mér</button>` : '';
         const completeButton = canComplete ? `<button class="task-action-strong" type="button" data-complete-task="${task.id}">Merkja lokið</button>` : '';
         const deleteButton = canDelete ? `<button class="icon-delete-btn" type="button" data-delete-task="${task.id}" title="Eyða úr lista" aria-label="Eyða úr lista">×</button>` : '';
 
         return `
           <div class="task-item">
             <div class="task-top">
+              ${headerMeta}
               <div class="task-title">${task.title}</div>
               ${notesText}
               ${assigneeText}
               ${metaText}
             </div>
             <div class="task-side">
-              <span class="task-status ${status}">${taskStatusLabel(status)}</span>
               <div class="task-actions">
+                ${editButton}
                 ${claimButton}
                 ${completeButton}
                 ${deleteButton}
@@ -1144,7 +1279,10 @@
         }
 
         const sortedTasks = [...list].sort((a, b) => {
-          const statusDiff = taskStatusSortValue(a.status || 'open') - taskStatusSortValue(b.status || 'open');
+          const categoryDiff = taskCategorySortValue(a.category) - taskCategorySortValue(b.category);
+          if (categoryDiff !== 0) return categoryDiff;
+
+          const statusDiff = taskStatusSortValue(a.status) - taskStatusSortValue(b.status);
           if (statusDiff !== 0) return statusDiff;
 
           const dateA = new Date(a.created_at || 0).getTime();
@@ -1152,8 +1290,8 @@
           return dateB - dateA;
         });
 
-        const activeTasks = sortedTasks.filter((task) => (task.status || 'open') !== 'done');
-        const completedTasks = sortedTasks.filter((task) => (task.status || 'open') === 'done');
+        const activeTasks = sortedTasks.filter((task) => normalizeTaskStatus(task.status) !== 'done');
+        const completedTasks = sortedTasks.filter((task) => normalizeTaskStatus(task.status) === 'done');
         const activeHtml = activeTasks.length
           ? activeTasks.map((task) => renderTaskItem(task, currentUser)).join('')
           : '<div class="empty">Engin opin verkefni eins og er.</div>';
@@ -1173,6 +1311,22 @@
         taskListEl.querySelectorAll('[data-claim-task]').forEach((btn) => {
           btn.addEventListener('click', async () => {
             await claimTask(btn.dataset.claimTask);
+          });
+        });
+
+        taskListEl.querySelectorAll('[data-edit-task]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const task = list.find((item) => String(item.id) === String(btn.dataset.editTask));
+            if (!task) return;
+            startTaskEdit(task);
+          });
+        });
+
+        taskListEl.querySelectorAll('[data-task-status-menu]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const task = list.find((item) => String(item.id) === String(btn.dataset.taskStatusMenu));
+            if (!task) return;
+            showTaskStatusMenu(btn, task);
           });
         });
 
@@ -1202,6 +1356,9 @@
           const safeTitle = escapeHtml(notice.title);
           const safeBody = notice.body ? `<div class="notice-body">${escapeHtml(notice.body)}</div>` : '';
           const typeMeta = getNoticeTypeMeta(notice.type);
+          const editButton = currentUserIsAdmin
+            ? `<button class="task-action-soft task-action-edit" type="button" data-edit-notice="${notice.id}">Breyta</button>`
+            : '';
           const deleteButton = currentUserIsAdmin
             ? `<button class="icon-delete-btn" type="button" data-delete-notice="${notice.id}" title="Eyða tilkynningu" aria-label="Eyða tilkynningu">×</button>`
             : '';
@@ -1209,19 +1366,28 @@
           return `
             <div class="notice-item">
               <div class="task-top">
-                <div>
-                  <div class="notice-heading">
-                    <div class="notice-title">${safeTitle}</div>
-                    <span class="notice-type-pill ${typeMeta.className}">${typeMeta.label}</span>
-                  </div>
-                  ${safeBody}
-                  <div class="notice-meta">${formatDateTime(notice.created_at)}${notice.created_by_name ? ' · frá ' + notice.created_by_name : ''}</div>
+                <div class="notice-type-label ${typeMeta.className}">${typeMeta.label}</div>
+                <div class="notice-title">${safeTitle}</div>
+                ${safeBody}
+                <div class="notice-meta">${formatDateTime(notice.created_at)}${notice.created_by_name ? ' · frá ' + notice.created_by_name : ''}</div>
+              </div>
+              <div class="task-side">
+                <div class="task-actions">
+                  ${editButton}
+                  ${deleteButton}
                 </div>
-                <div class="booking-actions">${deleteButton}</div>
               </div>
             </div>
           `;
         }).join('');
+
+        noticeListEl.querySelectorAll('[data-edit-notice]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const notice = list.find((item) => String(item.id) === String(btn.dataset.editNotice));
+            if (!notice) return;
+            startNoticeEdit(notice);
+          });
+        });
 
         noticeListEl.querySelectorAll('[data-delete-notice]').forEach((btn) => {
           btn.addEventListener('click', async () => {
@@ -1237,6 +1403,12 @@
         if (!activeDeletePromptEl) return;
         activeDeletePromptEl.remove();
         activeDeletePromptEl = null;
+      }
+
+      function clearTaskStatusMenu() {
+        if (!activeTaskStatusMenuEl) return;
+        activeTaskStatusMenuEl.remove();
+        activeTaskStatusMenuEl = null;
       }
 
       function showInlineDeletePrompt(button, message, onConfirm) {
@@ -1284,11 +1456,62 @@
         activeDeletePromptEl = prompt;
       }
 
+      function showTaskStatusMenu(button, task) {
+        const host = button.closest('.task-item');
+        if (!host) return;
+
+        if (activeTaskStatusMenuEl && activeTaskStatusMenuEl.parentElement === host) {
+          clearTaskStatusMenu();
+          return;
+        }
+
+        clearTaskStatusMenu();
+        clearInlineDeletePrompt();
+
+        const currentStatus = normalizeTaskStatus(task.status);
+        const menu = document.createElement('div');
+        menu.className = 'task-status-menu';
+        menu.innerHTML = taskStatusOptions().map((option) => `
+          <button
+            type="button"
+            class="task-status-menu-btn${option.value === currentStatus ? ' active' : ''}"
+            data-task-status-value="${option.value}"
+          >${option.label}</button>
+        `).join('');
+
+        menu.querySelectorAll('[data-task-status-value]').forEach((menuBtn) => {
+          menuBtn.addEventListener('click', async (event) => {
+            event.stopPropagation();
+            const nextStatus = menuBtn.dataset.taskStatusValue;
+            if (nextStatus === currentStatus) {
+              clearTaskStatusMenu();
+              return;
+            }
+            await updateTaskStatus(task.id, nextStatus);
+            clearTaskStatusMenu();
+          });
+        });
+
+        menu.addEventListener('click', (event) => {
+          event.stopPropagation();
+        });
+
+        host.appendChild(menu);
+        activeTaskStatusMenuEl = menu;
+      }
+
       document.addEventListener('click', (event) => {
         if (!activeDeletePromptEl) return;
         if (activeDeletePromptEl.contains(event.target)) return;
         if (event.target.closest('.icon-delete-btn')) return;
         clearInlineDeletePrompt();
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!activeTaskStatusMenuEl) return;
+        if (activeTaskStatusMenuEl.contains(event.target)) return;
+        if (event.target.closest('[data-task-status-menu]')) return;
+        clearTaskStatusMenu();
       });
 
       function toggleNoticeForm(forceOpen = null) {
@@ -1298,6 +1521,10 @@
 
         noticeForm.classList.toggle('hidden', !shouldOpen);
         toggleNoticeFormBtn.classList.toggle('hidden', shouldOpen);
+
+        if (!shouldOpen) {
+          resetNoticeForm();
+        }
       }
 
       function toggleTaskForm(forceOpen = null) {
@@ -1307,6 +1534,68 @@
 
         taskForm.classList.toggle('hidden', !shouldOpen);
         toggleTaskFormBtn.classList.toggle('hidden', shouldOpen);
+
+        if (shouldOpen) {
+          renderTaskAssigneeOptions(taskAssigneeInput?.value || '');
+        }
+
+        if (!shouldOpen) {
+          resetTaskForm();
+        }
+      }
+
+      function resetTaskForm() {
+        editingTaskId = null;
+        editingTaskStatus = 'not_started';
+        taskTitleInput.value = '';
+        taskCategoryInput.value = 'other';
+        renderTaskAssigneeOptions('');
+        taskStatusSelect.value = 'not_started';
+        taskNotesInput.value = '';
+        addTaskBtn.textContent = 'Skrá verkefni';
+        if (taskFormHeadingEl) {
+          taskFormHeadingEl.textContent = 'Nýtt verkefni';
+        }
+      }
+
+      function resetNoticeForm() {
+        editingNoticeId = null;
+        noticeTitleInput.value = '';
+        noticeBodyInput.value = '';
+        noticeTypeInput.value = 'info';
+        addNoticeBtn.textContent = 'Skrá tilkynningu';
+        if (noticeFormHeadingEl) {
+          noticeFormHeadingEl.textContent = 'Ný tilkynning';
+        }
+      }
+
+      function startNoticeEdit(notice) {
+        editingNoticeId = notice.id;
+        noticeTitleInput.value = notice.title || '';
+        noticeBodyInput.value = notice.body || '';
+        noticeTypeInput.value = normalizeNoticeType(notice.type);
+        addNoticeBtn.textContent = 'Vista breytingar';
+        if (noticeFormHeadingEl) {
+          noticeFormHeadingEl.textContent = 'Breyta tilkynningu';
+        }
+        toggleNoticeForm(true);
+        noticeTitleInput.focus();
+      }
+
+      function startTaskEdit(task) {
+        editingTaskId = task.id;
+        editingTaskStatus = normalizeTaskStatus(task.status);
+        taskTitleInput.value = task.title || '';
+        taskCategoryInput.value = normalizeTaskCategory(task.category);
+        renderTaskAssigneeOptions(task.claimed_by_user_id || '');
+        taskStatusSelect.value = editingTaskStatus;
+        taskNotesInput.value = task.notes || '';
+        addTaskBtn.textContent = 'Vista breytingar';
+        if (taskFormHeadingEl) {
+          taskFormHeadingEl.textContent = 'Breyta verkefni';
+        }
+        toggleTaskForm(true);
+        taskTitleInput.focus();
       }
 
       async function fetchBookings() {
@@ -1326,7 +1615,7 @@
       async function fetchTasks() {
         const { data, error } = await supabaseClient
           .from('tasks')
-          .select('id, title, notes, status, created_at, claimed_by_user_id, claimed_by_name, completed_at')
+          .select('id, title, category, notes, status, created_at, claimed_by_user_id, claimed_by_name, completed_at')
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -1409,6 +1698,10 @@
 
       try {
         const title = taskTitleInput.value.trim();
+        const category = normalizeTaskCategory(taskCategoryInput.value);
+        const assigneeId = taskAssigneeInput.value || '';
+        const assigneeProfile = assigneeId ? profilesById[assigneeId] : null;
+        const selectedStatus = normalizeTaskStatus(taskStatusSelect.value);
         const notes = taskNotesInput.value.trim();
         const { data: { user } } = await supabaseClient.auth.getUser();
 
@@ -1422,24 +1715,43 @@
           return;
         }
 
-        const { error } = await supabaseClient
-          .from('tasks')
-          .insert([
-            {
-              title,
-              notes: notes || null,
-              status: 'open'
-            }
-          ]);
+        const query = editingTaskId
+          ? supabaseClient
+              .from('tasks')
+              .update({
+                title,
+                category,
+                notes: notes || null,
+                claimed_by_user_id: assigneeId || null,
+                claimed_by_name: assigneeProfile?.display_name || null,
+                status: selectedStatus,
+                completed_at: selectedStatus === 'done' ? new Date().toISOString() : null
+              })
+              .eq('id', editingTaskId)
+          : supabaseClient
+              .from('tasks')
+              .insert([
+                {
+                  title,
+                  category,
+                  notes: notes || null,
+                  status: selectedStatus,
+                  claimed_by_user_id: assigneeId || null,
+                  claimed_by_name: assigneeProfile?.display_name || null,
+                  completed_at: selectedStatus === 'done' ? new Date().toISOString() : null
+                }
+              ]);
+
+        const { error } = await query;
 
         if (error) {
           showStatus(taskStatus, error.message, true);
           return;
         }
 
-        taskTitleInput.value = '';
-        taskNotesInput.value = '';
-        showStatus(taskStatus, 'Verkefni skráð.');
+        const wasEditing = Boolean(editingTaskId);
+        resetTaskForm();
+        showStatus(taskStatus, wasEditing ? 'Verkefni uppfært.' : 'Verkefni skráð.');
         toggleTaskForm(false);
         await refreshTasks();
       } finally {
@@ -1471,26 +1783,36 @@
         }
 
         const profile = getUserProfile(user);
-        const { error } = await supabaseClient
-          .from('notices')
-          .insert([
-            {
-              title,
-              body: body || null,
-              type,
-              created_by_name: profile.responsibleName
-            }
-          ]);
+        const query = editingNoticeId
+          ? supabaseClient
+              .from('notices')
+              .update({
+                title,
+                body: body || null,
+                type
+              })
+              .eq('id', editingNoticeId)
+          : supabaseClient
+              .from('notices')
+              .insert([
+                {
+                  title,
+                  body: body || null,
+                  type,
+                  created_by_name: profile.responsibleName
+                }
+              ]);
+
+        const { error } = await query;
 
         if (error) {
           showStatus(noticeStatus, error.message, true);
           return;
         }
 
-        noticeTitleInput.value = '';
-        noticeBodyInput.value = '';
-        noticeTypeInput.value = 'info';
-        showStatus(noticeStatus, 'Tilkynning skráð.');
+        const wasEditing = Boolean(editingNoticeId);
+        resetNoticeForm();
+        showStatus(noticeStatus, wasEditing ? 'Tilkynning uppfærð.' : 'Tilkynning skráð.');
         toggleNoticeForm(false);
         await refreshNotices();
       } finally {
@@ -1533,12 +1855,38 @@
       const { error } = await supabaseClient
         .from('tasks')
         .update({
-          status: 'claimed',
           claimed_by_user_id: user.id,
           claimed_by_name: profile.responsibleName
         })
         .eq('id', id)
-        .eq('status', 'open');
+        .neq('status', 'done')
+        .is('claimed_by_user_id', null);
+
+      if (error) {
+        showStatus(taskStatus, error.message, true);
+        return;
+      }
+
+      await refreshTasks();
+      }
+
+      async function updateTaskStatus(id, nextStatus) {
+      clearStatus(taskStatus);
+
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        showStatus(taskStatus, 'Þú þarft að vera skráð(ur) inn til að breyta stöðu verkefnis.', true);
+        return;
+      }
+
+      const normalizedStatus = normalizeTaskStatus(nextStatus);
+      const { error } = await supabaseClient
+        .from('tasks')
+        .update({
+          status: normalizedStatus,
+          completed_at: normalizedStatus === 'done' ? new Date().toISOString() : null
+        })
+        .eq('id', id);
 
       if (error) {
         showStatus(taskStatus, error.message, true);
@@ -1686,7 +2034,7 @@
         currentUserIsAdmin = isAdmin(data.user);
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
-        userEmail.textContent = (data.user.user_metadata?.display_name || data.user.email) + (currentUserIsAdmin ? ' (admin)' : '');
+        userEmail.textContent = getSignedInLabel(data.user);
         authFormsEl.classList.add('hidden');
         loginPanelEl.classList.add('hidden');
         passwordPanelEl.classList.add('hidden');
@@ -1750,6 +2098,64 @@
       await updateAuthUI();
       }
 
+      async function saveProfile() {
+      if (isSavingProfile) return;
+      isSavingProfile = true;
+      clearStatus(authStatus);
+      saveProfileBtn.disabled = true;
+
+      try {
+        const user = await resolveCurrentUser();
+        const displayName = profileDisplayNameInput.value.trim();
+
+        if (!user) {
+          showStatus(authStatus, 'Þú þarft að vera skráð(ur) inn til að breyta nafni.', true);
+          return;
+        }
+
+        if (!displayName) {
+          showStatus(authStatus, 'Settu inn nafn áður en þú vistar.', true);
+          return;
+        }
+
+        const { error: profileError } = await supabaseClient
+          .from('profiles')
+          .update({ display_name: displayName })
+          .eq('id', user.id);
+
+        if (profileError) {
+          showStatus(authStatus, profileError.message, true);
+          return;
+        }
+
+        const { error: userError } = await supabaseClient.auth.updateUser({
+          data: {
+            ...(user.user_metadata || {}),
+            display_name: displayName
+          }
+        });
+
+        if (userError) {
+          showStatus(authStatus, userError.message, true);
+          return;
+        }
+
+        await fetchProfiles().catch(() => []);
+        currentUser = {
+          ...user,
+          user_metadata: {
+            ...(user.user_metadata || {}),
+            display_name: displayName
+          }
+        };
+        userEmail.textContent = getSignedInLabel(currentUser);
+        showStatus(authStatus, 'Nafn uppfært.');
+      } finally {
+        isSavingProfile = false;
+        saveProfileBtn.disabled = false;
+      }
+      }
+
       async function changePassword() {
       if (isUpdatingPassword) return;
       isUpdatingPassword = true;
@@ -1809,7 +2215,7 @@
       if (user) {
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
-        userEmail.textContent = (user.user_metadata?.display_name || user.email) + (currentUserIsAdmin ? ' (admin)' : '');
+        userEmail.textContent = getSignedInLabel(user);
         logoutBtn.classList.remove('hidden');
         togglePasswordBtn.classList.remove('hidden');
         toggleLoginBtn.classList.add('hidden');
@@ -1934,8 +2340,10 @@
       togglePasswordBtn.addEventListener('click', () => {
         toggleAuthPanel('password');
       });
+      saveProfileBtn.addEventListener('click', saveProfile);
       addTaskBtn.addEventListener('click', addTask);
       toggleTaskFormBtn.addEventListener('click', () => {
+        resetTaskForm();
         toggleTaskForm();
       });
       cancelTaskFormBtn.addEventListener('click', () => {
@@ -1943,6 +2351,7 @@
       });
       addNoticeBtn.addEventListener('click', addNotice);
       toggleNoticeFormBtn.addEventListener('click', () => {
+        resetNoticeForm();
         toggleNoticeForm();
       });
       cancelNoticeFormBtn.addEventListener('click', () => {
