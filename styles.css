@@ -1083,15 +1083,9 @@
     #calendar .calendar-nav {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 12px;
       margin-bottom: 12px;
-    }
-
-    #calendar .calendar-nav-label {
-      font-weight: bold;
-      color: #6a4e38;
-      text-transform: capitalize;
     }
 
     #calendar .calendar-nav-buttons {
@@ -1171,10 +1165,46 @@
     #calendar .calendar-cell.booked {
       font-weight: 700;
       border-color: transparent;
+      cursor: pointer;
     }
 
     #calendar .calendar-cell.today {
       box-shadow: inset 0 0 0 1.5px rgba(73, 107, 91, 0.32);
+    }
+
+    #calendar .calendar-cell.booked.selected {
+      box-shadow:
+        inset 0 0 0 2px rgba(255, 251, 246, 0.78),
+        0 0 0 2px rgba(73, 107, 91, 0.24);
+    }
+
+    #calendar .calendar-cell.booked:focus-visible {
+      outline: 2px solid rgba(73, 107, 91, 0.38);
+      outline-offset: 2px;
+    }
+
+    #calendar .calendar-booking-note {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(203, 177, 148, 0.28);
+      color: #6a4e38;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    #calendar .calendar-booking-note strong {
+      color: #4f3d2f;
+    }
+
+    #calendar .calendar-booking-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      box-shadow: 0 0 0 3px rgba(73, 57, 42, 0.08);
+      flex: 0 0 auto;
     }
 
     .flatpickr-calendar {
@@ -2214,6 +2244,11 @@
         gap: 10px;
         padding: 2px 0 12px;
         margin-bottom: 16px;
+        border: 0;
+        border-bottom: 1px solid rgba(255, 248, 240, 0.18);
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
       }
 
       .auth-strip-actions {
@@ -2245,6 +2280,19 @@
 
       .auth-strip-user {
         line-height: 1.35;
+        color: #fff8f0;
+        text-shadow:
+          0 1px 2px rgba(0, 0, 0, 0.7),
+          0 0 16px rgba(0, 0, 0, 0.5);
+        overflow-wrap: anywhere;
+      }
+
+      .auth-link {
+        color: #fff8f0;
+        text-decoration-color: rgba(255, 248, 240, 0.86);
+        text-shadow:
+          0 1px 2px rgba(0, 0, 0, 0.7),
+          0 0 16px rgba(0, 0, 0, 0.5);
       }
 
       .booking-actions {

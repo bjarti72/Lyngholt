@@ -132,6 +132,7 @@
       let currentBookings = [];
       let bookingDayMap = {};
       let availabilityMonthOffset = 0;
+      let selectedCalendarDateKey = null;
       let profilesById = {};
       let mobileWeatherExpanded = false;
       let activeDeletePromptEl = null;
@@ -317,12 +318,14 @@
         bookings.forEach((booking) => {
           const cursor = new Date(booking.start_date + 'T12:00:00');
           const end = new Date(booking.end_date + 'T12:00:00');
+          const presentation = resolveBookingPresentation(booking);
 
           while (cursor <= end) {
-            const presentation = resolveBookingPresentation(booking);
             dayMap[formatDateKey(cursor)] = {
               color: presentation.responsibleColor,
-              responsibleName: presentation.responsibleName
+              responsibleName: presentation.responsibleName,
+              startDate: booking.start_date,
+              endDate: booking.end_date
             };
             cursor.setDate(cursor.getDate() + 1);
           }
@@ -357,6 +360,21 @@
         return NOTICE_TYPES[normalizeNoticeType(value)];
       }
 
+      function renderCalendarBookingNote(bookingInfo) {
+        if (!bookingInfo) return '';
+
+        const safeName = escapeHtml(bookingInfo.responsibleName);
+        const safeRange = escapeHtml(formatDateRange(bookingInfo.startDate, bookingInfo.endDate));
+        const safeColor = normalizeHexColor(bookingInfo.color);
+
+        return `
+          <div class="calendar-booking-note" aria-live="polite">
+            <span class="calendar-booking-dot" style="background:${safeColor};" aria-hidden="true"></span>
+            <span><strong>${safeName}</strong> bókaði ${safeRange}</span>
+          </div>
+        `;
+      }
+
       function renderAvailabilityCalendar() {
         const monthCount = getAvailabilityMonthCount();
         const weekdayLabels = ['Mán', 'Þri', 'Mið', 'Fim', 'Fös', 'Lau', 'Sun'];
@@ -386,12 +404,19 @@
             const classNames = ['calendar-cell'];
             const styles = [];
             let titleAttr = '';
+            let bookingAttrs = '';
 
             if (bookingInfo) {
               classNames.push('booked');
+              if (key === selectedCalendarDateKey) {
+                classNames.push('selected');
+              }
               styles.push(`background:${bookingInfo.color}`);
               styles.push(`color:${getContrastTextColor(bookingInfo.color)}`);
-              titleAttr = ` title="${escapeHtml(bookingInfo.responsibleName)}"`;
+              const safeResponsibleName = escapeHtml(bookingInfo.responsibleName);
+              const safeRange = escapeHtml(formatDateRange(bookingInfo.startDate, bookingInfo.endDate));
+              titleAttr = ` title="${safeResponsibleName} bókaði ${safeRange}"`;
+              bookingAttrs = ` role="button" tabindex="0" data-calendar-date="${key}" aria-label="${safeResponsibleName} bókaði ${safeRange}"`;
             }
 
             if (isToday) {
@@ -399,7 +424,7 @@
             }
 
             const styleAttr = styles.length ? ` style="${styles.join(';')}"` : '';
-            dayCellsHtml += `<div class="${classNames.join(' ')}"${styleAttr}${titleAttr}>${day}</div>`;
+            dayCellsHtml += `<div class="${classNames.join(' ')}"${styleAttr}${titleAttr}${bookingAttrs}>${day}</div>`;
           }
 
           const totalCells = firstWeekday + daysInMonth;
@@ -418,31 +443,44 @@
           `;
         }
 
-        const startMonth = new Date(today.getFullYear(), today.getMonth() + availabilityMonthOffset, 1, 12, 0, 0);
-        const endMonth = new Date(today.getFullYear(), today.getMonth() + availabilityMonthOffset + monthCount - 1, 1, 12, 0, 0);
-        const navLabel = monthCount === 1
-          ? formatIcelandicMonthYear(startMonth)
-          : `${formatIcelandicMonth(startMonth)} - ${formatIcelandicMonthYear(endMonth)}`;
+        const selectedBookingInfo = selectedCalendarDateKey ? bookingDayMap[selectedCalendarDateKey] : null;
 
         calendarEl.innerHTML = `
           <div class="calendar-nav">
-            <div class="calendar-nav-label">${navLabel}</div>
             <div class="calendar-nav-buttons">
               <button type="button" class="calendar-nav-btn" data-calendar-nav="prev">‹</button>
               <button type="button" class="calendar-nav-btn" data-calendar-nav="next">›</button>
             </div>
           </div>
           <div class="calendar-months">${monthsHtml}</div>
+          ${renderCalendarBookingNote(selectedBookingInfo)}
         `;
 
         calendarEl.querySelector('[data-calendar-nav="prev"]')?.addEventListener('click', () => {
           availabilityMonthOffset -= monthCount;
+          selectedCalendarDateKey = null;
           renderAvailabilityCalendar();
         });
 
         calendarEl.querySelector('[data-calendar-nav="next"]')?.addEventListener('click', () => {
           availabilityMonthOffset += monthCount;
+          selectedCalendarDateKey = null;
           renderAvailabilityCalendar();
+        });
+
+        calendarEl.querySelectorAll('[data-calendar-date]').forEach((cell) => {
+          const selectDate = () => {
+            const nextDateKey = cell.dataset.calendarDate;
+            selectedCalendarDateKey = selectedCalendarDateKey === nextDateKey ? null : nextDateKey;
+            renderAvailabilityCalendar();
+          };
+
+          cell.addEventListener('click', selectDate);
+          cell.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            selectDate();
+          });
         });
       }
 
@@ -815,17 +853,15 @@
       }
 
       function renderBookings(list, container, currentUserId, ownOnly = false, canDeleteAll = false) {
-      if (!list.length) {
-        container.innerHTML = '<div class="empty">Engar bókanir enn.</div>';
-        return;
-      }
-
       const filtered = ownOnly
         ? list.filter((item) => item.user_id === currentUserId)
         : list;
 
       if (!filtered.length) {
-        container.innerHTML = '<div class="empty">Engar bókanir á þessum lista.</div>';
+        const emptyText = ownOnly
+          ? (currentUserId ? 'Þú átt enga bókun skráða eins og er.' : 'Skráðu þig inn til að sjá þínar bókanir.')
+          : 'Engar bókanir eru skráðar enn.';
+        container.innerHTML = `<div class="empty booking-empty">${emptyText}</div>`;
         return;
       }
 
@@ -1519,6 +1555,9 @@
         }));
 
       bookingDayMap = expandBookingDays(bookings);
+      if (selectedCalendarDateKey && !bookingDayMap[selectedCalendarDateKey]) {
+        selectedCalendarDateKey = null;
+      }
       renderAvailabilityCalendar();
       updateBookingPreview();
 
