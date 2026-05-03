@@ -234,39 +234,41 @@
         <div id="taskFormHeading" class="task-form-heading">Nýtt verkefni</div>
         <div>
           <label for="taskTitle">Verkefni</label>
-          <input id="taskTitle" type="text" placeholder="Til dæmis: kaupa klósettpappír" />
+          <input id="taskTitle" type="text" />
         </div>
 
         <div>
-          <label for="taskCategory">Flokkur</label>
-          <select id="taskCategory">
-            <option value="shopping">Innkaup</option>
-            <option value="maintenance">Viðhald</option>
-            <option value="cleaning">Þrif</option>
-            <option value="other" selected>Annað</option>
-          </select>
+          <label for="taskNotes">Nánari skýring (valfrjálst)</label>
+          <textarea id="taskNotes" rows="3"></textarea>
         </div>
 
-        <div>
-          <label for="taskAssignee">Eigandi</label>
-          <select id="taskAssignee">
-            <option value="">Óúthlutað</option>
-          </select>
-        </div>
+        <div class="task-form-options">
+          <div>
+            <label for="taskCategory">Flokkur</label>
+            <select id="taskCategory">
+              <option value="shopping">Innkaup</option>
+              <option value="maintenance">Viðhald</option>
+              <option value="cleaning">Þrif</option>
+              <option value="other" selected>Annað</option>
+            </select>
+          </div>
 
-        <div>
-          <label for="taskStatusSelect">Staða</label>
-          <select id="taskStatusSelect">
-            <option value="not_started" selected>Ekki hafið</option>
-            <option value="in_progress">Í vinnslu</option>
-            <option value="on_hold">Í bið</option>
-            <option value="done">Lokið</option>
-          </select>
-        </div>
+          <div>
+            <label for="taskAssignee">Eigandi</label>
+            <select id="taskAssignee">
+              <option value="">Óúthlutað</option>
+            </select>
+          </div>
 
-        <div>
-          <label for="taskNotes">Athugasemd (valfrjálst)</label>
-          <input id="taskNotes" type="text" placeholder="Til dæmis: vantar fyrir næstu ferð" />
+          <div>
+            <label for="taskStatusSelect">Staða</label>
+            <select id="taskStatusSelect">
+              <option value="not_started" selected>Ekki hafið</option>
+              <option value="in_progress">Í vinnslu</option>
+              <option value="on_hold">Í bið</option>
+              <option value="done">Lokið</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-actions">
