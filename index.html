@@ -285,13 +285,13 @@
       <div id="taskStatus" class="status"></div>
     </section>
 
-    <div class="split-grid">
-      <section class="card">
+    <div class="split-grid booking-lists-grid">
+      <section class="card all-bookings-card">
         <h2>Allar bókanir</h2>
         <div id="allBookings" class="calendar-list"></div>
       </section>
 
-      <section class="card">
+      <section class="card my-bookings-card">
         <h2>Mínar bókanir</h2>
         <div id="myBookings" class="calendar-list"></div>
       </section>
@@ -440,6 +440,9 @@
       let mobileWeatherExpanded = false;
       let activeDeletePromptEl = null;
       let activeTaskStatusMenuEl = null;
+      let activeTaskCategoryFilter = 'all';
+      let activeTaskStatusFilter = 'all';
+      const ACTIVE_TASK_VISIBLE_LIMIT = 4;
       const NOTICE_TYPES = {
         important: { label: 'Mikilvægt', className: 'important' },
         info: { label: 'Upplýsingar', className: 'info' }
@@ -516,6 +519,19 @@
 
       function taskCategorySortValue(category) {
         return TASK_CATEGORY_SORT_ORDER[normalizeTaskCategory(category)] ?? 99;
+      }
+
+      function isTaskFilterActive() {
+        return activeTaskCategoryFilter !== 'all' || activeTaskStatusFilter !== 'all';
+      }
+
+      function taskMatchesActiveFilters(task) {
+        const categoryMatches = activeTaskCategoryFilter === 'all'
+          || normalizeTaskCategory(task.category) === activeTaskCategoryFilter;
+        const statusMatches = activeTaskStatusFilter === 'all'
+          || normalizeTaskStatus(task.status) === activeTaskStatusFilter;
+
+        return categoryMatches && statusMatches;
       }
 
       function populateProfilePanel(user) {
@@ -1261,48 +1277,87 @@
         }, {});
       }
 
-      function countOpenTasksByCategory(tasks) {
+      function countTasksByCategory(tasks) {
         return Object.keys(TASK_CATEGORIES).reduce((counts, category) => {
-          counts[category] = tasks.filter((task) => (
-            normalizeTaskStatus(task.status) !== 'done' && normalizeTaskCategory(task.category) === category
-          )).length;
+          counts[category] = tasks.filter((task) => normalizeTaskCategory(task.category) === category).length;
           return counts;
         }, {});
       }
 
-      function renderTaskSummary(tasks) {
+      function renderTaskSummary(tasks, currentUser) {
         if (!taskSummaryEl) return;
 
         const countsByStatus = countTasksByStatus(tasks);
         const statusCards = [
-          { label: 'Ekki hafið', value: countsByStatus.not_started, className: 'open' },
-          { label: 'Í vinnslu', value: countsByStatus.in_progress, className: 'in-progress' },
-          { label: 'Í bið', value: countsByStatus.on_hold, className: 'on-hold' },
-          { label: 'Lokið', value: countsByStatus.done, className: 'done' }
+          { key: 'not_started', label: 'Ekki hafið', value: countsByStatus.not_started, className: 'open' },
+          { key: 'in_progress', label: 'Í vinnslu', value: countsByStatus.in_progress, className: 'in-progress' },
+          { key: 'on_hold', label: 'Í bið', value: countsByStatus.on_hold, className: 'on-hold' },
+          { key: 'done', label: 'Lokið', value: countsByStatus.done, className: 'done' }
         ];
-        const categoryCounts = countOpenTasksByCategory(tasks);
+        const categoryCounts = countTasksByCategory(tasks);
         const categoryChips = Object.entries(TASK_CATEGORIES)
-          .map(([key, meta]) => ({ ...meta, value: categoryCounts[key] || 0 }))
+          .map(([key, meta]) => ({ key, ...meta, value: categoryCounts[key] || 0 }))
           .filter((item) => item.value > 0)
           .map((item) => `
-            <div class="task-summary-chip ${item.className}">
+            <button
+              class="task-summary-chip ${item.className} ${activeTaskCategoryFilter === item.key ? 'selected' : ''}"
+              type="button"
+              data-task-category-filter="${item.key}"
+              aria-pressed="${activeTaskCategoryFilter === item.key}"
+            >
               <span>${item.label}</span>
               <strong>${item.value}</strong>
-            </div>
+            </button>
           `)
           .join('');
+        const filterTools = isTaskFilterActive()
+          ? `
+            <div class="task-filter-row">
+              <span>Sía virk</span>
+              <button type="button" data-clear-task-filters>Hreinsa síu</button>
+            </div>
+          `
+          : '';
 
         taskSummaryEl.innerHTML = `
           ${categoryChips ? `<div class="task-summary-categories">${categoryChips}</div>` : ''}
           <div class="task-summary-statuses">
             ${statusCards.map((card) => `
-              <div class="task-summary-stat ${card.className}">
+              <button
+                class="task-summary-stat ${card.className} ${activeTaskStatusFilter === card.key ? 'selected' : ''}"
+                type="button"
+                data-task-status-filter="${card.key}"
+                aria-pressed="${activeTaskStatusFilter === card.key}"
+              >
                 <span>${card.label}</span>
                 <strong>${card.value}</strong>
-              </div>
+              </button>
             `).join('')}
           </div>
+          ${filterTools}
         `;
+
+        taskSummaryEl.querySelectorAll('[data-task-category-filter]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const nextCategory = btn.dataset.taskCategoryFilter;
+            activeTaskCategoryFilter = activeTaskCategoryFilter === nextCategory ? 'all' : nextCategory;
+            renderTasks(tasks, currentUser || null);
+          });
+        });
+
+        taskSummaryEl.querySelectorAll('[data-task-status-filter]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const nextStatus = btn.dataset.taskStatusFilter;
+            activeTaskStatusFilter = activeTaskStatusFilter === nextStatus ? 'all' : nextStatus;
+            renderTasks(tasks, currentUser || null);
+          });
+        });
+
+        taskSummaryEl.querySelector('[data-clear-task-filters]')?.addEventListener('click', () => {
+          activeTaskCategoryFilter = 'all';
+          activeTaskStatusFilter = 'all';
+          renderTasks(tasks, currentUser || null);
+        });
       }
 
       function renderTaskItem(task, currentUser) {
@@ -1360,7 +1415,7 @@
       }
 
       function renderTasks(list, currentUser) {
-        renderTaskSummary(list);
+        renderTaskSummary(list, currentUser);
 
         if (!list.length) {
           taskListEl.innerHTML = '<div class="empty">Engin verkefni enn.</div>';
@@ -1379,12 +1434,35 @@
           return dateB - dateA;
         });
 
-        const activeTasks = sortedTasks.filter((task) => normalizeTaskStatus(task.status) !== 'done');
-        const completedTasks = sortedTasks.filter((task) => normalizeTaskStatus(task.status) === 'done');
+        const filteredTasks = sortedTasks.filter(taskMatchesActiveFilters);
+        const filterIsActive = isTaskFilterActive();
+
+        if (!filteredTasks.length) {
+          taskListEl.innerHTML = '<div class="empty">Engin verkefni passa við síuna.</div>';
+          return;
+        }
+
+        const activeTasks = filteredTasks.filter((task) => normalizeTaskStatus(task.status) !== 'done');
+        const completedTasks = filteredTasks.filter((task) => normalizeTaskStatus(task.status) === 'done');
+        const shouldLimitActiveTasks = !filterIsActive;
+        const visibleActiveTasks = shouldLimitActiveTasks ? activeTasks.slice(0, ACTIVE_TASK_VISIBLE_LIMIT) : activeTasks;
+        const hiddenActiveTasks = shouldLimitActiveTasks ? activeTasks.slice(ACTIVE_TASK_VISIBLE_LIMIT) : [];
         const activeHtml = activeTasks.length
-          ? activeTasks.map((task) => renderTaskItem(task, currentUser)).join('')
-          : '<div class="empty">Engin opin verkefni eins og er.</div>';
-        const completedHtml = completedTasks.length
+          ? `
+            ${visibleActiveTasks.map((task) => renderTaskItem(task, currentUser)).join('')}
+            ${hiddenActiveTasks.length ? `
+              <details class="extra-tasks">
+                <summary>Sjá fleiri verkefni (${hiddenActiveTasks.length})</summary>
+                <div class="extra-tasks-list">
+                  ${hiddenActiveTasks.map((task) => renderTaskItem(task, currentUser)).join('')}
+                </div>
+              </details>
+            ` : ''}
+          `
+          : '';
+        const completedHtml = completedTasks.length && activeTaskStatusFilter === 'done'
+          ? completedTasks.map((task) => renderTaskItem(task, currentUser)).join('')
+          : completedTasks.length
           ? `
             <details class="completed-tasks">
               <summary>Lokið (${completedTasks.length})</summary>

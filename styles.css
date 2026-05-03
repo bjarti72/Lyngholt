@@ -1332,6 +1332,8 @@
     }
 
     .task-summary-stat {
+      width: auto;
+      min-width: 0;
       min-height: 30px;
       border: 1px solid rgba(163, 127, 86, 0.12);
       border-radius: 999px;
@@ -1340,6 +1342,9 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
+      color: inherit;
+      box-shadow: none;
+      cursor: pointer;
     }
 
     .task-summary-stat span,
@@ -1385,6 +1390,8 @@
     }
 
     .task-summary-chip {
+      width: auto;
+      min-width: 0;
       display: inline-flex;
       align-items: center;
       gap: 7px;
@@ -1393,6 +1400,52 @@
       border: 1px solid rgba(163, 127, 86, 0.1);
       border-radius: 999px;
       background: rgba(255, 251, 246, 0.48);
+      color: inherit;
+      box-shadow: none;
+      cursor: pointer;
+    }
+
+    .task-summary-stat:hover,
+    .task-summary-chip:hover {
+      border-color: rgba(73, 107, 91, 0.24);
+      background: rgba(255, 251, 246, 0.72);
+    }
+
+    .task-summary-stat.selected,
+    .task-summary-chip.selected {
+      border-color: rgba(73, 107, 91, 0.42);
+      box-shadow: inset 0 0 0 1px rgba(73, 107, 91, 0.18);
+      background: rgba(219, 231, 222, 0.58);
+    }
+
+    .task-filter-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: #9a8775;
+      font-size: 0.82rem;
+      line-height: 1.3;
+    }
+
+    .task-filter-row button {
+      width: auto;
+      min-width: 0;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      color: #556247;
+      font-size: 0.72rem;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+      text-decoration-color: rgba(73, 107, 91, 0.34);
     }
 
     .task-summary-chip strong {
@@ -1515,9 +1568,9 @@
     }
 
     .task-meta-row {
-      color: #8a6a11;
-      font-size: 0.88rem;
-      line-height: 1.4;
+      color: #9a8775;
+      font-size: 0.82rem;
+      line-height: 1.35;
       display: flex;
       align-items: baseline;
       justify-content: space-between;
@@ -1840,7 +1893,8 @@
         max-width: 148px;
       }
 
-    .completed-tasks {
+    .completed-tasks,
+    .extra-tasks {
       margin-top: 8px;
       border-top: 1px solid rgba(203, 177, 148, 0.38);
       border-radius: 0;
@@ -1848,7 +1902,8 @@
       overflow: visible;
     }
 
-    .completed-tasks summary {
+    .completed-tasks summary,
+    .extra-tasks summary {
       list-style: none;
       cursor: pointer;
       padding: 14px 0 10px;
@@ -1860,32 +1915,38 @@
       gap: 10px;
     }
 
-    .completed-tasks summary::-webkit-details-marker {
+    .completed-tasks summary::-webkit-details-marker,
+    .extra-tasks summary::-webkit-details-marker {
       display: none;
     }
 
-    .completed-tasks summary::after {
+    .completed-tasks summary::after,
+    .extra-tasks summary::after {
       content: '+';
       font-size: 1rem;
       line-height: 1;
       color: #8a6a11;
     }
 
-    .completed-tasks[open] summary {
+    .completed-tasks[open] summary,
+    .extra-tasks[open] summary {
       border-bottom: 1px solid rgba(203, 177, 148, 0.38);
     }
 
-    .completed-tasks[open] summary::after {
+    .completed-tasks[open] summary::after,
+    .extra-tasks[open] summary::after {
       content: '−';
     }
 
-    .completed-tasks-list {
+    .completed-tasks-list,
+    .extra-tasks-list {
       display: grid;
       gap: 0;
       padding: 0;
     }
 
-    .completed-tasks-list > .task-item:first-child {
+    .completed-tasks-list > .task-item:first-child,
+    .extra-tasks-list > .task-item:first-child {
       border-top: none;
     }
 
@@ -1912,6 +1973,14 @@
 
       .split-grid {
         grid-template-columns: 1fr;
+      }
+
+      .booking-lists-grid .my-bookings-card {
+        order: 1;
+      }
+
+      .booking-lists-grid .all-bookings-card {
+        order: 2;
       }
 
       .auth-split {
