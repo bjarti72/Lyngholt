@@ -1046,44 +1046,6 @@
       margin-top: 10px;
     }
 
-    .calendar-legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 14px;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(203, 177, 148, 0.32);
-      color: var(--muted);
-      font-size: 0.84rem;
-      line-height: 1.2;
-    }
-
-    .calendar-legend span {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .calendar-legend-swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 5px;
-      display: inline-block;
-      border: 1px solid rgba(203, 177, 148, 0.7);
-      background: rgba(255, 255, 255, 0.72);
-    }
-
-    .calendar-legend-swatch.booked {
-      border-color: transparent;
-      background: #d6e4dd;
-    }
-
-    .calendar-legend-swatch.today {
-      border-color: rgba(73, 107, 91, 0.42);
-      box-shadow: inset 0 0 0 2px rgba(73, 107, 91, 0.22);
-      background: rgba(255, 255, 255, 0.72);
-    }
-
     #calendar .calendar-nav {
       display: flex;
       align-items: center;
