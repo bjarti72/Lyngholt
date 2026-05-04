@@ -103,6 +103,8 @@
       const signupPanelEl = document.getElementById('signupPanel');
       const passwordPanelEl = document.getElementById('passwordPanel');
       const forgotPasswordPanelEl = document.getElementById('forgotPasswordPanel');
+      const loggedOutGateEl = document.getElementById('loggedOutGate');
+      const privateContentEl = document.getElementById('privateContent');
 
       const loggedOutBox = document.getElementById('loggedOutBox');
       const loggedInBox = document.getElementById('loggedInBox');
@@ -614,10 +616,6 @@
 
       bookBtn.disabled = true;
       renderAvailabilityCalendar();
-      refreshWeather();
-      fetchProfiles().catch((error) => {
-        console.error(error);
-      });
 
       let lastAvailabilityMonthCount = getAvailabilityMonthCount();
       window.addEventListener('resize', () => {
@@ -658,6 +656,38 @@
       function clearStatus(el) {
         el.textContent = '';
         el.classList.remove('show', 'error', 'warning');
+      }
+
+      function setPrivateContentVisible(isVisible) {
+        document.body.classList.toggle('logged-in', isVisible);
+        document.body.classList.toggle('logged-out', !isVisible);
+        privateContentEl?.classList.toggle('hidden', !isVisible);
+        loggedOutGateEl?.classList.toggle('hidden', isVisible);
+      }
+
+      function clearPrivateContent() {
+        currentBookings = [];
+        currentTasks = [];
+        currentNotices = [];
+        bookingDayMap = {};
+        selectedCalendarDateKey = null;
+        selectedStart = null;
+        selectedEnd = null;
+        activeTaskCategoryFilter = 'all';
+        activeTaskStatusFilter = 'all';
+        fullNameInput.value = '';
+        datePicker.clear();
+        calendarEl.innerHTML = '';
+        nextStayCardEl.innerHTML = '<div class="empty">Skráðu þig inn til að sjá næstu bókanir.</div>';
+        allBookingsEl.innerHTML = '';
+        myBookingsEl.innerHTML = '';
+        taskSummaryEl.innerHTML = '';
+        taskListEl.innerHTML = '';
+        noticeListEl.innerHTML = '';
+        clearStatus(bookingStatus);
+        clearStatus(taskStatus);
+        clearStatus(noticeStatus);
+        updateBookingPreview();
       }
 
       function formatDate(dateStr) {
@@ -2050,7 +2080,7 @@
           return;
         }
 
-        await fetchProfiles();
+        await fetchProfiles().catch(() => []);
       }
 
       const colorLabel = userColorOptions.find((option) => option.value === color)?.label || 'valinn';
@@ -2282,11 +2312,12 @@
 
       async function updateAuthUI() {
       const user = await resolveCurrentUser();
-      await fetchProfiles().catch(() => []);
-      currentUser = user;
-      currentUserIsAdmin = isAdmin(user);
 
       if (user) {
+        await fetchProfiles().catch(() => []);
+        currentUser = user;
+        currentUserIsAdmin = isAdmin(user);
+        setPrivateContentVisible(true);
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
         userEmail.textContent = getSignedInLabel(user);
@@ -2296,23 +2327,26 @@
         toggleSignupBtn.classList.add('hidden');
         authFormsEl.classList.add('hidden');
         forgotPasswordPanelEl.classList.add('hidden');
+        refreshWeather();
+        updateNoticeControls();
+        await Promise.all([refreshBookings(), refreshTasks(), refreshNotices()]);
       } else {
+        profilesById = {};
+        currentUser = null;
+        currentUserIsAdmin = false;
+        setPrivateContentVisible(false);
+        clearPrivateContent();
         loggedOutBox.classList.remove('hidden');
         loggedInBox.classList.add('hidden');
         userEmail.textContent = '';
-        currentUser = null;
-        currentUserIsAdmin = false;
         logoutBtn.classList.add('hidden');
         togglePasswordBtn.classList.add('hidden');
         toggleLoginBtn.classList.remove('hidden');
         toggleSignupBtn.classList.remove('hidden');
         passwordPanelEl.classList.add('hidden');
         forgotPasswordPanelEl.classList.add('hidden');
+        updateNoticeControls();
       }
-
-      updateNoticeControls();
-
-      await Promise.all([refreshBookings(), refreshTasks(), refreshNotices()]);
       }
 
       async function createBooking() {

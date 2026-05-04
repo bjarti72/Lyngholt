@@ -7,9 +7,9 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
-  <link rel='stylesheet' href='styles.css?v=20260504-4' />
+  <link rel='stylesheet' href='styles.css?v=20260504-6' />
 </head>
-<body>
+<body class="logged-out">
   <header>
     <div class="hero">
       <div>
@@ -136,6 +136,12 @@
 
     <div id="authStatus" class="status" role="status" aria-live="polite" aria-atomic="true"></div>
 
+    <section id="loggedOutGate" class="card logged-out-gate">
+      <h2>Innskráningar þörf</h2>
+      <p class="muted">Skráðu þig inn til að sjá dagatal, bókanir, verkefni, tilkynningar og aðrar upplýsingar um Lyngholt.</p>
+    </section>
+
+    <div id="privateContent" class="private-content hidden">
     <div class="summary-top-grid">
       <section class="card notice-card">
         <div class="section-header">
@@ -306,12 +312,13 @@
         <div id="myBookings" class="calendar-list"></div>
       </section>
     </div>
+    </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script src="app.js?v=20260504-4"></script>
+  <script src="app.js?v=20260504-6"></script>
 </body>
 </html>
 

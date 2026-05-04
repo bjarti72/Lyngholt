@@ -284,6 +284,26 @@
       cursor: pointer;
     }
 
+    .logged-out .hero-weather {
+      display: none;
+    }
+
+    .logged-out-gate {
+      max-width: 680px;
+      margin: 0 0 20px;
+      background: rgba(255, 250, 244, 0.9);
+    }
+
+    .logged-out-gate h2 {
+      margin-bottom: 6px;
+      color: #6a4e38;
+    }
+
+    .logged-out-gate p {
+      margin-bottom: 0;
+      line-height: 1.5;
+    }
+
     .summary-panel {
       min-width: 0;
     }
