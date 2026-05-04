@@ -55,6 +55,7 @@
       const signupNameInput = document.getElementById('signupName');
       const forgotPasswordEmailInput = document.getElementById('forgotPasswordEmail');
       const profileDisplayNameInput = document.getElementById('profileDisplayName');
+      const profileColorChoicesEl = document.getElementById('profileColorChoices');
       const newPasswordInput = document.getElementById('newPassword');
       const confirmPasswordInput = document.getElementById('confirmPassword');
       const fullNameInput = document.getElementById('fullName');
@@ -118,6 +119,7 @@
       let selectedStart = null;
       let selectedEnd = null;
       let isLoggingIn = false;
+      let isSigningUp = false;
       let isUpdatingPassword = false;
       let isSendingResetLink = false;
       let isBooking = false;
@@ -129,7 +131,10 @@
       let editingNoticeId = null;
       let currentUser = null;
       let currentUserIsAdmin = false;
+      let selectedProfileColor = '#8B5E34';
       let currentBookings = [];
+      let currentTasks = [];
+      let currentNotices = [];
       let bookingDayMap = {};
       let availabilityMonthOffset = 0;
       let selectedCalendarDateKey = null;
@@ -157,16 +162,16 @@
         other: 3
       };
       const userColorOptions = [
-        { value: '#D97706', label: 'Amber' },
-        { value: '#DC2626', label: 'Red' },
-        { value: '#2563EB', label: 'Blue' },
-        { value: '#059669', label: 'Green' },
-        { value: '#7C3AED', label: 'Violet' },
-        { value: '#DB2777', label: 'Pink' },
-        { value: '#0F766E', label: 'Teal' },
-        { value: '#4F46E5', label: 'Indigo' },
-        { value: '#9333EA', label: 'Purple' },
-        { value: '#EA580C', label: 'Orange' }
+        { value: '#8B5E34', label: 'Brúnn' },
+        { value: '#B26A3C', label: 'Leir' },
+        { value: '#C08A45', label: 'Gullbrúnn' },
+        { value: '#6F7F4E', label: 'Mosi' },
+        { value: '#496B5B', label: 'Skógargrænn' },
+        { value: '#47717A', label: 'Blágrænn' },
+        { value: '#6D7891', label: 'Blágrár' },
+        { value: '#8A6A8D', label: 'Lyng' },
+        { value: '#9B5F5D', label: 'Rauðbrúnn' },
+        { value: '#A78B55', label: 'Reyr' }
       ];
 
       async function fetchProfiles() {
@@ -206,6 +211,83 @@
         return getUserProfile(user).responsibleName + (currentUserIsAdmin ? ' (admin)' : '');
       }
 
+      function setSelectedProfileColor(color) {
+        selectedProfileColor = normalizeHexColor(color, userColorOptions[0].value);
+        renderProfileColorChoices(selectedProfileColor);
+      }
+
+      function renderProfileColorChoices(selectedColor = selectedProfileColor) {
+        if (!profileColorChoicesEl) return;
+
+        const normalizedSelectedColor = normalizeHexColor(selectedColor, userColorOptions[0].value);
+        const usedByOtherUsers = new Set(
+          Object.entries(profilesById)
+            .filter(([id]) => id !== currentUser?.id)
+            .map(([, profile]) => normalizeHexColor(profile?.color, ''))
+            .filter(Boolean)
+        );
+        const availableOptions = userColorOptions.filter((option) => (
+          option.value === normalizedSelectedColor || !usedByOtherUsers.has(option.value)
+        ));
+        const hasSelectedColor = availableOptions.some((option) => option.value === normalizedSelectedColor);
+        const options = hasSelectedColor
+          ? availableOptions
+          : [{ value: normalizedSelectedColor, label: 'Núverandi litur' }, ...availableOptions];
+
+        profileColorChoicesEl.innerHTML = options.map((option) => {
+          const safeColor = normalizeHexColor(option.value, userColorOptions[0].value);
+          const safeLabel = escapeHtml(option.label);
+          const isSelected = safeColor === normalizedSelectedColor;
+
+          return `
+            <button
+              type="button"
+              class="profile-color-swatch${isSelected ? ' selected' : ''}"
+              style="--profile-color:${safeColor};"
+              data-profile-color="${safeColor}"
+              role="radio"
+              aria-checked="${isSelected ? 'true' : 'false'}"
+              aria-label="${safeLabel}"
+              title="${safeLabel}"
+            ></button>
+          `;
+        }).join('');
+
+        profileColorChoicesEl.querySelectorAll('[data-profile-color]').forEach((button) => {
+          button.addEventListener('click', () => {
+            setSelectedProfileColor(button.dataset.profileColor);
+          });
+        });
+      }
+
+      function userCanDeleteBooking(booking, user) {
+        return Boolean(user && booking && (
+          currentUserIsAdmin || isAdmin(user) || booking.user_id === user.id
+        ));
+      }
+
+      function getCurrentTask(id) {
+        return currentTasks.find((task) => String(task.id) === String(id)) || null;
+      }
+
+      function userCanManageTask(task, user) {
+        return Boolean(task && user);
+      }
+
+      function userCanDeleteTask(task, user) {
+        return Boolean(
+          task
+          && userCanManageTask(task, user)
+          && normalizeTaskStatus(task.status) === 'done'
+        );
+      }
+
+      function userCanDeleteNotice(notice, user) {
+        return Boolean(user && notice && (
+          currentUserIsAdmin || isAdmin(user) || notice.created_by_user_id === user.id
+        ));
+      }
+
       function normalizeTaskCategory(value) {
         return Object.prototype.hasOwnProperty.call(TASK_CATEGORIES, value) ? value : 'other';
       }
@@ -233,7 +315,9 @@
 
       function populateProfilePanel(user) {
         if (!profileDisplayNameInput) return;
-        profileDisplayNameInput.value = user ? getUserProfile(user).responsibleName : '';
+        const profile = user ? getUserProfile(user) : null;
+        profileDisplayNameInput.value = profile?.responsibleName || '';
+        setSelectedProfileColor(profile?.responsibleColor || userColorOptions[0].value);
       }
 
       function renderTaskAssigneeOptions(selectedId = '') {
@@ -345,7 +429,7 @@
 
       function normalizeHexColor(value, fallback = '#d6e4dd') {
         const color = String(value ?? '').trim();
-        return /^#[0-9a-fA-F]{6}$/.test(color) ? color : fallback;
+        return /^#[0-9a-fA-F]{6}$/.test(color) ? color.toUpperCase() : fallback;
       }
 
       function getAvailabilityMonthCount() {
@@ -448,8 +532,8 @@
         calendarEl.innerHTML = `
           <div class="calendar-nav">
             <div class="calendar-nav-buttons">
-              <button type="button" class="calendar-nav-btn" data-calendar-nav="prev">‹</button>
-              <button type="button" class="calendar-nav-btn" data-calendar-nav="next">›</button>
+              <button type="button" class="calendar-nav-btn" data-calendar-nav="prev" aria-label="Fyrri mánuðir">‹</button>
+              <button type="button" class="calendar-nav-btn" data-calendar-nav="next" aria-label="Næstu mánuðir">›</button>
             </div>
           </div>
           <div class="calendar-months">${monthsHtml}</div>
@@ -544,8 +628,28 @@
         }
       });
 
+      function getFriendlyErrorMessage(text) {
+        const rawText = String(text || '').trim();
+        const message = rawText.toLowerCase();
+
+        if (!rawText) return 'Óvænt villa kom upp. Reyndu aftur.';
+        if (message.includes('invalid login credentials')) return 'Netfang eða lykilorð er rangt.';
+        if (message.includes('email not confirmed')) return 'Þú þarft að staðfesta netfangið áður en þú skráir þig inn.';
+        if (message.includes('already registered') || message.includes('user already registered')) return 'Þessi notandi er þegar til.';
+        if (message.includes('password') && (message.includes('at least') || message.includes('weak'))) return 'Lykilorðið þarf að vera sterkara eða lengra.';
+        if (message.includes('invalid email') || message.includes('validate email')) return 'Netfangið virðist ekki vera rétt.';
+        if (message.includes('rate limit')) return 'Of margar tilraunir í einu. Bíddu aðeins og reyndu aftur.';
+        if (message.includes('failed to fetch') || message.includes('networkerror')) return 'Ekki náðist samband við þjónustuna. Athugaðu nettengingu og reyndu aftur.';
+        if (message.includes('jwt') || message.includes('session')) return 'Innskráningin rann út. Skráðu þig inn aftur.';
+        if (message.includes('row-level security') || message.includes('permission denied')) return 'Þú hefur ekki heimild til að gera þessa aðgerð.';
+        if (message.includes('duplicate key')) return 'Þessi færsla er þegar til.';
+
+        return rawText;
+      }
+
       function showStatus(el, text, isError = false) {
-        el.textContent = text;
+        if (!el) return;
+        el.textContent = isError ? getFriendlyErrorMessage(text) : text;
         el.classList.add('show');
         el.classList.toggle('error', isError);
         el.classList.remove('warning');
@@ -617,7 +721,7 @@
         bookingPreviewEl.classList.add('show');
         bookingPreviewEl.classList.toggle('available', hasRange && rangeAvailable);
         bookingPreviewEl.classList.toggle('unavailable', hasRange && !rangeAvailable);
-        bookBtn.disabled = !(canBook && rangeAvailable);
+        bookBtn.disabled = isBooking || !(canBook && rangeAvailable);
       }
 
       function formatShortDate(dateStr) {
@@ -747,10 +851,10 @@
               Vindur: ${windDirection ? `${windDirection} · ` : ''}${weather.wind} m/s<br />
               Úrkoma næsta klst.: ${weather.precipitation} mm
             </div>
-            <button type="button" class="weather-forecast-toggle" aria-expanded="${mobileWeatherExpanded ? 'true' : 'false'}">
+            <button type="button" class="weather-forecast-toggle" aria-controls="weatherForecast" aria-expanded="${mobileWeatherExpanded ? 'true' : 'false'}">
               ${mobileWeatherExpanded ? 'Fela næstu daga' : 'Sjá næstu daga'}
             </button>
-            <div class="weather-forecast">${forecastHtml}</div>
+            <div id="weatherForecast" class="weather-forecast">${forecastHtml}</div>
           </div>
         `;
 
@@ -867,7 +971,7 @@
 
       container.innerHTML = filtered.map((item) => {
         const safeItemId = escapeHtml(item.id);
-        const deleteButton = ownOnly || canDeleteAll
+        const deleteButton = (ownOnly && userCanDeleteBooking(item, { id: currentUserId })) || canDeleteAll
           ? '<button class="icon-delete-btn" type="button" data-delete-id="' + safeItemId + '" title="Eyða bókun" aria-label="Eyða bókun">×</button>'
           : '';
 
@@ -963,6 +1067,10 @@
         signupPanelEl.classList.toggle('hidden', !openSignup);
         passwordPanelEl.classList.toggle('hidden', !openPassword);
         forgotPasswordPanelEl.classList.toggle('hidden', !openForgotPassword);
+        toggleLoginBtn.setAttribute('aria-expanded', String(openLogin));
+        toggleSignupBtn.setAttribute('aria-expanded', String(openSignup));
+        togglePasswordBtn.setAttribute('aria-expanded', String(openPassword));
+        toggleForgotPasswordBtn.setAttribute('aria-expanded', String(openForgotPassword));
 
         if (openPassword) {
           populateProfilePanel(currentUser);
@@ -1095,9 +1203,8 @@
       function renderTaskItem(task, currentUser) {
         const status = normalizeTaskStatus(task.status);
         const canClaim = currentUser && !task.claimed_by_user_id && status !== 'done';
-        const canComplete = currentUser && status !== 'done' && task.claimed_by_user_id === currentUser.id;
-        const canDelete = currentUser && status === 'done';
-        const canEdit = currentUser;
+        const canEdit = userCanManageTask(task, currentUser);
+        const canDelete = userCanDeleteTask(task, currentUser);
         const categoryMeta = getTaskCategoryMeta(task.category);
         const safeTaskId = escapeHtml(task.id);
         const safeTitle = escapeHtml(task.title);
@@ -1117,10 +1224,9 @@
 
         const editButton = canEdit ? `<button class="task-action-soft task-action-edit" type="button" data-edit-task="${safeTaskId}">Breyta</button>` : '';
         const claimButton = canClaim ? `<button class="task-action-soft task-action-claim" type="button" data-claim-task="${safeTaskId}">Taka að mér</button>` : '';
-        const completeButton = canComplete ? `<button class="task-action-strong" type="button" data-complete-task="${safeTaskId}">Merkja lokið</button>` : '';
         const deleteButton = canDelete ? `<button class="icon-delete-btn" type="button" data-delete-task="${safeTaskId}" title="Eyða úr lista" aria-label="Eyða úr lista">×</button>` : '';
         const metaActions = `${editButton}`;
-        const secondaryActions = `${claimButton}${completeButton}`;
+        const secondaryActions = `${claimButton}`;
         const metaText = `
           <div class="task-meta-row">
             <span>${metaParts.join(' · ')}</span>
@@ -1229,12 +1335,6 @@
           });
         });
 
-        taskListEl.querySelectorAll('[data-complete-task]').forEach((btn) => {
-          btn.addEventListener('click', async () => {
-            await completeTask(btn.dataset.completeTask);
-          });
-        });
-
         taskListEl.querySelectorAll('[data-delete-task]').forEach((btn) => {
           btn.addEventListener('click', async () => {
             btn.blur();
@@ -1260,7 +1360,7 @@
           const editButton = currentUserIsAdmin
             ? `<button class="task-action-soft task-action-edit" type="button" data-edit-notice="${safeNoticeId}">Breyta</button>`
             : '';
-          const deleteButton = currentUserIsAdmin
+          const deleteButton = userCanDeleteNotice(notice, currentUser)
             ? `<button class="icon-delete-btn" type="button" data-delete-notice="${safeNoticeId}" title="Eyða tilkynningu" aria-label="Eyða tilkynningu">×</button>`
             : '';
 
@@ -1308,6 +1408,17 @@
         if (!activeTaskStatusMenuEl) return;
         activeTaskStatusMenuEl.remove();
         activeTaskStatusMenuEl = null;
+      }
+
+      function updateNoticeControls() {
+        const canCreateNotices = Boolean(currentUser);
+        toggleNoticeFormBtn.classList.toggle('hidden', !canCreateNotices);
+
+        if (!canCreateNotices) {
+          noticeForm.classList.add('hidden');
+          toggleNoticeFormBtn.setAttribute('aria-expanded', 'false');
+          resetNoticeForm();
+        }
       }
 
       function showInlineDeletePrompt(button, message, onConfirm) {
@@ -1414,12 +1525,21 @@
       });
 
       function toggleNoticeForm(forceOpen = null) {
+        if (!currentUser) {
+          noticeForm.classList.add('hidden');
+          toggleNoticeFormBtn.setAttribute('aria-expanded', 'false');
+          resetNoticeForm();
+          showStatus(noticeStatus, 'Þú þarft að vera skráð(ur) inn til að bæta við tilkynningu.', true);
+          return;
+        }
+
         const shouldOpen = forceOpen === null
           ? noticeForm.classList.contains('hidden')
           : forceOpen;
 
         noticeForm.classList.toggle('hidden', !shouldOpen);
         toggleNoticeFormBtn.classList.toggle('hidden', shouldOpen);
+        toggleNoticeFormBtn.setAttribute('aria-expanded', String(shouldOpen));
 
         if (!shouldOpen) {
           resetNoticeForm();
@@ -1433,6 +1553,7 @@
 
         taskForm.classList.toggle('hidden', !shouldOpen);
         toggleTaskFormBtn.classList.toggle('hidden', shouldOpen);
+        toggleTaskFormBtn.setAttribute('aria-expanded', String(shouldOpen));
 
         if (shouldOpen) {
           renderTaskAssigneeOptions(taskAssigneeInput?.value || '');
@@ -1528,7 +1649,7 @@
       async function fetchNotices() {
         const { data, error } = await supabaseClient
           .from('notices')
-          .select('id, title, body, type, created_at, created_by_name')
+          .select('id, title, body, type, created_at, created_by_user_id, created_by_name')
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -1567,21 +1688,42 @@
       async function refreshTasks() {
       const user = currentUser || await resolveCurrentUser();
       const tasks = await fetchTasks();
+      currentTasks = tasks;
       renderTasks(tasks, user || null);
       }
 
       async function refreshNotices() {
       const notices = await fetchNotices();
+      currentNotices = notices;
       renderNotices(notices);
       }
 
       async function deleteBooking(id) {
       clearStatus(bookingStatus);
 
-      const { error } = await supabaseClient
+      const user = await resolveCurrentUser();
+      const booking = currentBookings.find((item) => String(item.id) === String(id));
+
+      if (!user) {
+        showStatus(bookingStatus, 'Þú þarft að vera skráð(ur) inn til að eyða bókun.', true);
+        return;
+      }
+
+      if (!userCanDeleteBooking(booking, user)) {
+        showStatus(bookingStatus, 'Þú getur aðeins eytt eigin bókunum nema þú sért admin.', true);
+        return;
+      }
+
+      let query = supabaseClient
         .from('bookings')
         .delete()
         .eq('id', id);
+
+      if (!(currentUserIsAdmin || isAdmin(user))) {
+        query = query.eq('user_id', user.id);
+      }
+
+      const { error } = await query;
 
       if (error) {
         showStatus(bookingStatus, error.message, true);
@@ -1617,7 +1759,12 @@
           return;
         }
 
-        const query = editingTaskId
+        if (editingTaskId && !getCurrentTask(editingTaskId)) {
+          showStatus(taskStatus, 'Verkefnið fannst ekki. Endurhlaðaðu síðuna og reyndu aftur.', true);
+          return;
+        }
+
+        let query = editingTaskId
           ? supabaseClient
               .from('tasks')
               .update({
@@ -1679,6 +1826,11 @@
           return;
         }
 
+        if (editingNoticeId && !(currentUserIsAdmin || isAdmin(user))) {
+          showStatus(noticeStatus, 'Aðeins admin getur breytt tilkynningum.', true);
+          return;
+        }
+
         if (!title) {
           showStatus(noticeStatus, 'Skráðu fyrst heiti tilkynningar.', true);
           return;
@@ -1701,6 +1853,7 @@
                   title,
                   body: body || null,
                   type,
+                  created_by_user_id: user.id,
                   created_by_name: profile.responsibleName
                 }
               ]);
@@ -1726,15 +1879,29 @@
       async function deleteNotice(id) {
       clearStatus(noticeStatus);
 
-      if (!currentUserIsAdmin) {
-        showStatus(noticeStatus, 'Aðeins admin getur eytt tilkynningum.', true);
+      const user = await resolveCurrentUser();
+      const notice = currentNotices.find((item) => String(item.id) === String(id));
+
+      if (!user) {
+        showStatus(noticeStatus, 'Þú þarft að vera skráð(ur) inn til að eyða tilkynningu.', true);
         return;
       }
 
-      const { error } = await supabaseClient
+      if (!userCanDeleteNotice(notice, user)) {
+        showStatus(noticeStatus, 'Þú getur aðeins eytt eigin tilkynningum nema þú sért admin.', true);
+        return;
+      }
+
+      let query = supabaseClient
         .from('notices')
         .delete()
         .eq('id', id);
+
+      if (!(currentUserIsAdmin || isAdmin(user))) {
+        query = query.eq('created_by_user_id', user.id);
+      }
+
+      const { error } = await query;
 
       if (error) {
         showStatus(noticeStatus, error.message, true);
@@ -1761,8 +1928,7 @@
           claimed_by_name: profile.responsibleName
         })
         .eq('id', id)
-        .neq('status', 'done')
-        .is('claimed_by_user_id', null);
+        .neq('status', 'done');
 
       if (error) {
         showStatus(taskStatus, error.message, true);
@@ -1778,6 +1944,12 @@
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) {
         showStatus(taskStatus, 'Þú þarft að vera skráð(ur) inn til að breyta stöðu verkefnis.', true);
+        return;
+      }
+
+      const task = getCurrentTask(id);
+      if (!userCanManageTask(task, user)) {
+        showStatus(taskStatus, 'Verkefnið fannst ekki. Endurhlaðaðu síðuna og reyndu aftur.', true);
         return;
       }
 
@@ -1798,38 +1970,18 @@
       await refreshTasks();
       }
 
-      async function completeTask(id) {
-      clearStatus(taskStatus);
-
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) {
-        showStatus(taskStatus, 'Þú þarft að vera skráð(ur) inn til að klára verkefni.', true);
-        return;
-      }
-
-      const { error } = await supabaseClient
-        .from('tasks')
-        .update({
-          status: 'done',
-          completed_at: new Date().toISOString()
-        })
-        .eq('id', id)
-        .eq('claimed_by_user_id', user.id);
-
-      if (error) {
-        showStatus(taskStatus, error.message, true);
-        return;
-      }
-
-      await refreshTasks();
-      }
-
       async function deleteTask(id) {
       clearStatus(taskStatus);
 
       const { data: { user } } = await supabaseClient.auth.getUser();
       if (!user) {
         showStatus(taskStatus, 'Þú þarft að vera skráð(ur) inn til að eyða verkefni.', true);
+        return;
+      }
+
+      const task = getCurrentTask(id);
+      if (!userCanDeleteTask(task, user)) {
+        showStatus(taskStatus, 'Aðeins er hægt að eyða verkefnum sem eru merkt lokið.', true);
         return;
       }
 
@@ -1848,8 +2000,14 @@
       }
 
       async function signup() {
+      if (isSigningUp) return;
+      isSigningUp = true;
       clearStatus(authStatus);
+      signupBtn.disabled = true;
+      const originalSignupText = signupBtn.textContent;
+      signupBtn.textContent = 'Stofna notanda...';
 
+      try {
         const email = signupEmailInput.value.trim();
         const password = signupPasswordInput.value;
         const displayName = signupNameInput.value.trim();
@@ -1902,6 +2060,11 @@
       signupNameInput.value = '';
       authFormsEl.classList.add('hidden');
       signupPanelEl.classList.add('hidden');
+      } finally {
+        isSigningUp = false;
+        signupBtn.disabled = false;
+        signupBtn.textContent = originalSignupText;
+      }
       }
 
       async function loginWithPassword() {
@@ -1934,6 +2097,7 @@
         showStatus(authStatus, 'Innskráning tókst.');
         currentUser = data.user;
         currentUserIsAdmin = isAdmin(data.user);
+        updateNoticeControls();
         loggedOutBox.classList.add('hidden');
         loggedInBox.classList.remove('hidden');
         userEmail.textContent = getSignedInLabel(data.user);
@@ -2009,9 +2173,10 @@
       try {
         const user = await resolveCurrentUser();
         const displayName = profileDisplayNameInput.value.trim();
+        const color = normalizeHexColor(selectedProfileColor, userColorOptions[0].value);
 
         if (!user) {
-          showStatus(authStatus, 'Þú þarft að vera skráð(ur) inn til að breyta nafni.', true);
+          showStatus(authStatus, 'Þú þarft að vera skráð(ur) inn til að breyta upplýsingum.', true);
           return;
         }
 
@@ -2022,7 +2187,10 @@
 
         const { error: profileError } = await supabaseClient
           .from('profiles')
-          .update({ display_name: displayName })
+          .update({
+            display_name: displayName,
+            color
+          })
           .eq('id', user.id);
 
         if (profileError) {
@@ -2033,7 +2201,8 @@
         const { error: userError } = await supabaseClient.auth.updateUser({
           data: {
             ...(user.user_metadata || {}),
-            display_name: displayName
+            display_name: displayName,
+            color
           }
         });
 
@@ -2047,11 +2216,14 @@
           ...user,
           user_metadata: {
             ...(user.user_metadata || {}),
-            display_name: displayName
+            display_name: displayName,
+            color
           }
         };
         userEmail.textContent = getSignedInLabel(currentUser);
-        showStatus(authStatus, 'Nafn uppfært.');
+        renderProfileColorChoices(color);
+        await refreshBookings().catch(() => {});
+        showStatus(authStatus, 'Upplýsingar uppfærðar.');
       } finally {
         isSavingProfile = false;
         saveProfileBtn.disabled = false;
@@ -2138,6 +2310,8 @@
         forgotPasswordPanelEl.classList.add('hidden');
       }
 
+      updateNoticeControls();
+
       await Promise.all([refreshBookings(), refreshTasks(), refreshNotices()]);
       }
 
@@ -2145,6 +2319,8 @@
       if (isBooking) return;
       isBooking = true;
       clearStatus(bookingStatus);
+      bookBtn.disabled = true;
+      bookBtn.textContent = 'Bóka...';
 
       try {
         const start_date = selectedStart;
@@ -2221,6 +2397,8 @@
         showStatus(bookingStatus, error.message || 'Óvænt villa kom upp við bókun.', true);
       } finally {
         isBooking = false;
+        bookBtn.textContent = 'Bóka';
+        updateBookingPreview();
       }
       }
 
